@@ -1,0 +1,115 @@
+.sidebar {
+  width: var(--sidebar-width);
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  background-color: var(--bg-paper);
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 0;
+  z-index: 1000;
+  transition: transform 0.3s ease-in-out;
+}
+
+/* Mobile: Hide by default or off-canvas */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+}
+
+.header {
+  padding: 1.5rem 1.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.logo {
+  font-family: var(--font-sans);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.nav {
+  flex: 1;
+  padding: 0 0.75rem;
+  overflow-y: auto;
+}
+
+.nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.25rem;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  transition: all 0.2s ease;
+  position: relative;
+  text-decoration: none;
+}
+
+.navItem:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+  color: var(--text-primary);
+}
+
+.navItem.active {
+  background-color: rgba(0, 0, 0, 0.05); /* Very subtle active bg */
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.navItem.active .iconWrapper,
+.navItem:hover .iconWrapper {
+  opacity: 1;
+}
+
+/* Active Icon Colors */
+.accent-emerald { color: var(--accent-emerald); }
+.accent-sapphire { color: var(--accent-sapphire); }
+.accent-ruby { color: var(--accent-ruby); }
+.accent-lavender { color: var(--accent-lavender); }
+.text-secondary { color: var(--text-secondary); }
+
+.label {
+  flex: 1;
+}
+
+.footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.settingsButton {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  color: var(--text-secondary);
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.settingsButton:hover {
+  color: var(--text-primary);
+}

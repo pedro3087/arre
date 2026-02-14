@@ -1,0 +1,134 @@
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.titleGroup {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.date {
+  color: var(--text-tertiary);
+  font-size: 0.875rem;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.searchWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  color: var(--text-tertiary);
+}
+
+.searchInput {
+  background: var(--bg-paper);
+  border: 1px solid var(--border-subtle);
+  border-radius: 9999px;
+  padding: 0.5rem 1rem 0.5rem 2.25rem;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  width: 200px;
+  transition: all 0.2s ease;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--text-secondary);
+  width: 250px;
+}
+
+.iconButton {
+  color: var(--text-secondary);
+  transition: color 0.2s ease;
+}
+
+.iconButton:hover {
+  color: var(--text-primary);
+}
+
+.newTaskButton {
+  background: var(--accent-purple-neon);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: opacity 0.2s ease;
+}
+
+.newTaskButton:hover {
+  opacity: 0.9;
+}
+
+.listHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  margin-top: 2rem;
+}
+
+.sectionTitle {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.focusBadge {
+  background: rgba(147, 51, 234, 0.1);
+  color: var(--accent-purple-neon);
+  padding: 0.125rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.625rem;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  border: 1px solid rgba(147, 51, 234, 0.2);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .headerRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .actions {
+    width: 100%;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .searchWrapper {
+    flex: 1;
+  }
+  
+  .searchInput {
+    width: 100%;
+  }
+
+  .searchInput:focus {
+    width: 100%;
+  }
+}

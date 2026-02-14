@@ -1,0 +1,29 @@
+.layout {
+  min-height: 100vh;
+  position: relative;
+  background-color: var(--bg-app);
+}
+
+.sidebarWrapper {
+  /* Sidebar handles its own fixed positioning */
+}
+
+.mainContent {
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  transition: margin-left 0.3s ease-in-out;
+}
+
+.container {
+  max-width: 1200px; /* Optional constraint for readability */
+  margin: 0 auto;
+  padding: var(--spacing-xl);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .mainContent {
+    margin-left: 0;
+    padding-bottom: 80px; /* Space for bottom nav if needed */
+  }
+}

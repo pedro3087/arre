@@ -1,0 +1,85 @@
+.taskItem {
+  display: flex;
+  align-items: flex-start;
+  padding: 0.75rem 0.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.taskItem:last-child {
+  border-bottom: none;
+}
+
+.taskItem:hover {
+  background-color: #fafafa;
+}
+
+.checkbox {
+  margin-right: 1rem;
+  padding-top: 2px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: opacity 0.2s ease;
+}
+
+.uncheckedCircle {
+  color: var(--text-tertiary); /* Default state */
+  transition: color 0.1s ease;
+}
+
+.taskItem:hover .uncheckedCircle {
+  color: var(--text-secondary);
+}
+
+.checkedCircle {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: var(--accent-sapphire);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.2s ease;
+}
+
+.completed .title {
+  color: var(--text-secondary);
+  text-decoration: line-through;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 0.125rem;
+  transition: color 0.2s ease;
+}
+
+.notes {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.meta {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.tag {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  background-color: var(--bg-app);
+  padding: 2px 6px;
+  border-radius: 4px;
+}

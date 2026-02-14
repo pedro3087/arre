@@ -1,0 +1,88 @@
+
+.filterBar {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem 0;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.pills {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.pill {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px; /* full rounded */
+  border: 1px solid var(--border-subtle);
+  background-color: var(--bg-paper);
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pill:hover {
+  background-color: var(--bg-overlay);
+  border-color: var(--text-tertiary);
+  color: var(--text-primary);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* Color Styles */
+.low .dot { background-color: var(--energy-low); }
+.neutral .dot { background-color: var(--energy-neutral); }
+.high .dot { background-color: var(--energy-high); }
+
+/* Active States */
+.active.low {
+  background-color: rgba(16, 185, 129, 0.1);
+  border-color: var(--energy-low);
+  color: var(--energy-low);
+}
+
+.active.neutral {
+  background-color: rgba(234, 179, 8, 0.1);
+  border-color: var(--energy-neutral);
+  color: var(--energy-neutral);
+}
+
+.active.high {
+  background-color: rgba(147, 51, 234, 0.2);
+  border-color: var(--energy-high);
+  color: var(--energy-high);
+  box-shadow: 0 0 15px rgba(147, 51, 234, 0.3); /* Neon glow */
+}
+
+/* Clear Button */
+.clearButton {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  text-decoration: underline;
+  padding: 0 0.5rem;
+}
+.clearButton:hover {
+  color: var(--text-secondary);
+}
