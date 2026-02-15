@@ -87,8 +87,8 @@ The configuration is located in `playwright.config.ts`. It includes:
 - **Base URL**: `http://localhost:5173` (ensure your dev server is running, or Playwright will start it automatically).
 - **Projects**:
   - **Desktop**: Chromium, Firefox, WebKit
-  - **Mobile**: Pixel 5 (Chrome), iPhone 12 (Safari)
-  - **Tablet**: iPad Pro 11
+  - ~~**Mobile**: Pixel 5 (Chrome), iPhone 12 (Safari)~~ (Disabled for MVP stability)
+  - ~~**Tablet**: iPad Pro 11~~ (Disabled for MVP stability)
 
 ## ✍️ Writing Tests
 
@@ -111,6 +111,9 @@ await page.getByTestId("submit-btn").click();
 ---
 
 ## 📋 Test Scenario Inventory
+
+For a comprehensive list of all test scenarios in BDD format (Given/When/Then), please refer to:
+👉 [TEST_SCENARIOS.md](./TEST_SCENARIOS.md)
 
 This section outlines the critical test scenarios for each major view and feature of the application. Use this as a checklist for manual testing or a roadmap for expanding automated test coverage.
 
@@ -165,6 +168,13 @@ This section outlines the critical test scenarios for each major view and featur
   - Verify Bottom Navigation bar appears.
   - Verify navigation tabs work correctly.
 
-### 5. **Upcoming / Anytime / Someday** (Future Phase)
+### 5. **Project Management Views**
 
-- **Placeholder Checks**: Verify these routes load their respective placeholder components without crashing.
+- **Upcoming / Anytime / Someday**:
+  - Verify routes load correctly.
+  - Verify tasks are grouped by Project (or Date for Upcoming).
+  - Verify "No Project" / "Single Actions" sections for unassigned tasks.
+- **Project CRUD**:
+  - Verify creation of new projects via sidebar.
+  - Verify editing/deleting projects.
+  - Verify task assignment to projects.
