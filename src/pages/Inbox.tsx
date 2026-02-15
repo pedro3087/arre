@@ -4,21 +4,17 @@ import { useOutletContext } from 'react-router-dom';
 import { TaskItem } from '../features/tasks/TaskItem';
 import { DashboardStats } from '../features/dashboard/DashboardStats';
 import { EnergyFilter } from '../features/dashboard/EnergyFilter';
-// Removed local NewTaskModal import
 import { Search, Bell, Plus, Filter } from 'lucide-react';
-import styles from './Dashboard.module.css'; // Reusing for generic styles, maybe split later
+import styles from './Dashboard.module.css';
 import inboxStyles from './Inbox.module.css';
 
 import { useTasks } from '../features/tasks/hooks/useTasks';
 import { MainLayoutContext } from '../layout/MainLayout';
 
 export function Inbox() {
-  const [energyFilter, setEnergyFilter] = useState<'all' | 'low' | 'neutral' | 'high'>('high'); // Default to high to match image
-  // Removed local isModalOpen state
-  
+  const [energyFilter, setEnergyFilter] = useState<'all' | 'low' | 'neutral' | 'high'>('high');
   const { openNewTaskModal } = useOutletContext<MainLayoutContext>();
-  
-  const { tasks, loading, error, updateTask } = useTasks('inbox'); // Removed addTask, handled by MainLayout
+  const { tasks, loading, error, updateTask } = useTasks('inbox');
 
   const filteredTasks = tasks.filter(t => 
     (energyFilter === 'all' || t.energy === energyFilter)
@@ -31,16 +27,21 @@ export function Inbox() {
     }
   };
 
+  const todayStr = new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'short',
+    day: 'numeric',
+  });
+
   if (loading) return <div className={styles.loading}>Loading tasks...</div>;
   if (error) return <div className={styles.error}>Error: {error}</div>;
 
   return (
-    <div className={styles.container} style={{ maxWidth: '1000px' }}> {/* Wider layout for dashboard */}
-      {/* Header matching the image */}
+    <div className={styles.container} style={{ maxWidth: '1000px' }}>
       <header className={inboxStyles.headerRow}>
         <div className={inboxStyles.titleGroup}>
           <h1 className={styles.title}>Work Area</h1>
-          <span className={styles.date}>Monday, Oct 24</span>
+          <span className={styles.date}>{todayStr}</span>
         </div>
         
         <div className={inboxStyles.actions}>
@@ -80,8 +81,6 @@ export function Inbox() {
         ))}
         {filteredTasks.length === 0 && <p className={styles.emptyState}>No tasks match this filter.</p>}
       </div>
-
-      {/* Removed local NewTaskModal */}
     </div>
   );
 }

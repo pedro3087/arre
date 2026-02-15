@@ -1,7 +1,6 @@
-import { useRef } from 'react';
 import { motion } from 'framer-motion';
 import clsx from 'clsx';
-import { Zap, Battery, BatteryCharging, BatteryFull } from 'lucide-react';
+import { Zap } from 'lucide-react';
 import styles from './EnergyFilter.module.css';
 
 interface EnergyFilterProps {
@@ -20,21 +19,18 @@ export function EnergyFilter({ selected, onSelect }: EnergyFilterProps) {
           onClick={() => onSelect('low')} 
           color="low"
           label="Low Energy"
-          icon={Battery}
         />
         <FilterPill 
           active={selected === 'neutral'} 
           onClick={() => onSelect('neutral')} 
           color="neutral"
           label="Neutral"
-          icon={BatteryCharging}
         />
         <FilterPill 
           active={selected === 'high'} 
           onClick={() => onSelect('high')} 
           color="high"
           label="High Focus"
-          icon={BatteryFull}
         />
         {(selected !== 'all') && (
            <button className={styles.clearButton} onClick={() => onSelect('all')}>Clear</button>
@@ -48,7 +44,14 @@ export function EnergyFilter({ selected, onSelect }: EnergyFilterProps) {
   );
 }
 
-function FilterPill({ active, onClick, color, label, icon: Icon }: any) {
+interface FilterPillProps {
+  active: boolean;
+  onClick: () => void;
+  color: string;
+  label: string;
+}
+
+function FilterPill({ active, onClick, color, label }: FilterPillProps) {
   return (
     <motion.button 
       layout

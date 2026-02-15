@@ -9,7 +9,6 @@ import {
   updateDoc, 
   deleteDoc,
   doc,
-  getDoc,
   serverTimestamp
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
@@ -50,12 +49,8 @@ export function useTasks(view?: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'so
   };
 
   const updateTask = async (id: string, updates: Partial<Task>) => {
-    if (!user) {
-      console.log('UpdateTask aborted. User is null.');
-      return;
-    }
+    if (!user) return;
     try {
-      console.log('UpdateTask executing. ID:', id, 'Updates:', updates);
       const taskRef = doc(db, 'users', user.uid, 'tasks', id);
       const firestoreUpdates: any = { ...updates, updatedAt: serverTimestamp() };
       
@@ -65,10 +60,6 @@ export function useTasks(view?: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'so
       }
 
       await updateDoc(taskRef, firestoreUpdates);
-      
-      // Verification
-      const verifySnap = await getDoc(taskRef);
-      console.log('VERIFY TITLE:', verifySnap.exists() ? (verifySnap.data() as any).title : 'DOC MISSING');
     } catch (e) {
       console.error("Error updating task", e);
       throw e;
@@ -94,9 +85,6 @@ export function useTasks(view?: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'so
 
     const tasksRef = collection(db, 'users', user.uid, 'tasks');
     let q;
-    
-    console.log('useTasks useEffect running. View:', view, 'User:', user.uid);
-
     const today = new Date().toISOString().split('T')[0];
 
     // Query Logic per View (matches PENDING_UI_FEATURES.md)
@@ -133,8 +121,8 @@ export function useTasks(view?: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'so
         q = query(
           tasksRef,
           where('date', '==', null),
-          where('projectId', '!=', null),
-          where('status', '!=', 'completed')
+          where('status', 'not-in', ['completed', 'someday']),
+          orderBy('createdAt', 'desc')
         );
         break;
 
@@ -157,7 +145,6 @@ export function useTasks(view?: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'so
     const unsubscribe = onSnapshot(q, 
       (snapshot) => {
         const fetchedTasks = snapshot.docs.map(convertTask);
-        console.log('SNAPSHOT FIRED. View:', view, 'Count:', fetchedTasks.length, 'Titles:', fetchedTasks.map(t => t.title));
         setTasks(fetchedTasks);
         setLoading(false);
       },

@@ -1,5 +1,4 @@
 import { ResponsiveContainer, AreaChart, Area, Tooltip } from 'recharts';
-import { useTheme } from '../../features/theme/ThemeProvider';
 
 const data = [
   { day: 'Mon', completion: 40 },
@@ -12,11 +11,7 @@ const data = [
 ];
 
 export function VelocityChart() {
-  const { theme } = useTheme();
-  
-  // Dynamic color based on theme, though image shows vibrant cyan in dark mode
   const strokeColor = 'var(--accent-cyan)';
-  const fillColor = theme === 'dark' ? 'rgba(6, 182, 212, 0.2)' : 'rgba(6, 182, 212, 0.1)';
 
   return (
     <div style={{ height: '100%', width: '100%', minHeight: '120px' }}>

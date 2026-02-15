@@ -5,7 +5,7 @@ import { X, Sparkles, Upload, FileText, FileSpreadsheet, Plus, ArrowRight, Folde
 import clsx from 'clsx';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '../../lib/firebase';
-import styles from './NewTaskModal.module.css';
+import styles from './TaskEditorModal.module.css';
 import { Task, Project, PROJECT_COLORS } from '../../shared/types/task';
 
 interface TaskEditorModalProps {
@@ -273,45 +273,6 @@ export function TaskEditorModal({ isOpen, onClose, onSave, initialData, projects
                       </button>
                     </div>
                   </form>
-                  <style>{`
-                    .${styles.metaRow} { align-items: flex-end; }
-                    .${styles.detailsColumn} { display: flex; flex-direction: column; gap: 1rem; flex: 1; }
-                    .${styles.dateRow} { display: flex; gap: 1rem; align-items: center; }
-                    .${styles.dateInput} { 
-                      padding: 8px; 
-                      border-radius: 8px; 
-                      border: 1px solid var(--border-subtle); 
-                      background: var(--bg-paper); 
-                      color: var(--text-primary);
-                    }
-                    .${styles.somedayLabel} { 
-                      display: flex; align-items: center; gap: 6px; 
-                      font-size: 0.9rem; color: var(--text-secondary);
-                    }
-                    .${styles.projectSelector} {
-                      display: flex;
-                      align-items: center;
-                      gap: 0.5rem;
-                    }
-                    .${styles.projectSelect} {
-                      flex: 1;
-                      padding: 8px 12px;
-                      border-radius: 8px;
-                      border: 1px solid var(--border-subtle);
-                      background: var(--bg-paper);
-                      color: var(--text-primary);
-                      font-size: 0.9rem;
-                      font-family: var(--font-sans);
-                      cursor: pointer;
-                      appearance: auto;
-                    }
-                    .${styles.projectIndicator} {
-                      width: 10px;
-                      height: 10px;
-                      border-radius: 50%;
-                      flex-shrink: 0;
-                    }
-                  `}</style>
                 </div>
               ) : (
                 <div className={styles.aiContainer}>
