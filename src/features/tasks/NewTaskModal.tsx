@@ -3,6 +3,8 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Sparkles, Upload, FileText, FileSpreadsheet, Plus, ArrowRight } from 'lucide-react';
 import clsx from 'clsx';
+import { httpsCallable } from 'firebase/functions';
+import { functions } from '../../lib/firebase';
 import styles from './NewTaskModal.module.css';
 
 interface NewTaskModalProps {
@@ -16,25 +18,61 @@ export function NewTaskModal({ isOpen, onClose, onSave }: NewTaskModalProps) {
   const [title, setTitle] = useState('');
   const [notes, setNotes] = useState('');
   const [energy, setEnergy] = useState<'low' | 'neutral' | 'high'>('neutral');
+  const [date, setDate] = useState('');
+  const [isSomeday, setIsSomeday] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
 
   const handleManualSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({ title, notes, energy, status: 'todo', createdAt: new Date().toISOString() });
+    onSave({ 
+      title, 
+      notes, 
+      energy, 
+      status: isSomeday ? 'someday' : 'todo', 
+      date: isSomeday ? null : (date || null),
+      createdAt: new Date().toISOString() 
+    });
     onClose();
   };
 
-  const simulateAiAnalysis = () => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
     setIsAnalyzing(true);
-    setTimeout(() => {
+    setAiSuggestions([]);
+
+    try {
+      // Convert file to base64
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64String = (reader.result as string).split(',')[1];
+        
+        const processMagicImport = httpsCallable<
+          { fileBase64: string; mimeType: string }, 
+          { tasks: string[] }
+        >(functions, 'processMagicImport');
+
+        try {
+          const result = await processMagicImport({
+            fileBase64: base64String,
+            mimeType: file.type
+          });
+          
+          setAiSuggestions(result.data.tasks);
+        } catch (err) {
+          console.error("AI proccessing failed", err);
+          setAiSuggestions(["Error processing document. Please try again."]);
+        } finally {
+          setIsAnalyzing(false);
+        }
+      };
+      reader.readAsDataURL(file);
+    } catch (err) {
+      console.error("File reading failed", err);
       setIsAnalyzing(false);
-      setAiSuggestions([
-        "Update Q4 Roadmap based on PDF insights",
-        "Email Finance team about budget discrepancy",
-        "Schedule sync with Engineering Leads"
-      ]);
-    }, 2500);
+    }
   };
 
   return createPortal(
@@ -119,21 +157,48 @@ export function NewTaskModal({ isOpen, onClose, onSave }: NewTaskModalProps) {
                     />
                     
                     <div className={styles.metaRow}>
-                      <div className={styles.energySelector}>
-                        <span className={styles.label}>Energy Level</span>
-                        <div className={styles.pills}>
-                          {(['low', 'neutral', 'high'] as const).map((e) => (
-                            <button
-                              key={e}
-                              type="button"
-                              className={clsx(styles.pill, energy === e && styles[e + 'Active'])}
-                              onClick={() => setEnergy(e)}
-                            >
-                              {e}
-                            </button>
-                          ))}
+                      <div className={styles.detailsColumn}>
+                        <div className={styles.dateRow}>
+                           <input 
+                              type="date" 
+                              className={styles.dateInput}
+                              value={date}
+                              onChange={(e) => {
+                                setDate(e.target.value);
+                                setIsSomeday(false);
+                              }}
+                              disabled={isSomeday}
+                           />
+                           <label className={styles.somedayLabel}>
+                             <input 
+                               type="checkbox" 
+                               checked={isSomeday}
+                               onChange={(e) => {
+                                 setIsSomeday(e.target.checked);
+                                 if (e.target.checked) setDate('');
+                               }}
+                             />
+                             Someday
+                           </label>
+                        </div>
+                        
+                        <div className={styles.energySelector}>
+                          <span className={styles.label}>Energy Level</span>
+                          <div className={styles.pills}>
+                            {(['low', 'neutral', 'high'] as const).map((e) => (
+                              <button
+                                key={e}
+                                type="button"
+                                className={clsx(styles.pill, energy === e && styles[e + 'Active'])}
+                                onClick={() => setEnergy(e)}
+                              >
+                                {e}
+                              </button>
+                            ))}
+                          </div>
                         </div>
                       </div>
+
                       <button 
                         type="submit" 
                         className={styles.createButton}
@@ -143,6 +208,23 @@ export function NewTaskModal({ isOpen, onClose, onSave }: NewTaskModalProps) {
                       </button>
                     </div>
                   </form>
+                  {/* Style override to fix layout issues */}
+                  <style>{`
+                    .${styles.metaRow} { align-items: flex-end; }
+                    .${styles.detailsColumn} { display: flex; flex-direction: column; gap: 1rem; flex: 1; }
+                    .${styles.dateRow} { display: flex; gap: 1rem; align-items: center; }
+                    .${styles.dateInput} { 
+                      padding: 8px; 
+                      border-radius: 8px; 
+                      border: 1px solid var(--border-subtle); 
+                      background: var(--bg-paper); 
+                      color: var(--text-primary);
+                    }
+                    .${styles.somedayLabel} { 
+                      display: flex; align-items: center; gap: 6px; 
+                      font-size: 0.9rem; color: var(--text-secondary);
+                    }
+                  `}</style>
                 </div>
               ) : (
                 <div className={styles.aiContainer}>
@@ -155,9 +237,17 @@ export function NewTaskModal({ isOpen, onClose, onSave }: NewTaskModalProps) {
                     <div className={styles.uploadSection}>
                       <div 
                         className={styles.dropZone}
-                        onClick={simulateAiAnalysis}
+                        onClick={() => document.getElementById('magic-upload-input')?.click()}
                         data-testid="drop-zone"
                       >
+                         <input 
+                           type="file" 
+                           id="magic-upload-input"
+                           className={styles.hiddenInput}
+                           style={{ display: 'none' }}
+                           onChange={handleFileUpload}
+                           accept=".pdf,.csv,.txt"
+                         />
                          <div className={styles.uploadIconWrapper}>
                            <Upload size={32} />
                          </div>
@@ -205,7 +295,16 @@ export function NewTaskModal({ isOpen, onClose, onSave }: NewTaskModalProps) {
                       <button 
                         className={styles.importButton}
                         onClick={() => {
-                          onSave({ title: "Imported Batch", notes: "From " + aiSuggestions.length + " AI suggestions", energy: 'high', status: 'todo' });
+                          // Save each suggested task separately
+                          aiSuggestions.forEach(suggestion => {
+                             onSave({ 
+                                title: suggestion, 
+                                notes: "Imported via Magic Import", 
+                                energy: 'neutral', 
+                                status: 'todo',
+                                createdAt: new Date().toISOString() // Important for sort
+                             });
+                          });
                           onClose();
                         }}
                         data-testid="btn-import-all"

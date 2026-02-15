@@ -151,14 +151,14 @@
   position: absolute;
   top: 1.5rem;
   right: 1.5rem;
-  background: transparent;
+  background: var(--bg-paper);
   width: 40px;
   height: 40px;
   border: 1px solid var(--border-subtle);
   border-radius: 12px;
   color: var(--text-secondary);
   cursor: pointer;
-  z-index: 10;
+  z-index: 50;
   display: flex;
   align-items: center;
   justify-content: center;

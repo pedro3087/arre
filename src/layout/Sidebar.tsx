@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Inbox, Sun, Calendar, Layers, Archive, Moon, Laptop } from 'lucide-react';
+import { Inbox, Sun, Calendar, Layers, Archive, Moon, Laptop, PlusCircle } from 'lucide-react';
 import clsx from 'clsx';
 import { useTheme } from '../features/theme/ThemeProvider';
 import styles from './Sidebar.module.css';
@@ -13,7 +13,11 @@ const NAV_ITEMS = [
   { path: '/someday', label: 'Someday', icon: Archive, color: 'accent-lavender' },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  onNewTask?: () => void;
+}
+
+export function Sidebar({ onNewTask }: SidebarProps) {
   const location = useLocation();
   const { theme, setTheme } = useTheme();
 
@@ -56,6 +60,17 @@ export function Sidebar() {
         </ul>
       </nav>
 
+      <div className={styles.actionGroup}>
+        <button 
+          className={styles.newTaskButton} 
+          onClick={onNewTask}
+          data-testid="btn-new-task-sidebar"
+        >
+          <PlusCircle size={20} />
+          <span>New Task</span>
+        </button>
+      </div>
+
       <div className={styles.footer}>
         <button className={styles.settingsButton} onClick={cycleTheme} title="Toggle Theme">
           <ThemeIcon size={20} />
@@ -64,6 +79,44 @@ export function Sidebar() {
         
         {import.meta.env.DEV && <SeedButton />}
       </div>
+
+      {/* Styled JSX for quick styling of new elements */}
+      <style>{`
+        .${styles.actionGroup} {
+          padding: 0 16px;
+          margin-bottom: auto; /* Push footer down but keep this close to nav if possible, or use flex-grow spacer */
+        }
+        .${styles.newTaskButton} {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          width: 100%;
+          padding: 10px 12px;
+          margin-top: 1rem;
+          background: var(--text-primary);
+          color: var(--bg-app);
+          border: none;
+          border-radius: 8px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: opacity 0.2s;
+        }
+        .${styles.newTaskButton}:hover {
+          opacity: 0.9;
+        }
+        /* Make nav not grow so action group is below it */
+        .${styles.nav} {
+          flex-grow: 0; 
+        }
+        .${styles.sidebar} {
+          display: flex;
+          flex-direction: column;
+        }
+        /* Push footer to bottom */
+        .${styles.footer} {
+          margin-top: auto;
+        }
+      `}</style>
     </aside>
   );
 }

@@ -129,7 +129,7 @@ export function useTasks(view: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'som
         ...task,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
-        status: 'todo'
+        status: task.status || 'todo'
       });
     } catch (e) {
       console.error("Error adding task", e);

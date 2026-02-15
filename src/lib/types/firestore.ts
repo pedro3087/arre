@@ -1,10 +1,11 @@
 import { Timestamp } from 'firebase/firestore';
+import { TaskStatus } from '../../shared/types/task';
 
 export interface TaskDocument {
-  id: string;
+  id: string; // Document ID
   title: string;
   notes?: string;
-  status: 'todo' | 'completed' | 'canceled';
+  status: TaskStatus;
   date?: string; // YYYY-MM-DD string is fine for query equality, or use Timestamp for precise time
   isEvening?: boolean;
   energy?: 'low' | 'neutral' | 'high';

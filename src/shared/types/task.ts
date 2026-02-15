@@ -1,4 +1,4 @@
-export type TaskStatus = 'todo' | 'completed' | 'canceled';
+export type TaskStatus = 'todo' | 'completed' | 'canceled' | 'someday';
 export type TaskTag = 'work' | 'personal' | 'errand' | 'urgent';
 
 export interface Task {

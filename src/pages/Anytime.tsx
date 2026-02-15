@@ -1,21 +1,31 @@
-import { MOCK_TASKS } from '../shared/data/mockData';
+import { useTasks } from '../features/tasks/hooks/useTasks';
 import { TaskItem } from '../features/tasks/TaskItem';
 import styles from './Dashboard.module.css';
 
 export function Anytime() {
-  const anytimeTasks = MOCK_TASKS.filter(t => t.projectId);
+  const { tasks, loading, error, updateTask } = useTasks('anytime');
+
+  const handleToggle = (id: string) => {
+    const task = tasks.find(t => t.id === id);
+    if (task) {
+      updateTask(id, { status: task.status === 'completed' ? 'todo' : 'completed' });
+    }
+  };
+
+  if (loading) return <div className={styles.loading}>Loading tasks...</div>;
+  if (error) return <div className={styles.error}>Error: {error}</div>;
 
   return (
     <div className={styles.container}>
-       <header className={styles.header}>
+      <header className={styles.header}>
         <h1 className={styles.title}>Anytime</h1>
-        <p className={styles.date}>Projects</p>
       </header>
-       <div className={styles.taskList}>
-        {anytimeTasks.map(task => (
-           <TaskItem key={task.id} task={task} onToggle={(id) => console.log('Toggle', id)} />
+
+      <div className={styles.taskList}>
+        {tasks.map(task => (
+           <TaskItem key={task.id} task={task} onToggle={handleToggle} />
         ))}
-         {anytimeTasks.length === 0 && <p className={styles.emptyState}>No active projects.</p>}
+        {tasks.length === 0 && <p className={styles.emptyState}>No tasks in Anytime.</p>}
       </div>
     </div>
   );

@@ -1,28 +1,52 @@
-import { MOCK_TASKS } from '../shared/data/mockData';
+import { useTasks } from '../features/tasks/hooks/useTasks';
 import { TaskItem } from '../features/tasks/TaskItem';
 import styles from './Dashboard.module.css';
 
 export function Upcoming() {
-  const current = new Date().toISOString().split('T')[0];
-  const upcomingTasks = MOCK_TASKS.filter(t => t.date && t.date > current);
+  const { tasks, loading, error, updateTask } = useTasks('upcoming');
+
+  const handleToggle = (id: string) => {
+    const task = tasks.find(t => t.id === id);
+    if (task) {
+      updateTask(id, { status: task.status === 'completed' ? 'todo' : 'completed' });
+    }
+  };
+
+  if (loading) return <div className={styles.loading}>Loading tasks...</div>;
+  if (error) return <div className={styles.error}>Error: {error}</div>;
+
+  // Group tasks by date
+  const groupedTasks = tasks.reduce((groups, task) => {
+    const date = task.date || 'No Date';
+    if (!groups[date]) {
+      groups[date] = [];
+    }
+    groups[date].push(task);
+    return groups;
+  }, {} as Record<string, typeof tasks>);
 
   return (
     <div className={styles.container}>
-       <header className={styles.header}>
+      <header className={styles.header}>
         <h1 className={styles.title}>Upcoming</h1>
-        <p className={styles.date}>Plan ahead</p>
       </header>
 
-      <div className={styles.taskList}>
-        {upcomingTasks.map(task => (
-           <div key={task.id}>
-             {/* Basic date header integration could happen here */}
-             <p className={styles.date} style={{marginBottom: '0.5rem'}}>{task.date}</p>
-             <TaskItem task={task} onToggle={(id) => console.log('Toggle', id)} />
-           </div>
-        ))}
-         {upcomingTasks.length === 0 && <p className={styles.emptyState}>No upcoming tasks.</p>}
-      </div>
+      {Object.entries(groupedTasks).map(([date, dateTasks]) => (
+        <section key={date} className={styles.section}>
+          <h2 className={styles.sectionTitle}>
+             {new Date(date).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
+          </h2>
+          <div className={styles.taskList}>
+            {dateTasks.map(task => (
+              <TaskItem key={task.id} task={task} onToggle={handleToggle} />
+            ))}
+          </div>
+        </section>
+      ))}
+
+      {tasks.length === 0 && (
+        <p className={styles.emptyState}>No upcoming tasks scheduled.</p>
+      )}
     </div>
   );
 }

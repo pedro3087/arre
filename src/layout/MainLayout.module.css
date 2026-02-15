@@ -20,10 +20,41 @@
   padding: var(--spacing-xl);
 }
 
+.fab {
+  display: none;
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  color: var(--bg-app);
+  border: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1000;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.fab:active {
+  transform: scale(0.95);
+}
+
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .mainContent {
     margin-left: 0;
     padding-bottom: 80px; /* Space for bottom nav if needed */
+  }
+
+  .sidebarWrapper {
+    display: none;
+  }
+  
+  .fab {
+    display: flex; /* Show FAB on mobile */
   }
 }

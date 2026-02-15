@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
-    "emulators": "firebase emulators:start --only auth,firestore,storage"
+    "emulators": "firebase emulators:start --only auth,firestore,storage,functions"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",

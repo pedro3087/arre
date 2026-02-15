@@ -5,7 +5,7 @@ import styles from './Login.module.css';
 import { ArrowRight, Zap } from 'lucide-react';
 
 export function Login() {
-  const { user, signInWithGoogle } = useAuth();
+  const { user, signInWithGoogle, signInAnonymouslyUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [error, setError] = useState('');
@@ -26,6 +26,14 @@ export function Login() {
     }
   };
 
+  const handleDevLogin = async () => {
+    try {
+      await signInAnonymouslyUser();
+    } catch (err) {
+      setError('Failed to sign in anonymously.');
+    }
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.card}>
@@ -41,7 +49,7 @@ export function Login() {
 
         {error && <div className={styles.error}>{error}</div>}
 
-        <button onClick={handleLogin} className={styles.googleButton}>
+        <button onClick={handleLogin} className={styles.googleButton} data-testid="login-button">
           <img 
             src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" 
             alt="Google" 
@@ -50,6 +58,12 @@ export function Login() {
           <span>Continue with Google</span>
           <ArrowRight size={16} className={styles.arrowIcon} />
         </button>
+
+        {import.meta.env.DEV && (
+          <button onClick={handleDevLogin} className={styles.secondaryButton} data-testid="dev-login-button" style={{ marginTop: '1rem', width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-subtle)', background: 'transparent', color: 'var(--text-secondary)', cursor: 'pointer' }}>
+            <span>Dev Login (Anonymous)</span>
+          </button>
+        )}
 
         <p className={styles.footer}>
           By continuing, you verify that you are ready for Deep Work.

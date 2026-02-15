@@ -40,6 +40,12 @@ export function TaskItem({ task, onToggle }: TaskItemProps) {
         {task.notes && <span className={styles.notes}>{task.notes}</span>}
         
         <div className={styles.meta}>
+          {task.date && (
+            <span className={clsx(styles.tag, styles.dateTag)}>
+              {new Date(task.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+            </span>
+          )}
+          {task.status === 'someday' && <span className={styles.tag}>Someday</span>}
           {task.tags?.map(tag => (
             <span key={tag} className={styles.tag}>#{tag}</span>
           ))}

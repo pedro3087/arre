@@ -3,6 +3,7 @@ import {
   User, 
   GoogleAuthProvider, 
   signInWithPopup, 
+  signInAnonymously,
   signOut, 
   onAuthStateChanged 
 } from 'firebase/auth';
@@ -12,6 +13,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
+  signInAnonymouslyUser: () => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -39,6 +41,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const signInAnonymouslyUser = async () => {
+    try {
+      await signInAnonymously(auth);
+    } catch (error) {
+      console.error("Error signing in anonymously", error);
+      throw error;
+    }
+  };
+
   const logout = async () => {
     try {
       await signOut(auth);
@@ -48,7 +59,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signInWithGoogle, logout }}>
+    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signInAnonymouslyUser, logout }}>
       {!loading && children}
     </AuthContext.Provider>
   );

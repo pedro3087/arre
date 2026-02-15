@@ -25,6 +25,7 @@ export function BottomNav() {
             key={item.path}
             to={item.path} 
             className={clsx(styles.navItem, isActive && styles.active)}
+            aria-label={item.label}
           >
             <span className={clsx(styles.iconWrapper, isActive && styles[item.color])}>
               <Icon size={24} />

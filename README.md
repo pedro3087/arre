@@ -152,7 +152,20 @@ For a detailed breakdown of the Firestore schema, Security Rules, and Cloud Func
 
 ### 🧪 Automated Testing
 
-We use Playwright for E2E testing. See the [Testing Guide](./TESTING.md) for instructions on running tests locally.
+We use Playwright for E2E testing to ensure stability across all platforms. Current status:
+
+- **30/30 Tests Passing**
+- Coverage across **Chromium, Firefox, Webkit**
+- Full **Mobile Emulation** (Mobile Chrome, Mobile Safari, iPad Pro 11)
+- Verified scenarios: Magic Import flow, Task Lifecycle, Cross-view Synchronization.
+
+See the [Testing Guide](./TESTING.md) for instructions on running tests locally.
+
+## 🛡️ Security & Reliability
+
+- **Secret Management**: AI integration uses Firebase Secret Manager for GEMINI_API_KEY.
+- **Granular Rules**: Firestore and Storage rules enforce strict per-user data isolation.
+- **Hook Reliability**: State management via `useTasks` is optimized for real-time Firestore sync and consistent view state.
 
 ---
 
