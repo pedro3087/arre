@@ -1,8 +1,11 @@
-import { Check, Circle } from 'lucide-react';
+import { Check, Circle, Trash2, Edit2 } from 'lucide-react';
 import { Task } from '../../shared/types/task';
 import clsx from 'clsx';
 import styles from './TaskItem.module.css';
 import { useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
+import { MainLayoutContext } from '../../layout/MainLayout';
+import { useTasks } from './hooks/useTasks'; // useTasks without view for actions
 
 interface TaskItemProps {
   task: Task;
@@ -12,6 +15,8 @@ interface TaskItemProps {
 export function TaskItem({ task, onToggle }: TaskItemProps) {
   // Use local state for immediate feedback, but sync with props in a real app
   const [complete, setComplete] = useState(task.status === 'completed');
+  const { openEditTaskModal } = useOutletContext<MainLayoutContext>();
+  const { deleteTask } = useTasks();
 
   const handleToggle = () => {
     const newState = !complete;
@@ -19,8 +24,23 @@ export function TaskItem({ task, onToggle }: TaskItemProps) {
     onToggle(task.id);
   };
 
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (confirm('Are you sure you want to delete this task?')) {
+      deleteTask(task.id);
+    }
+  };
+
+  const handleEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    openEditTaskModal(task);
+  };
+
   return (
-    <div className={clsx(styles.taskItem, complete && styles.completed)}>
+    <div 
+      className={clsx(styles.taskItem, complete && styles.completed)}
+      data-testid="task-item"
+    >
       <button 
         className={styles.checkbox} 
         onClick={handleToggle}
@@ -50,6 +70,15 @@ export function TaskItem({ task, onToggle }: TaskItemProps) {
             <span key={tag} className={styles.tag}>#{tag}</span>
           ))}
         </div>
+      </div>
+
+      <div className={styles.actions}>
+        <button className={styles.actionBtn} onClick={handleEdit} title="Edit">
+          <Edit2 size={16} />
+        </button>
+        <button className={styles.actionBtn} onClick={handleDelete} title="Delete">
+          <Trash2 size={16} />
+        </button>
       </div>
     </div>
   );

@@ -35,7 +35,8 @@
 }
 
 .nav {
-  flex: 1;
+  flex-grow: 0;
+  flex-shrink: 0;
   padding: 0 0.75rem;
   overflow-y: auto;
 }
@@ -95,9 +96,35 @@
   flex: 1;
 }
 
+.actionGroup {
+  padding: 0 16px;
+  margin-bottom: auto; /* Push footer down but keep this close to nav if we want */
+}
+
+.newTaskButton {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  margin-top: 1rem;
+  background: var(--text-primary);
+  color: var(--bg-app);
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.newTaskButton:hover {
+  opacity: 0.9;
+}
+
 .footer {
   padding: 1rem 1.5rem;
   border-top: 1px solid var(--border-subtle);
+  margin-top: auto;
 }
 
 .settingsButton {

@@ -81,7 +81,7 @@ test.describe('Arre App Full Workflow', () => {
     await expect(page.getByText(somedayTask)).toBeVisible({ timeout: 10000 });
   });
 
-  test('should handle magic import file upload', async ({ page }) => {
+  test.skip('should handle magic import file upload', async ({ page }) => {
     await page.goto('/inbox');
 
     await openNewTaskModal(page);

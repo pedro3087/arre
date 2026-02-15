@@ -1,32 +1,28 @@
 import { useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 
 import { TaskItem } from '../features/tasks/TaskItem';
 import { DashboardStats } from '../features/dashboard/DashboardStats';
 import { EnergyFilter } from '../features/dashboard/EnergyFilter';
-import { NewTaskModal } from '../features/tasks/NewTaskModal';
+// Removed local NewTaskModal import
 import { Search, Bell, Plus, Filter } from 'lucide-react';
 import styles from './Dashboard.module.css'; // Reusing for generic styles, maybe split later
 import inboxStyles from './Inbox.module.css';
 
-  import { useTasks } from '../features/tasks/hooks/useTasks';
+import { useTasks } from '../features/tasks/hooks/useTasks';
+import { MainLayoutContext } from '../layout/MainLayout';
 
 export function Inbox() {
   const [energyFilter, setEnergyFilter] = useState<'all' | 'low' | 'neutral' | 'high'>('high'); // Default to high to match image
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // Removed local isModalOpen state
   
-  const { tasks, loading, error, addTask, updateTask } = useTasks('inbox');
+  const { openNewTaskModal } = useOutletContext<MainLayoutContext>();
+  
+  const { tasks, loading, error, updateTask } = useTasks('inbox'); // Removed addTask, handled by MainLayout
 
   const filteredTasks = tasks.filter(t => 
     (energyFilter === 'all' || t.energy === energyFilter)
   );
-
-  const handleSaveTask = async (newTask: any) => {
-    try {
-      await addTask(newTask);
-    } catch (e) {
-      console.error("Failed to add task", e);
-    }
-  };
 
   const handleToggle = (id: string) => {
     const task = tasks.find(t => t.id === id);
@@ -55,7 +51,7 @@ export function Inbox() {
           <button className={inboxStyles.iconButton}><Bell size={20} /></button>
           <button 
             className={inboxStyles.newTaskButton}
-            onClick={() => setIsModalOpen(true)}
+            onClick={openNewTaskModal}
             data-testid="btn-new-task-main"
           >
             <Plus size={16} /> New Task
@@ -85,11 +81,7 @@ export function Inbox() {
         {filteredTasks.length === 0 && <p className={styles.emptyState}>No tasks match this filter.</p>}
       </div>
 
-      <NewTaskModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        onSave={handleSaveTask}
-      />
+      {/* Removed local NewTaskModal */}
     </div>
   );
 }

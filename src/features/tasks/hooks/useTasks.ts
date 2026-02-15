@@ -9,6 +9,7 @@ import {
   updateDoc, 
   deleteDoc,
   doc,
+  getDoc,
   serverTimestamp,
   Timestamp
 } from 'firebase/firestore';
@@ -27,44 +28,94 @@ const convertTask = (doc: any): Task => {
   } as Task;
 };
 
-export function useTasks(view: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'someday' | 'logbook') {
+export function useTasks(view?: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'someday' | 'logbook') {
   const { user } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  // CRUD actions need user but not necessarily view
+  const addTask = async (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
+    if (!user) return;
+    try {
+      await addDoc(collection(db, 'users', user.uid, 'tasks'), {
+        ...task,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        status: task.status || 'todo'
+      });
+    } catch (e) {
+      console.error("Error adding task", e);
+      throw e;
+    }
+  };
+
+  const updateTask = async (id: string, updates: Partial<Task>) => {
     if (!user) {
-      setTasks([]);
-      setLoading(false);
+      console.log('UpdateTask aborted. User is null.');
+      return;
+    }
+    try {
+      console.log('UpdateTask executing. ID:', id, 'Updates:', updates);
+      const taskRef = doc(db, 'users', user.uid, 'tasks', id);
+      const firestoreUpdates: any = { ...updates, updatedAt: serverTimestamp() };
+      
+      // If status is changing to completed, set completedAt
+      if (updates.status === 'completed') {
+        firestoreUpdates.completedAt = serverTimestamp();
+      }
+
+      await updateDoc(taskRef, firestoreUpdates);
+      
+      // Verification
+      const verifySnap = await getDoc(taskRef);
+      console.log('VERIFY TITLE:', verifySnap.exists() ? (verifySnap.data() as any).title : 'DOC MISSING');
+    } catch (e) {
+      console.error("Error updating task", e);
+      throw e;
+    }
+  };
+
+  const deleteTask = async (id: string) => {
+    if (!user) return;
+    try {
+      await deleteDoc(doc(db, 'users', user.uid, 'tasks', id));
+    } catch (e) {
+      console.error("Error deleting task", e);
+      throw e;
+    }
+  };
+
+  useEffect(() => {
+    if (!user || !view) {
+      if (!view) setLoading(false);
+      else setTasks([]);
       return;
     }
 
     const tasksRef = collection(db, 'users', user.uid, 'tasks');
     let q;
+    
+    console.log('useTasks useEffect running. View:', view, 'User:', user.uid);
 
     const today = new Date().toISOString().split('T')[0];
 
     // Query Logic per View (matches PENDING_UI_FEATURES.md)
     switch (view) {
       case 'today':
-        // Today = Tasks with date == today, not completed
-        // Firestore can do `where('date', '==', today)`
         q = query(
           tasksRef, 
           where('date', '==', today), 
           where('status', '!=', 'completed'),
-          orderBy('isEvening', 'asc'), // Sort evening tasks to bottom if boolean
+          orderBy('isEvening', 'asc'),
           orderBy('createdAt', 'desc')
         );
         break;
         
       case 'inbox':
-        // Inbox = No date, No project, not completed
         q = query(
           tasksRef,
           where('date', '==', null),
-          // where('projectId', '==', null), // Add this when projects exist
           where('status', '!=', 'completed'),
           orderBy('createdAt', 'desc')
         );
@@ -80,7 +131,6 @@ export function useTasks(view: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'som
         break;
 
       case 'anytime':
-        // Anytime = No date, has project (or general backlog)
         q = query(
           tasksRef,
           where('date', '==', null),
@@ -108,6 +158,7 @@ export function useTasks(view: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'som
     const unsubscribe = onSnapshot(q, 
       (snapshot) => {
         const fetchedTasks = snapshot.docs.map(convertTask);
+        console.log('SNAPSHOT FIRED. View:', view, 'Count:', fetchedTasks.length, 'Titles:', fetchedTasks.map(t => t.title));
         setTasks(fetchedTasks);
         setLoading(false);
       },
@@ -120,49 +171,6 @@ export function useTasks(view: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'som
 
     return () => unsubscribe();
   }, [user, view]);
-
-  // CRUD Actions
-  const addTask = async (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
-    if (!user) return;
-    try {
-      await addDoc(collection(db, 'users', user.uid, 'tasks'), {
-        ...task,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-        status: task.status || 'todo'
-      });
-    } catch (e) {
-      console.error("Error adding task", e);
-      throw e;
-    }
-  };
-
-  const updateTask = async (id: string, updates: Partial<Task>) => {
-    if (!user) return;
-    try {
-      const taskRef = doc(db, 'users', user.uid, 'tasks', id);
-      const firestoreUpdates = { ...updates, updatedAt: serverTimestamp() };
-      
-      if (updates.status === 'completed') {
-        (firestoreUpdates as any).completedAt = serverTimestamp();
-      }
-
-      await updateDoc(taskRef, firestoreUpdates);
-    } catch (e) {
-      console.error("Error updating task", e);
-      throw e;
-    }
-  };
-
-  const deleteTask = async (id: string) => {
-    if (!user) return;
-    try {
-      await deleteDoc(doc(db, 'users', user.uid, 'tasks', id));
-    } catch (e) {
-      console.error("Error deleting task", e);
-      throw e;
-    }
-  };
 
   return { tasks, loading, error, addTask, updateTask, deleteTask };
 }

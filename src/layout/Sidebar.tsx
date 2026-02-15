@@ -80,43 +80,7 @@ export function Sidebar({ onNewTask }: SidebarProps) {
         {import.meta.env.DEV && <SeedButton />}
       </div>
 
-      {/* Styled JSX for quick styling of new elements */}
-      <style>{`
-        .${styles.actionGroup} {
-          padding: 0 16px;
-          margin-bottom: auto; /* Push footer down but keep this close to nav if possible, or use flex-grow spacer */
-        }
-        .${styles.newTaskButton} {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          width: 100%;
-          padding: 10px 12px;
-          margin-top: 1rem;
-          background: var(--text-primary);
-          color: var(--bg-app);
-          border: none;
-          border-radius: 8px;
-          font-weight: 500;
-          cursor: pointer;
-          transition: opacity 0.2s;
-        }
-        .${styles.newTaskButton}:hover {
-          opacity: 0.9;
-        }
-        /* Make nav not grow so action group is below it */
-        .${styles.nav} {
-          flex-grow: 0; 
-        }
-        .${styles.sidebar} {
-          display: flex;
-          flex-direction: column;
-        }
-        /* Push footer to bottom */
-        .${styles.footer} {
-          margin-top: auto;
-        }
-      `}</style>
+      {/* Inline styles moved to Sidebar.module.css */}
     </aside>
   );
 }

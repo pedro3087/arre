@@ -8,14 +8,14 @@ import { functions } from '../../lib/firebase';
 import styles from './NewTaskModal.module.css';
 import { Task } from '../../shared/types/task';
 
-interface NewTaskModalProps {
+interface TaskEditorModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (task: any) => void;
   initialData?: Task | null;
 }
 
-export function NewTaskModal({ isOpen, onClose, onSave, initialData }: NewTaskModalProps) {
+export function TaskEditorModal({ isOpen, onClose, onSave, initialData }: TaskEditorModalProps) {
   const [activeTab, setActiveTab] = useState<'manual' | 'ai'>('ai'); // Default to AI based on request context
   const [title, setTitle] = useState('');
   const [notes, setNotes] = useState('');
@@ -49,7 +49,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, initialData }: NewTaskMo
 
   const handleManualSubmit = async (e: React.FormEvent | React.MouseEvent) => {
     e.preventDefault();
-    console.log('handleManualSubmit in NewTaskModal called. Title:', title);
+    console.log('handleManualSubmit in TaskEditorModal called. Title:', title);
     try {
       await onSave({ 
         title, 
@@ -59,6 +59,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, initialData }: NewTaskMo
         date: isSomeday ? null : (date || null),
         createdAt: initialData?.createdAt || new Date().toISOString() 
       });
+      console.log('Task saved successfully');
       onClose();
     } catch (err) {
       console.error('ERROR in handleManualSubmit:', err);
@@ -229,12 +230,11 @@ export function NewTaskModal({ isOpen, onClose, onSave, initialData }: NewTaskMo
                       </div>
 
                       <button 
-                        type="button" 
-                        onClick={handleManualSubmit}
+                        type="submit" 
                         className={styles.createButton}
                         data-testid="btn-create-task"
                       >
-                        Create Task <ArrowRight size={16} />
+                        {initialData ? 'Save Changes' : 'Create Task'} <ArrowRight size={16} />
                       </button>
                     </div>
                   </form>
@@ -258,6 +258,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, initialData }: NewTaskMo
                 </div>
               ) : (
                 <div className={styles.aiContainer}>
+                  {/* Reuse AI container logic from existing NewTaskModal - omitted for brevity? No, must include self-contained */}
                   <div className={styles.aiHeader}>
                     <h2 className={styles.gradientTitle}>Magic Import</h2>
                     <p className={styles.subtitle}>AI Powered Assistant</p>
