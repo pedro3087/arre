@@ -95,17 +95,25 @@ The E2E test suite has accumulated issues across Phases 1–4. Tests must pass b
    - Verify project grouping in Anytime view
    - Edit and delete a project
 
-### P1 — Code Cleanup & Technical Debt 🟡
+### P1 — Code Cleanup & Technical Debt 🟡 (MOSTLY DONE ✅)
 
-4. **Node.js version**: Current is 22.10.0, Vite 7 requires 22.12+. Upgrade via `nvm install 22.12` or download from nodejs.org. This causes a warning on every `vite` command but doesn't block functionality.
+4. **Node.js version**: Current is 22.10.0, Vite 7 requires 22.12+. Upgrade via `nvm install 22.12` or download from nodejs.org. This causes a warning on every `vite` command but doesn't block functionality. ⏳ _Requires manual system upgrade_
 
-5. **Sidebar inline styles**: `src/layout/Sidebar.tsx` may still have an inline `<style>` tag from Phase 3. Move those styles to `Sidebar.module.css`.
+5. ~~**Sidebar inline styles**~~: ✅ No inline `<style>` tags remain in any component.
 
-6. **Consolidate "New Task" buttons**: `Inbox.tsx` has its own `btn-new-task-main` button that opens the modal. `MainLayout.tsx` also manages the modal. These duplicate paths could cause confusion. Consider having Inbox use the global TaskEditorModal from MainLayout via context, like other views do.
+6. ~~**Consolidate "New Task" buttons**~~: ✅ Inbox uses `openNewTaskModal` from `MainLayoutContext` — no duplicate modal management. The `btn-new-task-main` button in Inbox is intentional for the view's header UX.
 
-7. **TaskEditorModal vs NewTaskModal naming**: Some test files reference `new-task-modal` testid but the component was renamed to `TaskEditorModal`. Verify all testids are consistent. The actual `data-testid` on the DOM element matters, not the component file name.
+7. ~~**TaskEditorModal vs NewTaskModal naming**~~: ✅ Deleted dead `NewTaskModal.tsx`. Renamed CSS module to `TaskEditorModal.module.css`. The `data-testid="new-task-modal"` on the DOM element is unchanged (tests use this).
 
-8. **Dashboard metrics**: `DashboardStats`, `VelocityChart`, `EnergyFilter` have unused variable warnings from TypeScript (`useRef`, `fillColor`, `Icon`). Clean these up.
+8. ~~**Dashboard metrics unused imports**~~: ✅ Removed `useRef`, `Battery*`, `BatteryCharging`, `BatteryFull` from EnergyFilter. Removed `useTheme` and `fillColor` from VelocityChart. Properly typed `FilterPill` props (was `any`).
+
+9. ~~**Debug console.logs**~~: ✅ Removed all debug `console.log` from `useTasks.ts` (5 statements). Kept `console.error` for real error handling.
+
+10. ~~**Inline styles in TaskEditorModal**~~: ✅ Moved `<style>` block (metaRow, detailsColumn, dateRow, dateInput, somedayLabel, projectSelector, projectSelect, projectIndicator) into `TaskEditorModal.module.css`.
+
+11. ~~**Fixed Anytime query**~~: ✅ The `anytime` Firestore query was filtering `where('projectId', '!=', null)` — this excluded tasks without a project. Changed to `where('status', 'not-in', ['completed', 'someday'])`.
+
+12. ~~**Inbox hardcoded date**~~: ✅ Replaced "Monday, Oct 24" with dynamic `toLocaleDateString()`.
 
 ### P2 — Logbook View (New Feature) 🟢
 
@@ -204,7 +212,7 @@ The E2E test suite has accumulated issues across Phases 1–4. Tests must pass b
 | `pages/Anytime.tsx`                         | Groups tasks by project ("Single Actions" for unassigned)             |
 | `pages/Someday.tsx`                         | Groups tasks by project ("Loose Ideas" for unassigned)                |
 | `features/tasks/TaskEditorModal.tsx`        | Create/edit task modal with project selector                          |
-| `features/tasks/NewTaskModal.tsx`           | Legacy? Verify if still used or replaced by TaskEditorModal           |
+| `features/tasks/TaskEditorModal.module.css` | Styles for task editor modal (renamed from NewTaskModal)              |
 | `features/tasks/TaskItem.tsx`               | Single task row with project badge, edit/delete actions               |
 | `features/tasks/hooks/useTasks.ts`          | Firestore CRUD hook for tasks (real-time)                             |
 | `shared/types/task.ts`                      | `TaskStatus`, `Project`, `PROJECT_COLORS`, `ProjectColor`             |
