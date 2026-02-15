@@ -97,6 +97,25 @@
   background-color: rgba(255, 59, 48, 0.1);
 }
 
+.projectBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  padding: 2px 8px 2px 6px;
+  background-color: rgba(0, 0, 0, 0.04);
+  color: var(--text-secondary);
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.projectDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
 /* Actions Group (Edit/Delete) */
 .actions {
   display: flex;

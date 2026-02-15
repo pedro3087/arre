@@ -1,11 +1,11 @@
 import { Check, Circle, Trash2, Edit2 } from 'lucide-react';
-import { Task } from '../../shared/types/task';
+import { Task, Project, PROJECT_COLORS } from '../../shared/types/task';
 import clsx from 'clsx';
 import styles from './TaskItem.module.css';
 import { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { MainLayoutContext } from '../../layout/MainLayout';
-import { useTasks } from './hooks/useTasks'; // useTasks without view for actions
+import { useTasks } from './hooks/useTasks';
 
 interface TaskItemProps {
   task: Task;
@@ -13,9 +13,8 @@ interface TaskItemProps {
 }
 
 export function TaskItem({ task, onToggle }: TaskItemProps) {
-  // Use local state for immediate feedback, but sync with props in a real app
   const [complete, setComplete] = useState(task.status === 'completed');
-  const { openEditTaskModal } = useOutletContext<MainLayoutContext>();
+  const { openEditTaskModal, projects } = useOutletContext<MainLayoutContext>();
   const { deleteTask } = useTasks();
 
   const handleToggle = () => {
@@ -35,6 +34,13 @@ export function TaskItem({ task, onToggle }: TaskItemProps) {
     e.stopPropagation();
     openEditTaskModal(task);
   };
+
+  const project = task.projectId
+    ? projects?.find((p: Project) => p.id === task.projectId)
+    : null;
+
+  const getProjectHex = (color: string) =>
+    PROJECT_COLORS.find(c => c.name === color)?.hex || '#86868b';
 
   return (
     <div 
@@ -60,6 +66,15 @@ export function TaskItem({ task, onToggle }: TaskItemProps) {
         {task.notes && <span className={styles.notes}>{task.notes}</span>}
         
         <div className={styles.meta}>
+          {project && (
+            <span className={styles.projectBadge}>
+              <span
+                className={styles.projectDot}
+                style={{ backgroundColor: getProjectHex(project.color) }}
+              />
+              {project.title}
+            </span>
+          )}
           {task.date && (
             <span className={clsx(styles.tag, styles.dateTag)}>
               {new Date(task.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}

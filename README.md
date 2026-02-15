@@ -34,6 +34,14 @@ _(Replace with actual screenshot)_
 - **Today View**: A focused list of tasks for right now, with a distinct **"This Evening"** section for separating work from personal time.
 - **Planning Views**: Dedicated views for **Upcoming**, **Anytime**, and **Someday** to keep your roadmap clear.
 
+### 📁 Project Management
+
+- **Create/Edit/Delete Projects**: Full CRUD with a curated 10-color palette (Emerald, Sapphire, Ruby, Lavender, Gold, Cyan, Rose, Amber, Teal, Indigo).
+- **Sidebar Projects List**: Real-time project list below nav items with color dots and hover-to-edit.
+- **Assign Tasks to Projects**: Dropdown in task creation/edit modal.
+- **Project Badges**: Tasks show their project with a color dot throughout all views.
+- **Grouped Views**: Anytime and Someday views group tasks by project with color-coded section headers and task counts. Unassigned tasks appear under "Single Actions" / "Loose Ideas".
+
 ## 🛠️ Tech Stack
 
 - **Framework**: React 19 + Vite (TypeScript)
@@ -49,6 +57,8 @@ mindmap
   root((Arre App))
     Layout & UI
       Sidebar Desktop
+        Nav Items
+        Projects List
       BottomNav Mobile
       Theme Toggler Light/Dark
 
@@ -60,9 +70,10 @@ mindmap
         Low Energy
         High Focus Deep Work
       Task List
-      New Task Modal
+      Task Editor Modal
         Manual Entry
         Magic Import AI Analysis
+        Project Selector
 
     Dashboard Today
       Current Tasks
@@ -70,15 +81,22 @@ mindmap
 
     Planning
       Upcoming
-      Anytime
-      Someday
+      Anytime Grouped by Project
+      Someday Grouped by Project
+
+    Projects
+      Project CRUD Modal
+      Color Picker 10 colors
+      Task Assignment
+      Sidebar Listing
 
     Core Features
       TaskItem
         Toggle State
-        Tags
+        Tags & Project Badge
         Notes
-      Mock Data System
+        Edit & Delete
+      Firebase Firestore
 ```
 
 ## 📦 Installation
@@ -109,8 +127,11 @@ mindmap
 
 ## 🔮 Future Roadmap (Pending)
 
-- **Drag & Drop**: Kanban-style organization for Anytime/Someday projects.
+- **Drag & Drop**: Kanban-style reordering within project groups.
+- **Logbook View**: Completed tasks archive grouped by date.
 - **Mobile Native**: React Native / Expo version.
+- **PWA Support**: Offline-capable progressive web app.
+- **CI/CD Pipeline**: Automated testing and deployment.
 
 ## 🔥 Backend & Services
 

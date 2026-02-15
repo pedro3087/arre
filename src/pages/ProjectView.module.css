@@ -1,0 +1,136 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding-bottom: 5rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.titleGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.05em;
+  line-height: 1.1;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.headerActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.iconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: none;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.iconButton:hover {
+  background: var(--bg-app);
+  color: var(--text-primary);
+}
+
+/* Project Group Section */
+.projectGroup {
+  margin-bottom: 2.5rem;
+}
+
+.projectGroupHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 0.25rem;
+}
+
+.projectDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.projectGroupTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.projectTaskCount {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  margin-left: auto;
+}
+
+.taskList {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Unassigned section */
+.unassignedGroup {
+  margin-bottom: 2.5rem;
+}
+
+.unassignedHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px dashed var(--border-subtle);
+  margin-bottom: 0.25rem;
+}
+
+.unassignedTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.emptyState {
+  color: var(--text-tertiary);
+  font-style: italic;
+  padding: 2rem 0;
+  text-align: center;
+}
+
+.loading {
+  color: var(--text-secondary);
+  padding: 2rem 0;
+  text-align: center;
+}
+
+.error {
+  color: var(--accent-ruby);
+  padding: 2rem 0;
+  text-align: center;
+}

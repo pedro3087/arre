@@ -1,4 +1,4 @@
-# Arre App — Session Handoff (2026-02-14)
+# Arre App — Session Handoff (2026-02-15)
 
 ## 🏗 Project Overview
 
@@ -38,7 +38,7 @@
 - [x] Anytime view shows non-date tasks
 - [x] Someday view shows `status: 'someday'` tasks with "Activate" action
 
-### Phase 3 — Testing Infrastructure & Auth for E2E (This Session)
+### Phase 3 — Testing Infrastructure & Auth for E2E
 
 - [x] **Anonymous auth support**: Added `signInAnonymously` to `AuthContext.tsx`
 - [x] **Dev Login button**: Login page shows "Dev Login (Anonymous)" button in DEV mode (`data-testid="dev-login-button"`)
@@ -48,7 +48,19 @@
 - [x] **FAB (Floating Action Button)**: Added in `MainLayout.tsx` for mobile viewports (`data-testid="btn-new-task-fab"`), hidden on desktop via CSS
 - [x] **BottomNav aria-labels**: Added `aria-label={item.label}` to all BottomNav links
 - [x] **Playwright config**: Tests run on chromium, firefox, webkit, Pixel 5, iPhone 12, iPad Pro 11
-- [x] **Test files created**: `tests/new-task.spec.ts` and `tests/full-flow.spec.ts`
+- [x] **Test files created**: `tests/new-task.spec.ts`, `tests/full-flow.spec.ts`, `tests/task-actions.spec.ts`
+
+### Phase 4 — Project Management (Advanced Organization)
+
+- [x] **`useProjects` hook** (`src/features/projects/hooks/useProjects.ts`): Full Firestore CRUD with real-time `onSnapshot` for `users/{uid}/projects` collection
+- [x] **`ProjectModal` component** (`src/features/projects/ProjectModal.tsx`): Create/edit/delete projects with 10-color palette picker (Emerald, Sapphire, Ruby, Lavender, Gold, Cyan, Rose, Amber, Teal, Indigo)
+- [x] **Sidebar Projects section**: Color dots + project names listed below nav items, hover-to-edit, "New Project" button
+- [x] **Task-Project assignment**: Project selector dropdown in `TaskEditorModal` with color indicator dot
+- [x] **Project badges on tasks**: `TaskItem` shows project badge (color dot + name) in meta row
+- [x] **Anytime view grouped by project**: Tasks partitioned by project with color-coded section headers and task counts; unassigned tasks under "Single Actions"
+- [x] **Someday view grouped by project**: Same grouping pattern; unassigned tasks under "Loose Ideas"
+- [x] **Shared types**: `PROJECT_COLORS` constant and `ProjectColor` type in `shared/types/task.ts`
+- [x] **`MainLayout` integration**: `useProjects` hook, `ProjectModal` state management, projects passed via Outlet context
 
 ---
 
@@ -140,27 +152,31 @@ await page.getByText("High").click();
 
 ### App Source (`src/`)
 
-| File                               | Purpose                                                              |
-| ---------------------------------- | -------------------------------------------------------------------- |
-| `main.tsx`                         | App entry, routing setup                                             |
-| `App.tsx`                          | Root component with providers                                        |
-| `lib/firebase.ts`                  | Firebase init + emulator connections                                 |
-| `lib/auth/AuthContext.tsx`         | Auth context with Google + Anonymous sign-in                         |
-| `lib/auth/ProtectedRoute.tsx`      | Route guard for authenticated users                                  |
-| `layout/MainLayout.tsx`            | Layout shell: Sidebar + Content + BottomNav + FAB + NewTaskModal     |
-| `layout/Sidebar.tsx`               | Desktop nav + "New Task" button                                      |
-| `layout/BottomNav.tsx`             | Mobile bottom nav                                                    |
-| `pages/Login.tsx`                  | Login page with Google + Dev buttons                                 |
-| `pages/Dashboard.tsx`              | Today view                                                           |
-| `pages/Inbox.tsx`                  | Inbox view (has its own "New Task" button too — `btn-new-task-main`) |
-| `pages/Upcoming.tsx`               | Groups tasks by date                                                 |
-| `pages/Anytime.tsx`                | Tasks without specific dates                                         |
-| `pages/Someday.tsx`                | Parked/someday tasks                                                 |
-| `features/tasks/NewTaskModal.tsx`  | Create task modal (Manual + AI tabs)                                 |
-| `features/tasks/TaskItem.tsx`      | Single task row component                                            |
-| `features/tasks/hooks/useTasks.ts` | Firestore CRUD hook                                                  |
-| `shared/types/task.ts`             | `TaskStatus = 'todo' \| 'completed' \| 'someday'`                    |
-| `lib/types/firestore.ts`           | Firestore document interfaces                                        |
+| File                                        | Purpose                                                              |
+| ------------------------------------------- | -------------------------------------------------------------------- |
+| `main.tsx`                                  | App entry, routing setup                                             |
+| `App.tsx`                                   | Root component with providers                                        |
+| `lib/firebase.ts`                           | Firebase init + emulator connections                                 |
+| `lib/auth/AuthContext.tsx`                  | Auth context with Google + Anonymous sign-in                         |
+| `lib/auth/ProtectedRoute.tsx`               | Route guard for authenticated users                                  |
+| `layout/MainLayout.tsx`                     | Layout shell: Sidebar + Content + BottomNav + FAB + NewTaskModal     |
+| `layout/Sidebar.tsx`                        | Desktop nav + "New Task" button                                      |
+| `layout/BottomNav.tsx`                      | Mobile bottom nav                                                    |
+| `pages/Login.tsx`                           | Login page with Google + Dev buttons                                 |
+| `pages/Dashboard.tsx`                       | Today view                                                           |
+| `pages/Inbox.tsx`                           | Inbox view (has its own "New Task" button too — `btn-new-task-main`) |
+| `pages/Upcoming.tsx`                        | Groups tasks by date                                                 |
+| `pages/Anytime.tsx`                         | Tasks without specific dates                                         |
+| `pages/Someday.tsx`                         | Parked/someday tasks                                                 |
+| `features/tasks/NewTaskModal.tsx`           | Create task modal (Manual + AI tabs)                                 |
+| `features/tasks/TaskItem.tsx`               | Single task row component                                            |
+| `features/tasks/hooks/useTasks.ts`          | Firestore CRUD hook                                                  |
+| `shared/types/task.ts`                      | `TaskStatus`, `Project`, `PROJECT_COLORS`, `ProjectColor`            |
+| `lib/types/firestore.ts`                    | Firestore document interfaces                                        |
+| `features/projects/hooks/useProjects.ts`    | Firestore CRUD hook for projects (real-time)                         |
+| `features/projects/ProjectModal.tsx`        | Create/edit/delete project modal with color picker                   |
+| `features/projects/ProjectModal.module.css` | Styles for the project modal                                         |
+| `pages/ProjectView.module.css`              | Shared styles for project-grouped views (Anytime, Someday)           |
 
 ### Functions (`functions/`)
 
@@ -206,15 +222,10 @@ await page.getByText("High").click();
 
 8. **Firestore security rules**: Verify rules allow read/write for authenticated users
 9. **Magic Import E2E**: The AI test depends on a `GEMINI_API_KEY` secret. In emulator mode, either mock the function response or skip the AI assertion gracefully
-10. **Task editing/deletion**: Not yet implemented
-11. **Project grouping**: Tasks can belong to projects (`projectId` field) but no project CRUD UI exists yet
-
-### P3 — Polish & Deploy
-
-12. Performance optimization
-13. PWA setup
-14. Firebase Hosting deployment
-15. CI/CD pipeline
+10. ~~**Task editing/deletion**: Not yet implemented~~ ✅ Done (TaskEditorModal supports edit mode)
+11. ~~**Project grouping**: Tasks can belong to projects (`projectId` field) but no project CRUD UI exists yet~~ ✅ Done (Phase 4)
+12. **Logbook view**: Completed tasks archive grouped by date (route `/logbook`)
+13. **Drag & drop**: Kanban-style reordering within project groups
 
 ---
 
@@ -252,17 +263,25 @@ npx playwright show-report
 
 ## 🔑 data-testid Reference
 
-| Test ID                | Component        | Notes                           |
-| ---------------------- | ---------------- | ------------------------------- |
-| `login-button`         | Login.tsx        | Google sign-in button           |
-| `dev-login-button`     | Login.tsx        | Anonymous sign-in (DEV only)    |
-| `btn-new-task-main`    | Inbox.tsx        | Inbox-specific new task button  |
-| `btn-new-task-sidebar` | Sidebar.tsx      | Desktop sidebar new task button |
-| `btn-new-task-fab`     | MainLayout.tsx   | Mobile floating action button   |
-| `new-task-modal`       | NewTaskModal.tsx | Modal container                 |
-| `btn-close-modal`      | NewTaskModal.tsx | Close modal X button            |
-| `tab-manual`           | NewTaskModal.tsx | Switch to manual task creation  |
-| `input-title`          | NewTaskModal.tsx | Task title input                |
-| `btn-create-task`      | NewTaskModal.tsx | Submit manual task button       |
-| `drop-zone`            | NewTaskModal.tsx | Magic Import drop zone          |
-| `btn-import-all`       | NewTaskModal.tsx | Import all AI suggestions       |
+| Test ID                | Component       | Notes                             |
+| ---------------------- | --------------- | --------------------------------- |
+| `login-button`         | Login.tsx       | Google sign-in button             |
+| `dev-login-button`     | Login.tsx       | Anonymous sign-in (DEV only)      |
+| `btn-new-task-main`    | Inbox.tsx       | Inbox-specific new task button    |
+| `btn-new-task-sidebar` | Sidebar.tsx     | Desktop sidebar new task button   |
+| `btn-new-task-fab`     | MainLayout.tsx  | Mobile floating action button     |
+| `new-task-modal`       | TaskEditorModal | Modal container                   |
+| `btn-close-modal`      | TaskEditorModal | Close modal X button              |
+| `tab-manual`           | TaskEditorModal | Switch to manual task creation    |
+| `input-title`          | TaskEditorModal | Task title input                  |
+| `input-notes`          | TaskEditorModal | Task notes textarea               |
+| `select-project`       | TaskEditorModal | Project selector dropdown         |
+| `btn-create-task`      | TaskEditorModal | Submit manual task button         |
+| `drop-zone`            | TaskEditorModal | Magic Import drop zone            |
+| `btn-import-all`       | TaskEditorModal | Import all AI suggestions         |
+| `project-modal`        | ProjectModal    | Project modal container           |
+| `project-title-input`  | ProjectModal    | Project name input                |
+| `color-{name}`         | ProjectModal    | Color swatch (e.g. color-emerald) |
+| `btn-save-project`     | ProjectModal    | Save/Create project button        |
+| `btn-delete-project`   | ProjectModal    | Delete project button             |
+| `btn-new-project`      | Sidebar         | New project button in sidebar     |

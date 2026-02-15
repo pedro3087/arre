@@ -49,9 +49,17 @@ test.describe('Task Actions (Edit/Delete)', () => {
     const btnHtml = await page.getByTestId('btn-create-task').evaluate(el => el.outerHTML);
     console.log('DEBUG BUTTON HTML:', btnHtml);
 
+    // Verify update
+    // Wait for task to appear, use a slightly longer timeout for the filter
+    await page.screenshot({ path: 'test-results/edit-modal-open.png' });
+    
     // Save by clicking the button
     await page.getByTestId('btn-create-task').click({ force: true });
     
+    // Give it a tiny bit of time to start the animation if any
+    await page.waitForTimeout(500);
+    await page.screenshot({ path: 'test-results/after-save-click.png' });
+
     // Ensure modal is gone - this implicitly waits for the save operation to finish
     await expect(page.getByTestId('new-task-modal')).not.toBeVisible({ timeout: 10000 });
     console.log('Modal closed, synced.');

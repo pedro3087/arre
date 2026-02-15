@@ -1,55 +1,56 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Sparkles, Upload, FileText, FileSpreadsheet, Plus, ArrowRight } from 'lucide-react';
+import { X, Sparkles, Upload, FileText, FileSpreadsheet, Plus, ArrowRight, FolderOpen } from 'lucide-react';
 import clsx from 'clsx';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '../../lib/firebase';
 import styles from './NewTaskModal.module.css';
-import { Task } from '../../shared/types/task';
+import { Task, Project, PROJECT_COLORS } from '../../shared/types/task';
 
 interface TaskEditorModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (task: any) => void;
   initialData?: Task | null;
+  projects?: Project[];
 }
 
-export function TaskEditorModal({ isOpen, onClose, onSave, initialData }: TaskEditorModalProps) {
-  const [activeTab, setActiveTab] = useState<'manual' | 'ai'>('ai'); // Default to AI based on request context
+export function TaskEditorModal({ isOpen, onClose, onSave, initialData, projects = [] }: TaskEditorModalProps) {
+  const [activeTab, setActiveTab] = useState<'manual' | 'ai'>('ai');
   const [title, setTitle] = useState('');
   const [notes, setNotes] = useState('');
   const [energy, setEnergy] = useState<'low' | 'neutral' | 'high'>('neutral');
   const [date, setDate] = useState('');
   const [isSomeday, setIsSomeday] = useState(false);
+  const [projectId, setProjectId] = useState<string | undefined>(undefined);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
 
   useEffect(() => {
     if (isOpen) {
       if (initialData) {
-        // Editing existing task
         setTitle(initialData.title);
         setNotes(initialData.notes || '');
         setEnergy(initialData.energy || 'neutral');
         setDate(initialData.date || '');
         setIsSomeday(initialData.status === 'someday');
+        setProjectId(initialData.projectId || undefined);
         setActiveTab('manual');
       } else {
-        // Creating new task
         setTitle('');
         setNotes('');
         setEnergy('neutral'); 
         setDate('');
         setIsSomeday(false);
-        setActiveTab('ai'); // Default for new tasks
+        setProjectId(undefined);
+        setActiveTab('ai');
       }
     }
   }, [isOpen, initialData]);
 
   const handleManualSubmit = async (e: React.FormEvent | React.MouseEvent) => {
     e.preventDefault();
-    console.log('handleManualSubmit in TaskEditorModal called. Title:', title);
     try {
       await onSave({ 
         title, 
@@ -57,9 +58,9 @@ export function TaskEditorModal({ isOpen, onClose, onSave, initialData }: TaskEd
         energy, 
         status: isSomeday ? 'someday' : 'todo', 
         date: isSomeday ? null : (date || null),
+        projectId: projectId || null,
         createdAt: initialData?.createdAt || new Date().toISOString() 
       });
-      console.log('Task saved successfully');
       onClose();
     } catch (err) {
       console.error('ERROR in handleManualSubmit:', err);
@@ -74,7 +75,6 @@ export function TaskEditorModal({ isOpen, onClose, onSave, initialData }: TaskEd
     setAiSuggestions([]);
 
     try {
-      // Convert file to base64
       const reader = new FileReader();
       reader.onloadend = async () => {
         const base64String = (reader.result as string).split(',')[1];
@@ -92,7 +92,7 @@ export function TaskEditorModal({ isOpen, onClose, onSave, initialData }: TaskEd
           
           setAiSuggestions(result.data.tasks);
         } catch (err) {
-          console.error("AI proccessing failed", err);
+          console.error("AI processing failed", err);
           setAiSuggestions(["Error processing document. Please try again."]);
         } finally {
           setIsAnalyzing(false);
@@ -103,6 +103,10 @@ export function TaskEditorModal({ isOpen, onClose, onSave, initialData }: TaskEd
       console.error("File reading failed", err);
       setIsAnalyzing(false);
     }
+  };
+
+  const getProjectHex = (color: string) => {
+    return PROJECT_COLORS.find(c => c.name === color)?.hex || '#86868b';
   };
 
   return createPortal(
@@ -167,7 +171,9 @@ export function TaskEditorModal({ isOpen, onClose, onSave, initialData }: TaskEd
               
               {activeTab === 'manual' ? (
                 <div className={styles.manualContainer}>
-                  <h2 className={styles.sectionTitle}>Create New Task</h2>
+                  <h2 className={styles.sectionTitle}>
+                    {initialData ? 'Edit Task' : 'Create New Task'}
+                  </h2>
                   <form onSubmit={handleManualSubmit} className={styles.form}>
                     <input 
                       type="text" 
@@ -211,6 +217,34 @@ export function TaskEditorModal({ isOpen, onClose, onSave, initialData }: TaskEd
                              Someday
                            </label>
                         </div>
+
+                        {/* Project Selector */}
+                        <div className={styles.projectSelector}>
+                          <FolderOpen size={16} style={{ color: 'var(--text-tertiary)', flexShrink: 0 }} />
+                          <select
+                            value={projectId || ''}
+                            onChange={(e) => setProjectId(e.target.value || undefined)}
+                            className={styles.projectSelect}
+                            data-testid="select-project"
+                          >
+                            <option value="">No Project</option>
+                            {projects.map((p) => (
+                              <option key={p.id} value={p.id}>
+                                {p.title}
+                              </option>
+                            ))}
+                          </select>
+                          {projectId && (
+                            <span
+                              className={styles.projectIndicator}
+                              style={{
+                                backgroundColor: getProjectHex(
+                                  projects.find(p => p.id === projectId)?.color || 'emerald'
+                                )
+                              }}
+                            />
+                          )}
+                        </div>
                         
                         <div className={styles.energySelector}>
                           <span className={styles.label}>Energy Level</span>
@@ -231,6 +265,7 @@ export function TaskEditorModal({ isOpen, onClose, onSave, initialData }: TaskEd
 
                       <button 
                         type="submit" 
+                        onClick={handleManualSubmit}
                         className={styles.createButton}
                         data-testid="btn-create-task"
                       >
@@ -238,7 +273,6 @@ export function TaskEditorModal({ isOpen, onClose, onSave, initialData }: TaskEd
                       </button>
                     </div>
                   </form>
-                  {/* Style override to fix layout issues */}
                   <style>{`
                     .${styles.metaRow} { align-items: flex-end; }
                     .${styles.detailsColumn} { display: flex; flex-direction: column; gap: 1rem; flex: 1; }
@@ -254,11 +288,33 @@ export function TaskEditorModal({ isOpen, onClose, onSave, initialData }: TaskEd
                       display: flex; align-items: center; gap: 6px; 
                       font-size: 0.9rem; color: var(--text-secondary);
                     }
+                    .${styles.projectSelector} {
+                      display: flex;
+                      align-items: center;
+                      gap: 0.5rem;
+                    }
+                    .${styles.projectSelect} {
+                      flex: 1;
+                      padding: 8px 12px;
+                      border-radius: 8px;
+                      border: 1px solid var(--border-subtle);
+                      background: var(--bg-paper);
+                      color: var(--text-primary);
+                      font-size: 0.9rem;
+                      font-family: var(--font-sans);
+                      cursor: pointer;
+                      appearance: auto;
+                    }
+                    .${styles.projectIndicator} {
+                      width: 10px;
+                      height: 10px;
+                      border-radius: 50%;
+                      flex-shrink: 0;
+                    }
                   `}</style>
                 </div>
               ) : (
                 <div className={styles.aiContainer}>
-                  {/* Reuse AI container logic from existing NewTaskModal - omitted for brevity? No, must include self-contained */}
                   <div className={styles.aiHeader}>
                     <h2 className={styles.gradientTitle}>Magic Import</h2>
                     <p className={styles.subtitle}>AI Powered Assistant</p>
@@ -314,7 +370,7 @@ export function TaskEditorModal({ isOpen, onClose, onSave, initialData }: TaskEd
                     </div>
                   ) : (
                     <div className={styles.resultsState}>
-                      <h3 className={styles.resultsHeader}><Sparkles size={16}/> 3 Tasks Generated</h3>
+                      <h3 className={styles.resultsHeader}><Sparkles size={16}/> {aiSuggestions.length} Tasks Generated</h3>
                       <div className={styles.tasksList}>
                         {aiSuggestions.map((suggestion, idx) => (
                           <div key={idx} className={styles.suggestedTask}>
@@ -326,14 +382,13 @@ export function TaskEditorModal({ isOpen, onClose, onSave, initialData }: TaskEd
                       <button 
                         className={styles.importButton}
                         onClick={() => {
-                          // Save each suggested task separately
                           aiSuggestions.forEach(suggestion => {
                              onSave({ 
                                 title: suggestion, 
                                 notes: "Imported via Magic Import", 
                                 energy: 'neutral', 
                                 status: 'todo',
-                                createdAt: new Date().toISOString() // Important for sort
+                                createdAt: new Date().toISOString()
                              });
                           });
                           onClose();

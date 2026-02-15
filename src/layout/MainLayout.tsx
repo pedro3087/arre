@@ -5,19 +5,26 @@ import styles from './MainLayout.module.css';
 
 import { useState } from 'react';
 import { useTasks } from '../features/tasks/hooks/useTasks';
+import { useProjects } from '../features/projects/hooks/useProjects';
 import { TaskEditorModal } from '../features/tasks/TaskEditorModal';
+import { ProjectModal } from '../features/projects/ProjectModal';
 import { Plus } from 'lucide-react';
-import { Task } from '../shared/types/task';
+import { Task, Project, ProjectColor } from '../shared/types/task';
 
 export type MainLayoutContext = {
   openNewTaskModal: () => void;
   openEditTaskModal: (task: Task) => void;
+  projects: Project[];
 };
 
 export function MainLayout() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
-  const { addTask, updateTask } = useTasks('inbox'); // View doesn't matter for addTask/updateTask logic
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+  const [projectToEdit, setProjectToEdit] = useState<Project | null>(null);
+  
+  const { addTask, updateTask } = useTasks('inbox');
+  const { projects, addProject, updateProject, deleteProject } = useProjects();
 
   const openNewTaskModal = () => {
     setTaskToEdit(null);
@@ -25,13 +32,11 @@ export function MainLayout() {
   };
 
   const openEditTaskModal = (task: Task) => {
-    console.log('openEditTaskModal called with:', task.id);
     setTaskToEdit(task);
     setIsModalOpen(true);
   };
 
   const handleSaveTask = async (taskData: any) => {
-    console.log('handleSaveTask called. Editing:', !!taskToEdit, 'Data:', taskData);
     try {
       if (taskToEdit) {
         await updateTask(taskToEdit.id, taskData);
@@ -43,15 +48,42 @@ export function MainLayout() {
     }
   };
 
+  const handleOpenNewProject = () => {
+    setProjectToEdit(null);
+    setIsProjectModalOpen(true);
+  };
+
+  const handleEditProject = (project: Project) => {
+    setProjectToEdit(project);
+    setIsProjectModalOpen(true);
+  };
+
+  const handleSaveProject = async (title: string, color: ProjectColor) => {
+    if (projectToEdit) {
+      await updateProject(projectToEdit.id, { title, color });
+    } else {
+      await addProject(title, color);
+    }
+  };
+
+  const handleDeleteProject = async (id: string) => {
+    await deleteProject(id);
+  };
+
   return (
     <div className={styles.layout}>
       <aside className={styles.sidebarWrapper}>
-        <Sidebar onNewTask={openNewTaskModal} />
+        <Sidebar
+          onNewTask={openNewTaskModal}
+          projects={projects}
+          onNewProject={handleOpenNewProject}
+          onEditProject={handleEditProject}
+        />
       </aside>
       
       <main className={styles.mainContent}>
         <div className={styles.container}>
-          <Outlet context={{ openNewTaskModal, openEditTaskModal } satisfies MainLayoutContext} />
+          <Outlet context={{ openNewTaskModal, openEditTaskModal, projects } satisfies MainLayoutContext} />
         </div>
       </main>
 
@@ -66,11 +98,21 @@ export function MainLayout() {
       <BottomNav />
       
       <TaskEditorModal 
-        key={isModalOpen ? 'open' : 'closed'}
+        key={isModalOpen ? (taskToEdit?.id || 'new') : 'closed'}
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
         onSave={handleSaveTask}
         initialData={taskToEdit}
+        projects={projects}
+      />
+
+      <ProjectModal
+        key={isProjectModalOpen ? (projectToEdit?.id || 'new-project') : 'project-closed'}
+        isOpen={isProjectModalOpen}
+        onClose={() => setIsProjectModalOpen(false)}
+        onSave={handleSaveProject}
+        onDelete={handleDeleteProject}
+        initialData={projectToEdit}
       />
     </div>
   );
