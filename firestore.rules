@@ -1,9 +1,50 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /users/{userId}/{document=**} {
-      // Users can only read/write their OWN data
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+    
+    // Helper: Verify user owns the data
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    // Schema: Project
+    function isValidProject() {
+      let data = request.resource.data;
+      let color = data.get('color', null);
+      return data.title is string && 
+             data.title.size() > 0 &&
+             (color == null || color is string);
+    }
+
+    // Schema: Task parameters
+    function isValidTask() {
+      let data = request.resource.data;
+      let status = data.get('status', null);
+      let projectId = data.get('projectId', null);
+      
+      // Mandatory fields: title and status
+      // Optional fields: projectId (must be string if present)
+      return data.title is string && 
+             data.title.size() > 0 &&
+             status in ['todo', 'completed', 'canceled', 'someday'] &&
+             (projectId == null || projectId is string);
+    }
+
+    // User Data Isolation
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+
+      // Projects Sub-collection
+      match /projects/{projectId} {
+        allow read, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidProject();
+      }
+
+      // Tasks Sub-collection
+      match /tasks/{taskId} {
+        allow read, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidTask();
+      }
     }
   }
 }

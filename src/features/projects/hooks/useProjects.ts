@@ -6,9 +6,11 @@ import {
   onSnapshot,
   addDoc,
   updateDoc,
-  deleteDoc,
   doc,
-  serverTimestamp
+  serverTimestamp,
+  getDocs,
+  where,
+  writeBatch
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useAuth } from '../../../lib/auth/AuthContext';
@@ -61,7 +63,26 @@ export function useProjects() {
   const deleteProject = async (id: string) => {
     if (!user) return;
     try {
-      await deleteDoc(doc(db, 'users', user.uid, 'projects', id));
+      // 1. Find tasks associated with this project
+      const tasksRef = collection(db, 'users', user.uid, 'tasks');
+      const q = query(tasksRef, where('projectId', '==', id));
+      const tasksSnap = await getDocs(q);
+
+      // 2. Prepare Atomic Batch
+      const batch = writeBatch(db);
+
+      // 3. Unassign tasks (cascade logic: set projectId to null)
+      tasksSnap.forEach((doc) => {
+        // Use 'updatedAt' if schema supports it, otherwise just projectId
+        batch.update(doc.ref, { projectId: null, updatedAt: serverTimestamp() });
+      });
+
+      // 4. Delete Project
+      const projectRef = doc(db, 'users', user.uid, 'projects', id);
+      batch.delete(projectRef);
+
+      // 5. Commit
+      await batch.commit();
     } catch (e) {
       console.error('Error deleting project', e);
       throw e;

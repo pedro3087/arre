@@ -67,13 +67,14 @@ graph TD
 
 - **Authentication**: Google Sign-In via Firebase Auth.
 - **Database**: Firestore queries wrapped in custom hooks.
+- **Security**: Firestore Rules enforce strict per-user isolation and schema validation.
 - **Storage**: Direct upload from client.
 - **Functions**: Callable Cloud Functions for complex logic (AI).
 
 ### 3. Backend Logic (Cloud Functions)
 
 - **Environment**: Node.js runtime.
-- **Triggers**: HTTPS Callable (for direct UI interaction) and Firestore Triggers (for background cleanups).
+- **Triggers**: HTTPS Callable (for Magic Import AI analysis).
 - **Security**: Admin SDK access, validated input.
 
 ### 4. Intelligence Layer (AI)

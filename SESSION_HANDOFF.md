@@ -128,22 +128,15 @@ The E2E test suite has accumulated issues across Phases 1–4. Tests must pass b
 12. **Sidebar/BottomNav**: Add "Logbook" navigation item with appropriate icon (e.g., `BookOpen` from Lucide)
 13. **Design**: Use the same `ProjectView.module.css` grouping pattern but group by date instead of project
 
-### P3 — Firestore Security & Project Deletion 🟡
+### P3 — Firestore Security & Project Deletion ✅ DONE
 
-14. **Firestore rules** (`firestore.rules`): Currently allows any authenticated user to read/write their own `users/{userId}/**` data. This is correct but should be reviewed for the `projects` subcollection specifically. Current rules:
+13. **Firestore rules** (`firestore.rules`): ✅ Implemented strict schema validation for `tasks` and `projects`.
+    - Enforced mandatory fields (`title`, `status`) and ownership checks (`userId`).
+    - Used helper functions (`isValidTask`, `isValidProject`) for modularity.
 
-    ```
-    match /users/{userId}/{document=**} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-    ```
-
-    These wildcard rules already cover `users/{userId}/projects/{projectId}` — this is fine.
-
-15. **Project deletion cascade**: When a project is deleted, tasks with that `projectId` should have their `projectId` cleared. Currently, deleting a project leaves orphaned `projectId` values on tasks. Options:
-    - **Client-side**: In `handleDeleteProject`, query all tasks with that `projectId` and batch-update them
-    - **Cloud Function**: Trigger on project deletion to clean up tasks
-    - **UI tolerance**: The current code safely handles missing projects (badge just won't show)
+14. **Project deletion cascade**: ✅ Implemented within `useProjects.ts`.
+    - Client-side batch operation automatically unassigns all associated tasks (`projectId: null`) when a project is deleted.
+    - Ensures data integrity and prevents orphaned tasks.
 
 ### P4 — Deployment & CI/CD 🔵
 
