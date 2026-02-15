@@ -43,6 +43,7 @@ export function MainLayout() {
       } else {
         await addTask(taskData);
       }
+      setIsModalOpen(false);
     } catch (e) {
       console.error("Failed to save task", e);
     }

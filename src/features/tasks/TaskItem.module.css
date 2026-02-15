@@ -129,6 +129,12 @@
   opacity: 1;
 }
 
+@media (hover: none) {
+  .actions {
+    opacity: 1;
+  }
+}
+
 .actionBtn {
   background: none;
   border: none;
