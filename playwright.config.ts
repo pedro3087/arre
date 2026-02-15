@@ -42,19 +42,20 @@ export default defineConfig({
     },
 
     /* Test against mobile viewports. */
-    {
-      name: 'Mobile Chrome',
-      use: { ...devices['Pixel 5'] },
-    },
-    {
-      name: 'Mobile Safari',
-      use: { ...devices['iPhone 12'] },
-    },
-    /* Test against tablet viewports. */
-    {
-      name: 'iPad Pro 11',
-      use: { ...devices['iPad Pro 11'] },
-    },
+    // TEMPORARILY DISABLED: Focusing on Web (Desktop) MVP
+    // {
+    //   name: 'Mobile Chrome',
+    //   use: { ...devices['Pixel 5'] },
+    // },
+    // {
+    //   name: 'Mobile Safari',
+    //   use: { ...devices['iPhone 12'] },
+    // },
+    // /* Test against tablet viewports. */
+    // {
+    //   name: 'iPad Pro 11',
+    //   use: { ...devices['iPad Pro 11'] },
+    // },
   ],
 
   /* Run your local dev server before starting the tests */

@@ -77,9 +77,9 @@ export function useTasks(view?: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'so
   };
 
   useEffect(() => {
-    if (!user || !view) {
-      if (!view) setLoading(false);
-      else setTasks([]);
+    if (!user) {
+      setTasks([]);
+      setLoading(false);
       return;
     }
 
@@ -87,13 +87,15 @@ export function useTasks(view?: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'so
     let q;
     const today = new Date().toISOString().split('T')[0];
 
-    // Query Logic per View (matches PENDING_UI_FEATURES.md)
+    // Query Logic per View
+    // Note: Using 'status == todo' instead of '!= completed' to avoid Firestore index issues
+    // and invalid range+inequality combinations (especially for 'upcoming').
     switch (view) {
       case 'today':
         q = query(
           tasksRef, 
           where('date', '==', today), 
-          where('status', '!=', 'completed'),
+          where('status', '==', 'todo'),
           orderBy('isEvening', 'asc'),
           orderBy('createdAt', 'desc')
         );
@@ -103,7 +105,7 @@ export function useTasks(view?: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'so
         q = query(
           tasksRef,
           where('date', '==', null),
-          where('status', '!=', 'completed'),
+          where('status', '==', 'todo'),
           orderBy('createdAt', 'desc')
         );
         break;
@@ -112,7 +114,7 @@ export function useTasks(view?: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'so
         q = query(
           tasksRef,
           where('date', '>', today),
-          where('status', '!=', 'completed'),
+          where('status', '==', 'todo'),
           orderBy('date', 'asc')
         );
         break;
@@ -121,13 +123,17 @@ export function useTasks(view?: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'so
         q = query(
           tasksRef,
           where('date', '==', null),
-          where('status', 'not-in', ['completed', 'someday']),
+          where('status', '==', 'todo'),
           orderBy('createdAt', 'desc')
         );
         break;
 
-       case 'someday':
-        q = query(tasksRef, where('status', '==', 'someday'));
+      case 'someday':
+        q = query(
+          tasksRef, 
+          where('status', '==', 'someday'),
+          orderBy('createdAt', 'desc')
+        );
         break;
 
       case 'logbook':
