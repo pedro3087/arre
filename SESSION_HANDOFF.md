@@ -64,87 +64,122 @@
 
 ---
 
-## 🔴 Known Bugs / Blockers (Must Fix)
+## � What To Do Next — Phase 5: Polish, Stability & Deploy
 
-### 1. `full-flow.spec.ts` has TWO `catch` blocks (syntax error)
+The app's core feature set is now complete. The next phase is focused on **hardening** — fixing tests, cleaning up code, adding the final view (Logbook), and preparing for deployment.
 
-**File**: `tests/full-flow.spec.ts`, lines 109–122  
-**Problem**: There are two consecutive `catch (e)` blocks — invalid JavaScript syntax.  
-**Fix**: Remove the first `catch` block or restructure the try/catch. The intent is:
+### P0 — Test Stability (Critical) 🔴
 
-```typescript
-try {
-  await expect(page.getByText("Tasks Generated")).toBeVisible({
-    timeout: 20000,
-  });
-  await page.getByTestId("btn-import-all").click();
-  await expect(page.getByText("Imported via Magic Import")).toBeVisible();
-} catch (e) {
-  console.log("AI step timed out or failed", e);
-}
-```
+The E2E test suite has accumulated issues across Phases 1–4. Tests must pass before any deployment.
 
-### 2. `full-flow.spec.ts` has duplicate comments/lines
+1. **Audit all 3 test files** against the current UI:
+   - `tests/new-task.spec.ts` (3 tests): Uses `new-task-modal` testid — verify these still match the TaskEditorModal's testids. The modal heading may have changed from "Magic Import" to something else after the TaskEditorModal rewrite.
+   - `tests/full-flow.spec.ts` (2 tests): The magic import test is `test.skip`'d — this is fine. The lifecycle test creates tasks via openNewTaskModal helper — verify testids match.
+   - `tests/task-actions.spec.ts` (1 test): Uses `btn-new-task-main` (Inbox-only) — this test only runs from `/inbox`. Verify the edit/delete flow still works. The test looks for `getByTitle('Edit')` and `getByTitle('Delete')` — confirm these title attributes exist on the TaskItem action buttons.
 
-**File**: `tests/full-flow.spec.ts`  
-**Lines**: 13-14 (duplicate "Navigate to Upcoming"), 19-20 (duplicate "Create a task"), 50-51 (duplicate "Navigate to Someday"), 56-57 (duplicate "Create a Someday task"), 75-78 (duplicate `page.goto('/inbox')`)  
-**Fix**: Remove the duplicate comment/code lines.
+2. **Run tests and fix failures**:
 
-### 3. `full-flow.spec.ts` — unused `path` and `fs` imports
+   ```bash
+   # Start emulators first
+   npm run emulators
+   # Run tests (chromium first for speed)
+   npx playwright test --project=chromium
+   # Then all browsers
+   npx playwright test
+   ```
 
-**File**: `tests/full-flow.spec.ts`, lines 3-4  
-**Problem**: `import path from 'path'` and `import fs from 'fs'` cause lint errors because `@types/node` aren't resolved in the Playwright test context, and they're not actually used.  
-**Fix**: Remove both imports.
+3. **Add project-specific tests**: New test file `tests/project-management.spec.ts` covering:
+   - Create a project via the ProjectModal
+   - Assign a task to a project
+   - Verify project badge appears on TaskItem
+   - Verify project grouping in Anytime view
+   - Edit and delete a project
 
-### 4. `full-flow.spec.ts` — `Buffer.from()` not recognized
+### P1 — Code Cleanup & Technical Debt 🟡
 
-**File**: `tests/full-flow.spec.ts`, line 89  
-**Problem**: `Buffer` is a Node.js global not available without proper types. Also, Playwright's `setInputFiles` accepts `Buffer` natively in Node.js context.  
-**Fix**: Either add `/// <reference types="node" />` at the top, or use a simpler file upload approach.
+4. **Node.js version**: Current is 22.10.0, Vite 7 requires 22.12+. Upgrade via `nvm install 22.12` or download from nodejs.org. This causes a warning on every `vite` command but doesn't block functionality.
 
-### 5. `new-task.spec.ts` — `.catch()` on Locator (line 52)
+5. **Sidebar inline styles**: `src/layout/Sidebar.tsx` may still have an inline `<style>` tag from Phase 3. Move those styles to `Sidebar.module.css`.
 
-**File**: `tests/new-task.spec.ts`, line 52  
-**Problem**: `page.getByText('high', { exact: true }).catch(...)` — Playwright Locators don't have `.catch()`.  
-**Fix**: Use proper try/catch or just click directly:
+6. **Consolidate "New Task" buttons**: `Inbox.tsx` has its own `btn-new-task-main` button that opens the modal. `MainLayout.tsx` also manages the modal. These duplicate paths could cause confusion. Consider having Inbox use the global TaskEditorModal from MainLayout via context, like other views do.
 
-```typescript
-await page.getByText("High").click();
-```
+7. **TaskEditorModal vs NewTaskModal naming**: Some test files reference `new-task-modal` testid but the component was renamed to `TaskEditorModal`. Verify all testids are consistent. The actual `data-testid` on the DOM element matters, not the component file name.
 
-### 6. `new-task.spec.ts` — login() redirects to `/` but test expects `/inbox`
+8. **Dashboard metrics**: `DashboardStats`, `VelocityChart`, `EnergyFilter` have unused variable warnings from TypeScript (`useRef`, `fillColor`, `Icon`). Clean these up.
 
-**File**: `tests/utils.ts` line 7, and `tests/new-task.spec.ts` line 11  
-**Problem**: `login()` asserts `toHaveURL('/')` (dashboard). Then `beforeEach` navigates to `/inbox`. If anonymous auth with emulator doesn't work, login will fail here.  
-**Fix**: Ensure Firebase Auth emulator is running and anonymous auth is enabled. The emulator must be started with `npm run emulators` which includes `auth`.
+### P2 — Logbook View (New Feature) 🟢
 
-### 7. Node.js Version Warning
+9. **Route**: `/logbook` — add to `App.tsx` routing
+10. **UI**: Reverse chronological list of completed tasks, grouped by "Date Completed"
+11. **Query**: `tasks.where('status', '==', 'completed').orderBy('completedAt', 'desc')`
+12. **Sidebar/BottomNav**: Add "Logbook" navigation item with appropriate icon (e.g., `BookOpen` from Lucide)
+13. **Design**: Use the same `ProjectView.module.css` grouping pattern but group by date instead of project
 
-**Problem**: Current Node.js is 22.10.0, but Vite 7 requires 20.19+ or **22.12+**.  
-**Fix**: Upgrade Node.js to at least 22.12 (e.g., `nvm install 22.12` or download from nodejs.org).
+### P3 — Firestore Security & Project Deletion 🟡
 
-### 8. Sidebar styling uses inline `<style>` tag
+14. **Firestore rules** (`firestore.rules`): Currently allows any authenticated user to read/write their own `users/{userId}/**` data. This is correct but should be reviewed for the `projects` subcollection specifically. Current rules:
 
-**File**: `src/layout/Sidebar.tsx`, lines 83-119  
-**Problem**: The new "New Task" button and action group styles are injected via an inline `<style>` tag with CSS Module class references. This works but is not ideal — the styles should be in `Sidebar.module.css`.  
-**Fix**: Move the styles from the inline `<style>` block into `src/layout/Sidebar.module.css` as proper CSS Module classes.
+    ```
+    match /users/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    ```
+
+    These wildcard rules already cover `users/{userId}/projects/{projectId}` — this is fine.
+
+15. **Project deletion cascade**: When a project is deleted, tasks with that `projectId` should have their `projectId` cleared. Currently, deleting a project leaves orphaned `projectId` values on tasks. Options:
+    - **Client-side**: In `handleDeleteProject`, query all tasks with that `projectId` and batch-update them
+    - **Cloud Function**: Trigger on project deletion to clean up tasks
+    - **UI tolerance**: The current code safely handles missing projects (badge just won't show)
+
+### P4 — Deployment & CI/CD 🔵
+
+16. **Firebase Hosting**: Deploy the built frontend
+    ```bash
+    npm run build
+    firebase deploy --only hosting
+    ```
+17. **Cloud Functions**: Deploy the `processMagicImport` function
+    ```bash
+    firebase deploy --only functions
+    ```
+18. **CI/CD Pipeline**: GitHub Actions workflow for:
+    - Build verification on PR
+    - Playwright tests with Firebase emulators
+    - Auto-deploy on merge to `main`
+
+19. **PWA**: Add `vite-plugin-pwa` for offline support, service worker, and install prompt
+
+### P5 — Future Enhancements (Backlog) 🔮
+
+20. **Drag & Drop**: Reorder tasks within project groups (use `@dnd-kit/core`)
+21. **Sidebar project navigation**: Click a project in sidebar → filter views to show only that project's tasks
+22. **Recurring tasks**: Weekly/monthly repeat patterns
+23. **Tags system**: Beyond projects — hashtag-style labels for cross-cutting concerns
+24. **Keyboard shortcuts**: Quick-add task, navigate views, toggle sidebar
+25. **Mobile native**: React Native / Expo version
 
 ---
 
-## 🟡 Tests Status — ALL 30 FAILING
+## 🟡 Known Bugs / Issues
 
-| Test File           | Tests                     | Status     | Root Cause                                                                      |
-| ------------------- | ------------------------- | ---------- | ------------------------------------------------------------------------------- |
-| `new-task.spec.ts`  | 3 tests × 6 browsers = 18 | ❌ Failing | Login not working (anonymous auth not reaching emulator), `.catch()` on locator |
-| `full-flow.spec.ts` | 2 tests × 6 browsers = 12 | ❌ Failing | Same login issue + syntax errors (double catch) + unused imports                |
+### 1. Test suite needs re-validation after Phase 4
 
-### Why Tests Are Failing — Root Cause Analysis
+**Impact**: Test files reference testids and UI elements from before the TaskEditorModal rewrite and project management additions. Some may fail due to:
 
-1. **Primary**: The `login()` function clicks `dev-login-button` which calls `signInAnonymously(auth)` via Firebase Auth. For this to work **Firebase Auth emulator must be running** (`npm run emulators`) AND the app must be configured to connect to the auth emulator. Check `src/lib/firebase.ts` — verify `connectAuthEmulator(auth, 'http://localhost:9099')` is present and active.
+- Changed headings/labels in the modal
+- New project selector UI interfering with existing test flows
+- Sidebar now has a "Projects" section that shifts layout
 
-2. **Secondary**: Even if login succeeds, the test files have syntax/type bugs listed in "Known Bugs" above.
+### 2. Node.js version warning
 
-3. **Mobile tests**: On mobile viewports (Pixel 5, iPhone 12), the sidebar is hidden. Tests try `btn-new-task-sidebar` first, fall back to `btn-new-task-fab`. The FAB is in MainLayout with `display: none` default, `display: flex` at `max-width: 768px`. This logic should work if the CSS is correct.
+**Problem**: Node.js 22.10.0, Vite 7 needs 22.12+.
+**Impact**: Warning only, not blocking.
+
+### 3. Orphaned task projectIds
+
+**Problem**: Deleting a project doesn't clear `projectId` from associated tasks.
+**Impact**: Low — UI gracefully ignores unknown projectIds (badge just doesn't render).
 
 ---
 
@@ -152,31 +187,32 @@ await page.getByText("High").click();
 
 ### App Source (`src/`)
 
-| File                                        | Purpose                                                              |
-| ------------------------------------------- | -------------------------------------------------------------------- |
-| `main.tsx`                                  | App entry, routing setup                                             |
-| `App.tsx`                                   | Root component with providers                                        |
-| `lib/firebase.ts`                           | Firebase init + emulator connections                                 |
-| `lib/auth/AuthContext.tsx`                  | Auth context with Google + Anonymous sign-in                         |
-| `lib/auth/ProtectedRoute.tsx`               | Route guard for authenticated users                                  |
-| `layout/MainLayout.tsx`                     | Layout shell: Sidebar + Content + BottomNav + FAB + NewTaskModal     |
-| `layout/Sidebar.tsx`                        | Desktop nav + "New Task" button                                      |
-| `layout/BottomNav.tsx`                      | Mobile bottom nav                                                    |
-| `pages/Login.tsx`                           | Login page with Google + Dev buttons                                 |
-| `pages/Dashboard.tsx`                       | Today view                                                           |
-| `pages/Inbox.tsx`                           | Inbox view (has its own "New Task" button too — `btn-new-task-main`) |
-| `pages/Upcoming.tsx`                        | Groups tasks by date                                                 |
-| `pages/Anytime.tsx`                         | Tasks without specific dates                                         |
-| `pages/Someday.tsx`                         | Parked/someday tasks                                                 |
-| `features/tasks/NewTaskModal.tsx`           | Create task modal (Manual + AI tabs)                                 |
-| `features/tasks/TaskItem.tsx`               | Single task row component                                            |
-| `features/tasks/hooks/useTasks.ts`          | Firestore CRUD hook                                                  |
-| `shared/types/task.ts`                      | `TaskStatus`, `Project`, `PROJECT_COLORS`, `ProjectColor`            |
-| `lib/types/firestore.ts`                    | Firestore document interfaces                                        |
-| `features/projects/hooks/useProjects.ts`    | Firestore CRUD hook for projects (real-time)                         |
-| `features/projects/ProjectModal.tsx`        | Create/edit/delete project modal with color picker                   |
-| `features/projects/ProjectModal.module.css` | Styles for the project modal                                         |
-| `pages/ProjectView.module.css`              | Shared styles for project-grouped views (Anytime, Someday)           |
+| File                                        | Purpose                                                               |
+| ------------------------------------------- | --------------------------------------------------------------------- |
+| `main.tsx`                                  | App entry, routing setup                                              |
+| `App.tsx`                                   | Root component with providers + route definitions                     |
+| `lib/firebase.ts`                           | Firebase init + emulator connections                                  |
+| `lib/auth/AuthContext.tsx`                  | Auth context with Google + Anonymous sign-in                          |
+| `lib/auth/ProtectedRoute.tsx`               | Route guard for authenticated users                                   |
+| `layout/MainLayout.tsx`                     | Layout shell: Sidebar + Content + BottomNav + FAB + Modals + Projects |
+| `layout/Sidebar.tsx`                        | Desktop nav + Projects list + "New Task" button                       |
+| `layout/BottomNav.tsx`                      | Mobile bottom nav                                                     |
+| `pages/Login.tsx`                           | Login page with Google + Dev buttons                                  |
+| `pages/Dashboard.tsx`                       | Today view                                                            |
+| `pages/Inbox.tsx`                           | Inbox view + energy filter + own "New Task" button                    |
+| `pages/Upcoming.tsx`                        | Groups tasks by date                                                  |
+| `pages/Anytime.tsx`                         | Groups tasks by project ("Single Actions" for unassigned)             |
+| `pages/Someday.tsx`                         | Groups tasks by project ("Loose Ideas" for unassigned)                |
+| `features/tasks/TaskEditorModal.tsx`        | Create/edit task modal with project selector                          |
+| `features/tasks/NewTaskModal.tsx`           | Legacy? Verify if still used or replaced by TaskEditorModal           |
+| `features/tasks/TaskItem.tsx`               | Single task row with project badge, edit/delete actions               |
+| `features/tasks/hooks/useTasks.ts`          | Firestore CRUD hook for tasks (real-time)                             |
+| `shared/types/task.ts`                      | `TaskStatus`, `Project`, `PROJECT_COLORS`, `ProjectColor`             |
+| `lib/types/firestore.ts`                    | Firestore document interfaces                                         |
+| `features/projects/hooks/useProjects.ts`    | Firestore CRUD hook for projects (real-time)                          |
+| `features/projects/ProjectModal.tsx`        | Create/edit/delete project modal with color picker                    |
+| `features/projects/ProjectModal.module.css` | Styles for the project modal                                          |
+| `pages/ProjectView.module.css`              | Shared styles for project-grouped views (Anytime, Someday)            |
 
 ### Functions (`functions/`)
 
@@ -187,11 +223,12 @@ await page.getByText("High").click();
 
 ### Tests (`tests/`)
 
-| File                | Purpose                                                               |
-| ------------------- | --------------------------------------------------------------------- |
-| `utils.ts`          | `login()` helper — clicks dev-login-button                            |
-| `new-task.spec.ts`  | 3 tests: open/close modal, create manual task, verify magic import UI |
-| `full-flow.spec.ts` | 2 tests: full lifecycle across views, magic import file upload        |
+| File                   | Purpose                                                               |
+| ---------------------- | --------------------------------------------------------------------- |
+| `utils.ts`             | `login()` helper — clicks dev-login-button                            |
+| `new-task.spec.ts`     | 3 tests: open/close modal, create manual task, verify magic import UI |
+| `full-flow.spec.ts`    | 2 tests: full lifecycle across views, magic import file upload (skip) |
+| `task-actions.spec.ts` | 1 test: edit and delete a task from Inbox                             |
 
 ### Config
 
@@ -199,33 +236,8 @@ await page.getByText("High").click();
 | ---------------------- | --------------------------------------------------------------------- |
 | `playwright.config.ts` | 6 browser configs, webServer on port 5173                             |
 | `firebase.json`        | Emulator ports and config                                             |
+| `firestore.rules`      | Security rules (user-scoped read/write)                               |
 | `package.json`         | Scripts including `emulators` with `auth,firestore,storage,functions` |
-
----
-
-## 📋 What To Do Next (Priority Order)
-
-### P0 — Fix Broken Tests
-
-1. **Fix `full-flow.spec.ts` syntax**: Remove duplicate catch block, remove duplicate comments, remove unused `path`/`fs` imports
-2. **Fix `new-task.spec.ts` line 52**: Replace `.catch()` on Locator with proper click
-3. **Verify emulator auth**: Ensure `src/lib/firebase.ts` connects to auth emulator so anonymous login works
-4. **Run tests with emulators**: Start emulators (`npm run emulators`), then run `npx playwright test` — ideally focus on chromium first: `npx playwright test --project=chromium`
-
-### P1 — Clean Up Code
-
-5. **Move Sidebar inline styles** to `Sidebar.module.css`
-6. **Consolidate "New Task" buttons**: Inbox has its own `btn-new-task-main`; MainLayout also has the modal. Decide if Inbox should keep its own button or use the global one from Sidebar/FAB
-7. **Upgrade Node.js** to 22.12+ for Vite compatibility
-
-### P2 — Feature Completion
-
-8. **Firestore security rules**: Verify rules allow read/write for authenticated users
-9. **Magic Import E2E**: The AI test depends on a `GEMINI_API_KEY` secret. In emulator mode, either mock the function response or skip the AI assertion gracefully
-10. ~~**Task editing/deletion**: Not yet implemented~~ ✅ Done (TaskEditorModal supports edit mode)
-11. ~~**Project grouping**: Tasks can belong to projects (`projectId` field) but no project CRUD UI exists yet~~ ✅ Done (Phase 4)
-12. **Logbook view**: Completed tasks archive grouped by date (route `/logbook`)
-13. **Drag & drop**: Kanban-style reordering within project groups
 
 ---
 
@@ -285,3 +297,4 @@ npx playwright show-report
 | `btn-save-project`     | ProjectModal    | Save/Create project button        |
 | `btn-delete-project`   | ProjectModal    | Delete project button             |
 | `btn-new-project`      | Sidebar         | New project button in sidebar     |
+| `task-item`            | TaskItem        | Individual task row               |

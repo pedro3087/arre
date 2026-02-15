@@ -125,13 +125,35 @@ mindmap
     npm run build
     ```
 
-## 🔮 Future Roadmap (Pending)
+## 🗺️ Roadmap
 
-- **Drag & Drop**: Kanban-style reordering within project groups.
-- **Logbook View**: Completed tasks archive grouped by date.
-- **Mobile Native**: React Native / Expo version.
-- **PWA Support**: Offline-capable progressive web app.
-- **CI/CD Pipeline**: Automated testing and deployment.
+### ✅ Completed
+
+| Phase | Name                   | Highlights                                                                      |
+| ----- | ---------------------- | ------------------------------------------------------------------------------- |
+| 1     | Core App Structure     | Vite + React + TypeScript, Firebase Auth, Theming, Sidebar/BottomNav, All views |
+| 2     | AI & Advanced Features | Magic Import (Gemini 1.5 Pro), Upcoming/Anytime/Someday views, Energy filtering |
+| 3     | Testing Infrastructure | Playwright E2E, Anonymous auth for tests, 6-browser config, FAB for mobile      |
+| 4     | Project Management     | CRUD with 10-color palette, Sidebar listing, Task assignment, Grouped views     |
+
+### 🔜 Phase 5 — Polish, Stability & Deploy
+
+| Priority | Task                                                                                          | Status  |
+| -------- | --------------------------------------------------------------------------------------------- | ------- |
+| P0 🔴    | **Test stability** — Re-validate all E2E tests against current UI, add project-specific tests | Pending |
+| P1 🟡    | **Code cleanup** — Upgrade Node.js 22.12+, remove inline styles, consolidate New Task buttons | Pending |
+| P2 🟢    | **Logbook view** — Completed tasks archive at `/logbook`, grouped by date                     | Pending |
+| P3 🟡    | **Security & data integrity** — Firestore rules review, project deletion cascade              | Pending |
+| P4 🔵    | **Deployment** — Firebase Hosting + Functions deploy, CI/CD pipeline, PWA support             | Pending |
+
+### 🔮 Future (Backlog)
+
+- **Drag & Drop**: Reorder tasks within project groups
+- **Project Filtering**: Click sidebar project → filter all views to that project
+- **Recurring Tasks**: Weekly/monthly repeat patterns
+- **Tags System**: Cross-cutting labels beyond projects
+- **Keyboard Shortcuts**: Quick-add, view navigation, sidebar toggle
+- **Mobile Native**: React Native / Expo version
 
 ## 🔥 Backend & Services
 
