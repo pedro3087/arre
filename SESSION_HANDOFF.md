@@ -95,9 +95,9 @@ The E2E test suite has accumulated issues across Phases 1–4. Tests must pass b
    - Verify project grouping in Anytime view
    - Edit and delete a project
 
-### P1 — Code Cleanup & Technical Debt 🟡 (MOSTLY DONE ✅)
+### P1 — Code Cleanup & Technical Debt ✅ DONE
 
-4. **Node.js version**: Current is 22.10.0, Vite 7 requires 22.12+. Upgrade via `nvm install 22.12` or download from nodejs.org. This causes a warning on every `vite` command but doesn't block functionality. ⏳ _Requires manual system upgrade_
+4. ~~**Node.js version**~~: ✅ Upgraded from 22.10.0 → 22.22.0 via `nvm use 22.22.0`. Vite 7 warning gone. Build time improved ~2x.
 
 5. ~~**Sidebar inline styles**~~: ✅ No inline `<style>` tags remain in any component.
 
@@ -179,10 +179,9 @@ The E2E test suite has accumulated issues across Phases 1–4. Tests must pass b
 - New project selector UI interfering with existing test flows
 - Sidebar now has a "Projects" section that shifts layout
 
-### 2. Node.js version warning
+### ~~2. Node.js version warning~~ ✅ FIXED
 
-**Problem**: Node.js 22.10.0, Vite 7 needs 22.12+.
-**Impact**: Warning only, not blocking.
+Upgraded to Node 22.22.0 via nvm.
 
 ### 3. Orphaned task projectIds
 
@@ -273,7 +272,7 @@ npx playwright show-report
 
 ## ⚙️ Environment Notes
 
-- **Node.js**: v22.10.0 (needs 22.12+ for Vite 7)
+- **Node.js**: v22.22.0 (managed via nvm-windows 1.2.2, v22.10.0 also available)
 - **OS**: Windows
 - **Firebase Emulator Ports**: Auth=9099, Firestore=8080, Storage=9199, Functions=5001
 - **Dev Server**: http://localhost:5173
