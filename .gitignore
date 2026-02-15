@@ -22,3 +22,15 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Test results and reports
+playwright-report/
+test-results/
+test-results.json
+test-output*.txt
+git_status_*.txt
+head_commit_files.txt
+
+# Firebase logs
+*-debug.log*
+emulator.log
