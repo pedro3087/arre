@@ -11,6 +11,8 @@ node_modules
 dist
 dist-ssr
 *.local
+.env
+.env.*
 
 # Editor directories and files
 .vscode/*
@@ -34,3 +36,7 @@ head_commit_files.txt
 # Firebase logs
 *-debug.log*
 emulator.log
+ui-debug.log
+
+# Firebase
+.firebase/

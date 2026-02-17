@@ -191,7 +191,7 @@ To run the full stack locally (including Auth and Database emulators):
 ### 📚 Backend Architecture
 
 For a detailed breakdown of the Firestore schema, Security Rules, and Cloud Functions logic, please refer to:
-[BACKEND_ARCHITECTURE.md](./BACKEND_ARCHITECTURE.md)
+[BACKEND_ARCHITECTURE.md](./docs/BACKEND_ARCHITECTURE.md)
 
 ### 🧪 Automated Testing
 
@@ -204,7 +204,7 @@ We use Playwright for E2E testing to ensure stability across all platforms. Curr
   - Advanced flows (Project Management) skipped due to local emulator latency, but code is complete.
 - Verified scenarios: Magic Import flow, Task Lifecycle, Cross-view Synchronization.
 
-See the [Testing Guide](./TESTING.md) for instructions on running tests locally.
+See the [Testing Guide](./docs/TESTING.md) for instructions on running tests locally.
 
 ## 🛡️ Security & Reliability
 

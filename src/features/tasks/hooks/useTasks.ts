@@ -26,7 +26,7 @@ const convertTask = (doc: any): Task => {
   } as Task;
 };
 
-export function useTasks(view?: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'someday' | 'logbook') {
+export function useTasks(view?: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'someday' | 'logbook' | null) {
   const { user } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
@@ -79,6 +79,12 @@ export function useTasks(view?: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'so
   useEffect(() => {
     if (!user) {
       setTasks([]);
+      setLoading(false);
+      return;
+    }
+
+    // Optimization: If view is null, user only wants actions, not data.
+    if (view === null) {
       setLoading(false);
       return;
     }

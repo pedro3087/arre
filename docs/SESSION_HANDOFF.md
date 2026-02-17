@@ -140,11 +140,9 @@ The E2E test suite has accumulated issues across Phases 1–4. Tests must pass b
 
 ### P4 — Deployment & CI/CD 🔵
 
-16. **Firebase Hosting**: Deploy the built frontend
-    ```bash
-    npm run build
-    firebase deploy --only hosting
-    ```
+16. ~~**Firebase Hosting**: Deploy the built frontend~~: ✅ DONE.
+    - Updated `firebase.json` with hosting configuration (`public: "dist"`, SPA rewrites).
+    - Built via `npm run build` and deployed to `https://arre-app-dev.web.app`.
 17. **Cloud Functions**: Deploy the `processMagicImport` function
     ```bash
     firebase deploy --only functions

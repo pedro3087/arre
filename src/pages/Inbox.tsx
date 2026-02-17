@@ -33,7 +33,7 @@ export function Inbox() {
     day: 'numeric',
   });
 
-  if (loading) return <div className={styles.loading}>Loading tasks...</div>;
+  // if (loading) return <div className={styles.loading}>Loading tasks...</div>; // Render structure instead
   if (error) return <div className={styles.error}>Error: {error}</div>;
 
   return (
@@ -76,10 +76,20 @@ export function Inbox() {
           <button className={inboxStyles.iconButton}><Filter size={16} /></button>
         </div>
 
-        {filteredTasks.map(task => (
-           <TaskItem key={task.id} task={task} onToggle={handleToggle} />
-        ))}
-        {filteredTasks.length === 0 && <p className={styles.emptyState}>No tasks match this filter.</p>}
+        {loading ? (
+          <div className={styles.loadingState}>
+             <div className="skeleton-line" style={{ height: '40px', marginBottom: '8px', background: 'var(--bg-elevated)', borderRadius: '8px' }}></div>
+             <div className="skeleton-line" style={{ height: '40px', marginBottom: '8px', background: 'var(--bg-elevated)', borderRadius: '8px' }}></div>
+             <div className="skeleton-line" style={{ height: '40px', marginBottom: '8px', background: 'var(--bg-elevated)', borderRadius: '8px' }}></div>
+          </div>
+        ) : (
+          <>
+            {filteredTasks.map(task => (
+               <TaskItem key={task.id} task={task} onToggle={handleToggle} />
+            ))}
+            {filteredTasks.length === 0 && <p className={styles.emptyState}>No tasks match this filter.</p>}
+          </>
+        )}
       </div>
     </div>
   );

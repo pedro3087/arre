@@ -23,7 +23,7 @@ export function MainLayout() {
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [projectToEdit, setProjectToEdit] = useState<Project | null>(null);
   
-  const { addTask, updateTask } = useTasks('inbox');
+  const { addTask, updateTask } = useTasks(null);
   const { projects, addProject, updateProject, deleteProject } = useProjects();
 
   const openNewTaskModal = () => {
