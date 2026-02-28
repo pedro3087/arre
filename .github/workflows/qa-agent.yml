@@ -31,7 +31,7 @@ jobs:
       # Alternatively, use 'if: failure()' on the subsequent steps.
       - name: Run Playwright tests
         id: playwright
-        run: npm run test
+        run: npx firebase emulators:exec "npm run test" --project demo-test
         env:
           # Pass CI flag so playwright config builds json reporter
           CI: true
