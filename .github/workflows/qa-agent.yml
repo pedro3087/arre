@@ -1,0 +1,58 @@
+name: CI / E2E Tests with AI QA Agent
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Fetch depth 0 to ensure we have history to generate a git diff against main
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      # Using 'continue-on-error: true' ensures the workflow doesn't completely stop here if tests fail.
+      # We want the next step (AI Agent) to run right after.
+      # Alternatively, use 'if: failure()' on the subsequent steps.
+      - name: Run Playwright tests
+        id: playwright
+        run: npm run test
+        env:
+          # Pass CI flag so playwright config builds json reporter
+          CI: true
+
+      - name: Run AI QA Agent
+        if: failure() && steps.playwright.outcome == 'failure'
+        run: node scripts/qa-agent.js
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
+          COMMIT_SHA: ${{ github.sha }}
+          TEST_REPORT_PATH: "test-results.json"
+
+      # Finally, if playwright failed, we should still fail the job overall
+      # so the PR is blocked from merging.
+      - name: Check overall test status
+        if: always()
+        run: |
+          if [ "${{ steps.playwright.outcome }}" == "failure" ]; then
+            exit 1
+          fi
