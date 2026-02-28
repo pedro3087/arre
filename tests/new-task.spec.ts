@@ -66,6 +66,6 @@ test.describe('New Task Modal Flow', () => {
   test('should verify magic import UI elements', async ({ page }) => {
     await openModal(page);
     await expect(page.getByTestId('drop-zone')).toBeVisible();
-    await expect(page.getByText('This text does not exist so it should fail AI QA Agent')).toBeVisible();
+    await expect(page.getByText('Drop PDF or CSV here')).toBeVisible();
   });
 });
