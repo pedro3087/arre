@@ -20,24 +20,38 @@ jobs:
           node-version: lts/*
           cache: "npm"
 
-      - name: Install dependencies
+      - name: Install dependencies (root)
         run: npm ci
+
+      - name: Install dependencies (functions)
+        run: cd functions && npm ci
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
+
+      - name: Set up Java 21 (Required for Firebase Emulators)
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
 
       # Using 'continue-on-error: true' ensures the workflow doesn't completely stop here if tests fail.
       # We want the next step (AI Agent) to run right after.
       # Alternatively, use 'if: failure()' on the subsequent steps.
       - name: Run Playwright tests
         id: playwright
-        run: npx firebase emulators:exec "npm run test" --project demo-test
+        run: CI=true npx firebase emulators:exec "npx playwright test --project=chromium" --project demo-test
+        continue-on-error: true
         env:
-          # Pass CI flag so playwright config builds json reporter
-          CI: true
+          VITE_FIREBASE_API_KEY: "demo-api-key"
+          VITE_FIREBASE_AUTH_DOMAIN: "demo-test.firebaseapp.com"
+          VITE_FIREBASE_PROJECT_ID: "demo-test"
+          VITE_FIREBASE_STORAGE_BUCKET: "demo-test.appspot.com"
+          VITE_FIREBASE_MESSAGING_SENDER_ID: "123456789"
+          VITE_FIREBASE_APP_ID: "1:123456789:web:abcdef"
 
       - name: Run AI QA Agent
-        if: failure() && steps.playwright.outcome == 'failure'
+        if: always()
         run: node scripts/qa-agent.js
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
