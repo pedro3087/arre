@@ -40,7 +40,7 @@ jobs:
       # Alternatively, use 'if: failure()' on the subsequent steps.
       - name: Run Playwright tests
         id: playwright
-        run: CI=true npx firebase emulators:exec "npm run test" --project demo-test
+        run: CI=true npx firebase emulators:exec "npx playwright test --project=chromium" --project demo-test
         continue-on-error: true
 
       - name: Run AI QA Agent
