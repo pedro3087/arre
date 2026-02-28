@@ -26,6 +26,12 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
+      - name: Set up Java 21 (Required for Firebase Emulators)
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
+
       # Using 'continue-on-error: true' ensures the workflow doesn't completely stop here if tests fail.
       # We want the next step (AI Agent) to run right after.
       # Alternatively, use 'if: failure()' on the subsequent steps.
