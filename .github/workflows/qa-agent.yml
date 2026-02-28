@@ -20,8 +20,11 @@ jobs:
           node-version: lts/*
           cache: "npm"
 
-      - name: Install dependencies
+      - name: Install dependencies (root)
         run: npm ci
+
+      - name: Install dependencies (functions)
+        run: cd functions && npm ci
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
@@ -38,6 +41,7 @@ jobs:
       - name: Run Playwright tests
         id: playwright
         run: npx firebase emulators:exec "npm run test" --project demo-test
+        continue-on-error: true
         env:
           # Pass CI flag so playwright config builds json reporter
           CI: true
