@@ -144,7 +144,7 @@ mindmap
 | P1 🟡    | **Code cleanup** — Upgrade Node.js 22.12+, remove inline styles, consolidate New Task buttons | ✅ Done |
 | P2 🟢    | **Logbook view** — Completed tasks archive at `/logbook`, grouped by date                     | Pending |
 | P3 🟡    | **Security & data integrity** — Firestore rules review, project deletion cascade              | ✅ Done |
-| P4 🔵    | **Deployment** — Firebase Hosting + Functions deploy, CI/CD pipeline, PWA support             | Pending |
+| P4 🔵    | **Deployment** — Firebase Hosting + Functions deploy, CI/CD pipeline with AI QA Agent         | ✅ Done |
 
 ### 🔮 Future (Backlog)
 
@@ -203,8 +203,9 @@ We use Playwright for E2E testing to ensure stability across all platforms. Curr
   - Mobile emulation temporarily disabled for stability.
   - Advanced flows (Project Management) skipped due to local emulator latency, but code is complete.
 - Verified scenarios: Magic Import flow, Task Lifecycle, Cross-view Synchronization.
+- **AI QA Agent**: CI pipelines are equipped with an autonomous agent that automatically analyzes test failures via Gemini 2.5 and posts debugging comments directly on Pull Requests.
 
-See the [Testing Guide](./docs/TESTING.md) for instructions on running tests locally.
+See the [Testing Guide](./docs/TESTING.md) for instructions on running tests locally, and the [AI QA Agent Documentation](./docs/AI_QA_AGENT.md) for details on the self-healing CI pipeline.
 
 ## 🛡️ Security & Reliability
 
