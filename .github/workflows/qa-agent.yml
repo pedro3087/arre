@@ -51,7 +51,7 @@ jobs:
           VITE_FIREBASE_APP_ID: "1:123456789:web:abcdef"
 
       - name: Run AI QA Agent
-        if: failure() && steps.playwright.outcome == 'failure'
+        if: always()
         run: node scripts/qa-agent.js
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
