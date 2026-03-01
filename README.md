@@ -142,7 +142,7 @@ mindmap
 | -------- | --------------------------------------------------------------------------------------------- | ------- |
 | P0 🔴    | **Test stability** — Re-validate all E2E tests against current UI, add project-specific tests | ✅ Done |
 | P1 🟡    | **Code cleanup** — Upgrade Node.js 22.12+, remove inline styles, consolidate New Task buttons | ✅ Done |
-| P2 🟢    | **Logbook view** — Completed tasks archive at `/logbook`, grouped by date                     | Pending |
+| P2 🟢    | **Logbook view** — Completed tasks archive at `/logbook`, grouped by date                     | ✅ Done |
 | P3 🟡    | **Security & data integrity** — Firestore rules review, project deletion cascade              | ✅ Done |
 | P4 🔵    | **Deployment** — Firebase Hosting + Functions deploy, CI/CD pipeline with AI QA Agent         | ✅ Done |
 
@@ -206,6 +206,8 @@ We use Playwright for E2E testing to ensure stability across all platforms. Curr
 - **AI QA Agent**: CI pipelines are equipped with an autonomous agent that automatically analyzes test failures via Gemini 2.5 and posts debugging comments directly on Pull Requests.
 
 See the [Testing Guide](./docs/TESTING.md) for instructions on running tests locally, and the [AI QA Agent Documentation](./docs/AI_QA_AGENT.md) for details on the self-healing CI pipeline.
+
+For a detailed visual breakdown of the deployment automation flows, see the [CI/CD Pipeline Architecture](./docs/CI_CD_PIPELINE.md).
 
 ## 🛡️ Security & Reliability
 
