@@ -16,12 +16,12 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          VITE_FIREBASE_API_KEY: "AIzaSyCUBAK7wEhVotT3kkz8KklbavzL3CG3jf0"
-          VITE_FIREBASE_AUTH_DOMAIN: "arre-app-dev.firebaseapp.com"
-          VITE_FIREBASE_PROJECT_ID: "arre-app-dev"
-          VITE_FIREBASE_STORAGE_BUCKET: "arre-app-dev.firebasestorage.app"
-          VITE_FIREBASE_MESSAGING_SENDER_ID: "428395068609"
-          VITE_FIREBASE_APP_ID: "1:428395068609:web:cdadc4f41a25064cf2e840"
+          VITE_FIREBASE_API_KEY: "${{ secrets.VITE_FIREBASE_API_KEY }}"
+          VITE_FIREBASE_AUTH_DOMAIN: "${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}"
+          VITE_FIREBASE_PROJECT_ID: "${{ secrets.VITE_FIREBASE_PROJECT_ID }}"
+          VITE_FIREBASE_STORAGE_BUCKET: "${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}"
+          VITE_FIREBASE_MESSAGING_SENDER_ID: "${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}"
+          VITE_FIREBASE_APP_ID: "${{ secrets.VITE_FIREBASE_APP_ID }}"
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
