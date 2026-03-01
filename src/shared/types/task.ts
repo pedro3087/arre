@@ -12,6 +12,8 @@ export interface Task {
   tags?: TaskTag[];
   projectId?: string;
   createdAt: string;
+  updatedAt?: string;
+  completedAt?: string;
 }
 
 export const PROJECT_COLORS = [

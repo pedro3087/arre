@@ -16,13 +16,30 @@ import { useAuth } from '../../../lib/auth/AuthContext';
 import { TaskDocument } from '../../../lib/types/firestore';
 import { Task } from '../../../shared/types/task';
 
+const parseFirestoreDate = (dateField: any): string | undefined => {
+  if (!dateField) return undefined;
+  if (typeof dateField === 'object' && 'toDate' in dateField && typeof dateField.toDate === 'function') {
+    return dateField.toDate().toISOString();
+  }
+  if (typeof dateField === 'string' && !isNaN(new Date(dateField).getTime())) {
+    return dateField;
+  }
+  if (dateField instanceof Date) {
+    return dateField.toISOString();
+  }
+  return undefined;
+};
+
 // Convert Firestore doc to App Task type
 const convertTask = (doc: any): Task => {
   const data = doc.data() as TaskDocument;
+  
   return {
     ...data,
     id: doc.id,
-    createdAt: data.createdAt?.toDate().toISOString() || new Date().toISOString()
+    createdAt: parseFirestoreDate(data.createdAt) || new Date().toISOString(),
+    updatedAt: parseFirestoreDate(data.updatedAt),
+    completedAt: parseFirestoreDate(data.completedAt)
   } as Task;
 };
 
