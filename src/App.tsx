@@ -5,6 +5,7 @@ import { Inbox } from './pages/Inbox';
 import { Upcoming } from './pages/Upcoming';
 import { Anytime } from './pages/Anytime';
 import { Someday } from './pages/Someday';
+import { Logbook } from './pages/Logbook';
 import { ThemeProvider } from './features/theme/ThemeProvider';
 import './styles/global.css';
 
@@ -30,6 +31,7 @@ function App() {
               <Route path="/upcoming" element={<Upcoming />} />
               <Route path="/anytime" element={<Anytime />} />
               <Route path="/someday" element={<Someday />} />
+              <Route path="/logbook" element={<Logbook />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
           </Routes>

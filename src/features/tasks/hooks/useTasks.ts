@@ -19,11 +19,11 @@ import { Task } from '../../../shared/types/task';
 // Convert Firestore doc to App Task type
 const convertTask = (doc: any): Task => {
   const data = doc.data() as TaskDocument;
-  return {
+  return ({
     ...data,
     id: doc.id,
     createdAt: data.createdAt?.toDate().toISOString() || new Date().toISOString()
-  } as Task;
+  } as unknown) as Task;
 };
 
 export function useTasks(view?: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'someday' | 'logbook' | null) {

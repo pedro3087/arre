@@ -142,7 +142,7 @@ mindmap
 | -------- | --------------------------------------------------------------------------------------------- | ------- |
 | P0 🔴    | **Test stability** — Re-validate all E2E tests against current UI, add project-specific tests | ✅ Done |
 | P1 🟡    | **Code cleanup** — Upgrade Node.js 22.12+, remove inline styles, consolidate New Task buttons | ✅ Done |
-| P2 🟢    | **Logbook view** — Completed tasks archive at `/logbook`, grouped by date                     | Pending |
+| P2 🟢    | **Logbook view** — Completed tasks archive at `/logbook`, grouped by date                     | ✅ Done |
 | P3 🟡    | **Security & data integrity** — Firestore rules review, project deletion cascade              | ✅ Done |
 | P4 🔵    | **Deployment** — Firebase Hosting + Functions deploy, CI/CD pipeline with AI QA Agent         | ✅ Done |
 
