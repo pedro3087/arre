@@ -5,6 +5,7 @@ test.describe('Logbook View', () => {
   test.beforeEach(async ({ page }) => {
     await login(page);
     await page.goto('/inbox');
+    await page.getByText('Clear').click();
   });
 
   test('should display completed tasks in the logbook', async ({ page }) => {
@@ -30,7 +31,7 @@ test.describe('Logbook View', () => {
     await expect(page).toHaveURL('/logbook');
 
     // 4. Verify the task appears in the logbook
-    await expect(page.getByText('Logbook', { exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Logbook', exact: true })).toBeVisible();
     await expect(page.getByText(taskTitle)).toBeVisible();
     
     // 5. Uncheck the task to verify it can be restored (optional, but good for coverage)
