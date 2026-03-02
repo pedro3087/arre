@@ -29,7 +29,7 @@ jobs:
       - name: Deploy Firebase Backend (Rules, Indexes, Functions)
         uses: w9jds/firebase-action@master
         with:
-          args: deploy --only firestore,functions
+          args: deploy --only firestore,functions --force
         env:
           GCP_SA_KEY: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_ARRE_APP_DEV }}"
           PROJECT_ID: arre-app-dev
