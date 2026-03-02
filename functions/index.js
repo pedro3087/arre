@@ -10,7 +10,7 @@ const geminiApiKey = defineSecret('GEMINI_API_KEY');
 // Initialize Gemini Client
 const getGeminiModel = (apiKey) => {
   const genAI = new GoogleGenerativeAI(apiKey);
-  return genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  return genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 };
 
 /**
