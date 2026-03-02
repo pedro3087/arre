@@ -10,7 +10,7 @@ const geminiApiKey = defineSecret('GEMINI_API_KEY');
 // Initialize Gemini Client
 const getGeminiModel = (apiKey) => {
   const genAI = new GoogleGenerativeAI(apiKey);
-  return genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+  return genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 };
 
 /**
@@ -155,7 +155,7 @@ exports.generateBriefing = onCall({
     
     const result = await model.generateContent([
       systemPrompt,
-      { text: \`User Context:\\n\${contextData}\` }
+      { text: `User Context:\n${contextData}` }
     ]);
 
     const response = result.response;
@@ -165,6 +165,6 @@ exports.generateBriefing = onCall({
 
   } catch (error) {
     console.error("Generate Briefing Error:", error);
-    throw new HttpsError('internal', 'Briefing generation failed.', error.message);
+    throw new HttpsError('internal', `Briefing generation failed: ${error.message}`, error.message);
   }
 });
