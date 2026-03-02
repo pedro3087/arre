@@ -155,7 +155,7 @@ exports.generateBriefing = onCall({
     
     const result = await model.generateContent([
       systemPrompt,
-      { text: \`User Context:\\n\${contextData}\` }
+      { text: `User Context:\n${contextData}` }
     ]);
 
     const response = result.response;
