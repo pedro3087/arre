@@ -103,3 +103,68 @@ exports.processMagicImport = onCall({
     throw new HttpsError('internal', 'Details extraction failed.', error.message);
   }
 });
+
+/**
+ * Cloud Function: generateBriefing
+ * Generates an AI briefing based on the user's tasks and projects.
+ */
+exports.generateBriefing = onCall({
+    secrets: [geminiApiKey],
+    memory: "512MiB",
+    timeoutSeconds: 60
+  }, async (request) => {
+  
+  // 1. Validate Input
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'User must be logged in.');
+  }
+
+  const { tasks, projects, localTime } = request.data;
+  
+  if (!tasks || !Array.isArray(tasks)) {
+    throw new HttpsError('invalid-argument', 'Missing or invalid tasks data.');
+  }
+
+  try {
+    // 2. Prompt Engineering
+    const systemPrompt = `
+      You are an expert, friendly productivity assistant for the "Arre" app.
+      Your goal is to provide a concise, motivational, and highly readable daily briefing for the user based on their current tasks and projects.
+      The current local time for the user is: ${localTime || new Date().toISOString()}
+
+      Guidelines:
+      1. Structure the briefing into three parts: 
+         - A very brief greeting and overview of today.
+         - A short summary of tasks for today (what's on their plate).
+         - A quick glance at tomorrow or upcoming priorities.
+      2. Keep it conversational, uplifting, and direct. Avoid sounding robotic.
+      3. Use markdown for formatting (bullet points, bold text).
+      4. Highlight projects if relevant (e.g., "For your [Project Name] project...").
+      5. Don't list every single task individually if there are many; group them or highlight the most critical ones.
+      6. Limit your response to 2-3 short paragraphs.
+    `;
+
+    // 3. Document Content (Stringified Tasks & Projects)
+    const contextData = JSON.stringify({
+      projects: projects || [],
+      tasks: tasks.map(t => ({ title: t.title, status: t.status, date: t.date, isEvening: t.isEvening, energy: t.energy, projectName: t.projectName }))
+    }, null, 2);
+
+    // 4. Call Gemini
+    const model = getGeminiModel(geminiApiKey.value());
+    
+    const result = await model.generateContent([
+      systemPrompt,
+      { text: \`User Context:\\n\${contextData}\` }
+    ]);
+
+    const response = result.response;
+    const text = response.text();
+
+    return { briefing: text };
+
+  } catch (error) {
+    console.error("Generate Briefing Error:", error);
+    throw new HttpsError('internal', 'Briefing generation failed.', error.message);
+  }
+});
