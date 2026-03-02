@@ -24,6 +24,13 @@ jobs:
           VITE_FIREBASE_STORAGE_BUCKET: "${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}"
           VITE_FIREBASE_MESSAGING_SENDER_ID: "${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}"
           VITE_FIREBASE_APP_ID: "${{ secrets.VITE_FIREBASE_APP_ID }}"
+      - name: Deploy Firebase Backend (Rules, Indexes, Functions)
+        uses: w9jds/firebase-action@master
+        with:
+          args: deploy --only firestore,functions
+        env:
+          GCP_SA_KEY: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_ARRE_APP_DEV }}"
+          PROJECT_ID: arre-app-dev
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
