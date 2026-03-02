@@ -1,16 +1,10 @@
 import { ResponsiveContainer, AreaChart, Area, Tooltip } from 'recharts';
 
-const data = [
-  { day: 'Mon', completion: 40 },
-  { day: 'Tue', completion: 60 },
-  { day: 'Wed', completion: 55 },
-  { day: 'Thu', completion: 80 },
-  { day: 'Fri', completion: 70 },
-  { day: 'Sat', completion: 85 },
-  { day: 'Sun', completion: 95 },
-];
+interface VelocityChartProps {
+  data: { day: string; completion: number }[];
+}
 
-export function VelocityChart() {
+export function VelocityChart({ data }: VelocityChartProps) {
   const strokeColor = 'var(--accent-cyan)';
 
   return (
