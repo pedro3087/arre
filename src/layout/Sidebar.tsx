@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Inbox, Sun, Calendar, Layers, Archive, Moon, Laptop, PlusCircle, FolderPlus, MoreHorizontal, CheckSquare } from 'lucide-react';
+import { Inbox, Sun, Calendar, Layers, Archive, Moon, Laptop, PlusCircle, FolderPlus, MoreHorizontal, CheckSquare, Sparkles } from 'lucide-react';
 import clsx from 'clsx';
 import { useTheme } from '../features/theme/ThemeProvider';
 import styles from './Sidebar.module.css';
@@ -13,6 +13,7 @@ const NAV_ITEMS = [
   { path: '/anytime', label: 'Anytime', icon: Layers, color: 'accent-ruby' },
   { path: '/someday', label: 'Someday', icon: Archive, color: 'accent-lavender' },
   { path: '/logbook', label: 'Logbook', icon: CheckSquare, color: 'text-secondary' },
+  { path: '/briefing', label: 'AI Briefing', icon: Sparkles, color: 'accent-lavender' },
 ];
 
 interface SidebarProps {
