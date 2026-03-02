@@ -59,8 +59,21 @@ async function run() {
       failedTests.push({ title: 'Global setup/teardown', errors: reportData.errors });
   }
 
+  // Extract Stats for Summary Table
+  const stats = reportData.stats || { expected: 0, unexpected: 0, flaky: 0, skipped: 0, duration: 0 };
+  const total = stats.expected + stats.unexpected + stats.flaky + stats.skipped;
+  const durationInSeconds = (stats.duration / 1000).toFixed(1);
+
+  const resultsTable = `| Metric | Count |\n|---|---|\n| 🧪 Total Tests | ${total} |\n| ✅ Passed | ${stats.expected} |\n| ❌ Failed | ${stats.unexpected} |\n| ⚠️ Flaky | ${stats.flaky} |\n| ⏭️ Skipped | ${stats.skipped} |\n| ⏱️ Duration | ${durationInSeconds}s |`;
+
   if (failedTests.length === 0) {
-    console.log('No failed tests detected in the report. Exiting.');
+    console.log('No failed tests detected. Posting success summary.');
+    if (GITHUB_TOKEN && PR_NUMBER && REPO_OWNER && REPO_NAME) {
+      const commentBody = `🤖 **QA Agent Coverage Report**\n\n✅ **All tests passed successfully!**\n\n${resultsTable}`;
+      await postGitHubCommentRaw(commentBody);
+    } else {
+      console.log('GitHub context missing or not running in PR. Exiting gracefully.');
+    }
     return;
   }
 
@@ -111,7 +124,8 @@ Provide your response in Markdown, using clear headers, bullet points, and codeb
 
   // 4. Post to GitHub PR
   if (GITHUB_TOKEN && PR_NUMBER && REPO_OWNER && REPO_NAME) {
-      await postGitHubComment(geminiResponse);
+      const fullComment = `🤖 **AI QA Agent Analysis**\n\nI detected test failures in this PR and analyzed the errors against the recent code changes.\n\n### Test Execution Summary\n\n${resultsTable}\n\n---\n\n### Root Cause Analysis\n\n${geminiResponse}`;
+      await postGitHubCommentRaw(fullComment);
   } else {
       console.log('GitHub context not fully provided. Skipping PR comment.');
       console.log('--- Analysis Output ---');
@@ -152,9 +166,8 @@ async function callGeminiAPI(prompt) {
   }
 }
 
-async function postGitHubComment(body) {
+async function postGitHubCommentRaw(commentBody) {
     console.log(`Posting comment to PR #${PR_NUMBER}...`);
-    const commentBody = `🤖 **AI QA Agent Analysis**\n\nI detected test failures in this PR and analyzed the errors against the recent code changes.\n\n---\n\n${body}`;
     
     const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues/${PR_NUMBER}/comments`;
     try {
