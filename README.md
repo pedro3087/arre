@@ -146,14 +146,11 @@ mindmap
 | P3 🟡    | **Security & data integrity** — Firestore rules review, project deletion cascade              | ✅ Done |
 | P4 🔵    | **Deployment** — Firebase Hosting + Functions deploy, CI/CD pipeline with AI QA Agent         | ✅ Done |
 
-### 🔮 Future (Backlog)
+### 🔮 Project Tracking
 
-- **Drag & Drop**: Reorder tasks within project groups
-- **Project Filtering**: Click sidebar project → filter all views to that project
-- **Recurring Tasks**: Weekly/monthly repeat patterns
-- **Tags System**: Cross-cutting labels beyond projects
-- **Keyboard Shortcuts**: Quick-add, view navigation, sidebar toggle
-- **Mobile Native**: React Native / Expo version
+All future development, feature requests, and bugs are now tracked entirely within our GitHub Repository issues.
+
+👉 **[View the Active Issues Board](https://github.com/pedro3087/arre/issues)**
 
 ## 🔥 Backend & Services
 
