@@ -45,6 +45,11 @@ service cloud.firestore {
         allow read, delete: if isOwner(userId);
         allow create, update: if isOwner(userId) && isValidTask();
       }
+
+      // Integrations Sub-collection
+      match /integrations/{integrationId} {
+        allow read, write: if isOwner(userId);
+      }
     }
   }
 }
