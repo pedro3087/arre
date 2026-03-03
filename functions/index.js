@@ -1,11 +1,18 @@
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const { defineSecret } = require('firebase-functions/params');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+const admin = require("firebase-admin");
+const { google } = require("googleapis");
 const pdf = require('pdf-parse');
 const { parse } = require('csv-parse/sync');
 
+// Initialize Firebase Admin
+admin.initializeApp();
+
 // Define Secrets (You must set this in Google Cloud Secret Manager)
 const geminiApiKey = defineSecret('GEMINI_API_KEY');
+const googleClientId = defineSecret('GOOGLE_CLIENT_ID');
+const googleClientSecret = defineSecret('GOOGLE_CLIENT_SECRET');
 
 // Initialize Gemini Client
 const getGeminiModel = (apiKey) => {
@@ -166,5 +173,118 @@ exports.generateBriefing = onCall({
   } catch (error) {
     console.error("Generate Briefing Error:", error);
     throw new HttpsError('internal', `Briefing generation failed: ${error.message}`, error.message);
+  }
+});
+
+// Helper Function: Get Google Tasks OAuth Client
+async function getGoogleTasksClient(uid) {
+  // Retrieve the user's refresh token from Firestore
+  const doc = await admin.firestore().collection('users').doc(uid).collection('integrations').doc('googleTasks').get();
+  
+  if (!doc.exists) {
+    throw new HttpsError('failed-precondition', 'Google Tasks integration not connected.');
+  }
+
+  const { refreshToken } = doc.data();
+  if (!refreshToken) {
+    throw new HttpsError('failed-precondition', 'No refresh token available.');
+  }
+
+  const oauth2Client = new google.auth.OAuth2(
+    googleClientId.value(),
+    googleClientSecret.value()
+  );
+
+  oauth2Client.setCredentials({ refresh_token: refreshToken });
+  
+  return google.tasks({ version: 'v1', auth: oauth2Client });
+}
+
+/**
+ * Cloud Function: getGoogleTaskLists
+ * Fetches available lists for the authenticated user.
+ */
+exports.getGoogleTaskLists = onCall({
+  secrets: [googleClientId, googleClientSecret],
+  memory: "256MiB",
+  timeoutSeconds: 30
+}, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'User must be logged in.');
+  }
+
+  try {
+    const tasksService = await getGoogleTasksClient(request.auth.uid);
+    const res = await tasksService.tasklists.list({ maxResults: 100 });
+    return { lists: res.data.items || [] };
+  } catch (error) {
+    console.error("Google Tasks List Error:", error);
+    throw new HttpsError('internal', 'Failed to fetch task lists.', error.message);
+  }
+});
+
+/**
+ * Cloud Function: getGoogleTasks
+ * Fetches tasks for a specific task list.
+ */
+exports.getGoogleTasks = onCall({
+  secrets: [googleClientId, googleClientSecret],
+  memory: "256MiB",
+  timeoutSeconds: 30
+}, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'User must be logged in.');
+  }
+
+  const { listId, showCompleted, showHidden } = request.data;
+  if (!listId) {
+    throw new HttpsError('invalid-argument', 'Missing listId.');
+  }
+
+  try {
+    const tasksService = await getGoogleTasksClient(request.auth.uid);
+    const res = await tasksService.tasks.list({
+      tasklist: listId,
+      showCompleted: showCompleted !== undefined ? showCompleted : true,
+      showHidden: showHidden !== undefined ? showHidden : true,
+      maxResults: 100
+    });
+    return { tasks: res.data.items || [] };
+  } catch (error) {
+    console.error("Google Tasks Error:", error);
+    throw new HttpsError('internal', 'Failed to fetch tasks.', error.message);
+  }
+});
+
+/**
+ * Cloud Function: updateGoogleTask
+ * Updates a specific task's status (or other fields).
+ */
+exports.updateGoogleTask = onCall({
+  secrets: [googleClientId, googleClientSecret],
+  memory: "256MiB",
+  timeoutSeconds: 30
+}, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'User must be logged in.');
+  }
+
+  const { listId, taskId, taskPayload } = request.data;
+  if (!listId || !taskId || !taskPayload) {
+    throw new HttpsError('invalid-argument', 'Missing required parameters.');
+  }
+
+  try {
+    const tasksService = await getGoogleTasksClient(request.auth.uid);
+    // Use patch for partial updates to a task
+    const res = await tasksService.tasks.patch({
+      tasklist: listId,
+      task: taskId,
+      requestBody: taskPayload
+    });
+    return { task: res.data };
+  } catch (error) {
+    console.error("Google Tasks Update Error:", error);
+    throw new HttpsError('internal', 'Failed to update task.', error.message);
   }
 });
