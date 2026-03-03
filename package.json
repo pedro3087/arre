@@ -22,6 +22,7 @@
     "vite": "^7.3.1"
   },
   "dependencies": {
+    "@react-oauth/google": "^0.13.4",
     "clsx": "^2.1.1",
     "firebase": "^12.9.0",
     "framer-motion": "^12.34.0",
@@ -32,5 +33,22 @@
     "react-router-dom": "^7.13.0",
     "recharts": "^3.7.0",
     "tailwind-merge": "^3.4.0"
-  }
+  },
+  "description": "**Arre** is a modern, minimalist productivity application designed to help you focus on what matters. Inspired by the \"White Paper\" aesthetic with vibrant, surprising accents, Arre combines sleek design with deep work analytics.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pedro3087/arre.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pedro3087/arre/issues"
+  },
+  "homepage": "https://github.com/pedro3087/arre#readme"
 }
