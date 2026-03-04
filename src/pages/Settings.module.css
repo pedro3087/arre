@@ -1,0 +1,154 @@
+.settingsContainer {
+  padding: var(--spacing-6);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: var(--spacing-8);
+}
+
+.titleWrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  color: var(--text-primary);
+}
+
+.headerIcon {
+  color: var(--text-secondary);
+}
+
+.titleWrapper h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.settingsContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.settingsSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.settingsSection h2 {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.875rem;
+}
+
+.integrationCard {
+  background-color: var(--surface-overlay);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-6);
+}
+
+.integrationInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.integrationHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+}
+
+.integrationLogo {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.integrationHeader h3 {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.integrationDescription {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.integrationActions {
+  flex-shrink: 0;
+}
+
+.connectButton {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--spacing-2) var(--spacing-4);
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  white-space: nowrap;
+}
+
+.connectButton:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.connectButton:disabled,
+.disconnectButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.disconnectButton {
+  background-color: var(--surface-overlay);
+  color: var(--status-error);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-2) var(--spacing-4);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.disconnectButton:hover:not(:disabled) {
+  background-color: var(--status-error);
+  color: white;
+  border-color: var(--status-error);
+}
+
+.loadingText {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.errorText {
+  color: var(--status-error);
+  font-size: 0.875rem;
+  margin-top: var(--spacing-2);
+}
+
+@media (max-width: 640px) {
+  .integrationCard {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

@@ -13,6 +13,7 @@ import { AuthProvider } from './lib/auth/AuthContext';
 import { ProtectedRoute } from './lib/auth/ProtectedRoute';
 import { Login } from './pages/Login';
 import { AIBriefing } from './pages/AIBriefing';
+import { Settings } from './pages/Settings';
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
               <Route path="/someday" element={<Someday />} />
               <Route path="/logbook" element={<Logbook />} />
               <Route path="/briefing" element={<AIBriefing />} />
+              <Route path="/settings" element={<Settings />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
           </Routes>
