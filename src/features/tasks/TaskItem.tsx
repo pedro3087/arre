@@ -72,11 +72,6 @@ export function TaskItem({ task, onToggle }: TaskItemProps) {
         <div className={styles.meta}>
           {task.isGoogleTask && (
             <span className={clsx(styles.tag, styles.googleTaskTag)} title={`Google Tasks: ${task.googleTaskListId}`}>
-              <img 
-                src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Google_Tasks_2021.svg/1200px-Google_Tasks_2021.svg.png" 
-                alt="Google Task" 
-                className={styles.googleIcon} 
-              />
               Google Task
             </span>
           )}
