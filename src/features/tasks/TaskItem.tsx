@@ -18,6 +18,10 @@ export function TaskItem({ task, onToggle }: TaskItemProps) {
   const { deleteTask } = useTasks();
 
   const handleToggle = () => {
+    if (task.isGoogleTask) {
+      alert("Completing Google Tasks from Arre is coming in Story 5!");
+      return;
+    }
     const newState = !complete;
     setComplete(newState);
     onToggle(task.id);
@@ -66,6 +70,16 @@ export function TaskItem({ task, onToggle }: TaskItemProps) {
         {task.notes && <span className={styles.notes}>{task.notes}</span>}
         
         <div className={styles.meta}>
+          {task.isGoogleTask && (
+            <span className={clsx(styles.tag, styles.googleTaskTag)} title={`Google Tasks: ${task.googleTaskListId}`}>
+              <img 
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Google_Tasks_2021.svg/1200px-Google_Tasks_2021.svg.png" 
+                alt="Google Task" 
+                className={styles.googleIcon} 
+              />
+              Google Task
+            </span>
+          )}
           {project && (
             <span className={styles.projectBadge}>
               <span
@@ -88,12 +102,16 @@ export function TaskItem({ task, onToggle }: TaskItemProps) {
       </div>
 
       <div className={styles.actions}>
-        <button className={styles.actionBtn} onClick={handleEdit} title="Edit">
-          <Edit2 size={16} />
-        </button>
-        <button className={styles.actionBtn} onClick={handleDelete} title="Delete">
-          <Trash2 size={16} />
-        </button>
+        {!task.isGoogleTask && (
+          <button className={styles.actionBtn} onClick={handleEdit} title="Edit">
+            <Edit2 size={16} />
+          </button>
+        )}
+        {!task.isGoogleTask && (
+          <button className={styles.actionBtn} onClick={handleDelete} title="Delete">
+            <Trash2 size={16} />
+          </button>
+        )}
       </div>
     </div>
   );
