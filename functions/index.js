@@ -178,15 +178,23 @@ exports.generateBriefing = onCall({
 
 // Helper Function: Get Google Tasks OAuth Client
 async function getGoogleTasksClient(uid) {
-  // Retrieve the user's refresh token from Firestore
-  const doc = await admin.firestore().collection('users').doc(uid).collection('integrations').doc('googleTasks').get();
+  console.log(`[getGoogleTasksClient] Requesting for UID: ${uid}`);
+  const docRef = admin.firestore().collection('users').doc(uid).collection('integrations').doc('googleTasks');
+  console.log(`[getGoogleTasksClient] Document Path: ${docRef.path}`);
+  
+  const doc = await docRef.get();
   
   if (!doc.exists) {
+    console.error(`[getGoogleTasksClient] Document does not exist at path: ${docRef.path}`);
     throw new HttpsError('failed-precondition', 'Google Tasks integration not connected.');
   }
 
-  const { refreshToken } = doc.data();
+  const data = doc.data();
+  console.log(`[getGoogleTasksClient] Document Data: ${JSON.stringify(data)}`);
+
+  const { refreshToken } = data;
   if (!refreshToken) {
+    console.error(`[getGoogleTasksClient] Refresh token missing in document data.`);
     throw new HttpsError('failed-precondition', 'No refresh token available.');
   }
 
