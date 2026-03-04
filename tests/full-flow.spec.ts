@@ -1,6 +1,5 @@
 /// <reference types="node" />
-import { test, expect } from '@playwright/test';
-import { login } from './utils';
+import { test, expect } from './auth';
 
 /**
  * Helper to open the New Task modal from either sidebar button, FAB, or Inbox button.
@@ -31,11 +30,9 @@ async function openNewTaskModal(page: import('@playwright/test').Page) {
 
 test.describe('Arre App Full Workflow', () => {
   
-  test.beforeEach(async ({ page }) => {
-    await login(page);
-  });
 
-  test('should support the full task lifecycle across views', async ({ page }) => {
+
+  test('should support the full task lifecycle across views', async ({ loggedInPage: page }) => {
     // 1. Navigate to Upcoming
     await page.goto('/upcoming');
     await expect(page).toHaveURL('/upcoming');
@@ -81,7 +78,7 @@ test.describe('Arre App Full Workflow', () => {
     await expect(page.getByText(somedayTask)).toBeVisible({ timeout: 10000 });
   });
 
-  test.skip('should handle magic import file upload', async ({ page }) => {
+  test.skip('should handle magic import file upload', async ({ loggedInPage: page }) => {
     await page.goto('/inbox');
 
     await openNewTaskModal(page);

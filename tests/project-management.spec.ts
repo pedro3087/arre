@@ -1,14 +1,10 @@
-import { test, expect } from '@playwright/test';
-import { login } from './utils';
+import { test, expect } from './auth';
 
 test.describe('Project management', () => {
   
-  test.beforeEach(async ({ page }) => {
-    await login(page);
+  test.beforeEach(async ({ loggedInPage: page }) => {
   });
-
-  // TODO: persistent timeout in emulator environment. Skip until fixed.
-  test.skip('should create a project, assign tasks to it, and verify grouping', async ({ page }) => {
+  test.skip('should create a project, assign tasks to it, and verify grouping', async ({ loggedInPage: page }) => {
     test.slow(); // Allow 3x timeout for emulator operations
     
     console.log('START: Project Management Test');
