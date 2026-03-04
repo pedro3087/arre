@@ -8,7 +8,7 @@ import {
   onAuthStateChanged,
   linkWithPopup
 } from 'firebase/auth';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 
 interface AuthContextType {
@@ -18,6 +18,7 @@ interface AuthContextType {
   signInAnonymouslyUser: () => Promise<void>;
   logout: () => Promise<void>;
   connectGoogleTasks: () => Promise<void>;
+  disconnectGoogleTasks: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -113,8 +114,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
 
+  const disconnectGoogleTasks = async () => {
+    if (!auth.currentUser) throw new Error("User must be logged in to disconnect.");
+    try {
+      await deleteDoc(doc(db, 'users', auth.currentUser.uid, 'integrations', 'googleTasks'));
+      console.log("Google Tasks disconnected.");
+    } catch (error) {
+      console.error("Error disconnecting Google Tasks", error);
+      throw error;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signInAnonymouslyUser, logout, connectGoogleTasks }}>
+    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signInAnonymouslyUser, logout, connectGoogleTasks, disconnectGoogleTasks }}>
       {!loading && children}
     </AuthContext.Provider>
   );
