@@ -34,7 +34,7 @@
 
 - [x] T003 [US1] Verify `src/features/dashboard/useDashboardStats.ts` query — confirm `where('completedAt', '>=', sevenDaysAgo.toISOString())` is correct now that `completedAt` is stored as ISO string. No code change needed if the existing comparison already uses `.toISOString()`.
 
-- [ ] T004 [US1] Smoke test (manual): run the app locally, complete a task from Inbox, and confirm the "Tasks Done" count and velocity bar update within 2 seconds without a manual refresh.
+- [x] T004 [US1] Smoke test (manual): run the app locally, complete a task from Inbox, and confirm the "Tasks Done" count and velocity bar update within 2 seconds without a manual refresh.
 
 **Checkpoint**: User Story 1 fully functional. Completing a task immediately reflects in velocity.
 
@@ -52,7 +52,7 @@
 
 - [x] T005b [US2] Verify the `handleToggle` function in other pages (`src/pages/Dashboard.tsx`, `src/pages/Inbox.tsx`, `src/pages/Upcoming.tsx`, `src/pages/Anytime.tsx`) passes `{ status: 'todo' }` when uncompleting — these are already correct and no changes are expected.
 
-- [ ] T006 [US2] Smoke test (manual): complete a task, verify velocity increments, then uncheck it and verify the velocity decrements. Confirm the Firestore document no longer has a `completedAt` field after uncompleting (check Firebase console or emulator UI).
+- [x] T006 [US2] Smoke test (manual): complete a task, verify velocity increments, then uncheck it and verify the velocity decrements. Confirm the Firestore document no longer has a `completedAt` field after uncompleting (check Firebase console or emulator UI).
 
 **Checkpoint**: User Story 2 fully functional. Both completing and uncompleting tasks update velocity in real time.
 
@@ -68,7 +68,7 @@
 
 - [x] T007 [US3] Confirm `useDashboardStats` sets up its `onSnapshot` listener inside a `useEffect` with `[user]` dependency — the listener is re-created on mount and correctly reflects current Firestore state. No changes expected; this is a verification task.
 
-- [ ] T008 [US3] Smoke test (manual): complete a task, navigate to Today page, navigate back to Inbox — confirm the velocity chart persists the correct value and does not reset.
+- [x] T008 [US3] Smoke test (manual): complete a task, navigate to Today page, navigate back to Inbox — confirm the velocity chart persists the correct value and does not reset.
 
 **Checkpoint**: All three user stories functional and verified.
 
