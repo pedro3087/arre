@@ -5,10 +5,9 @@ import {
   signInWithPopup, 
   signInAnonymously,
   signOut, 
-  onAuthStateChanged,
-  linkWithPopup
+  onAuthStateChanged
 } from 'firebase/auth';
-import { doc, setDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, deleteDoc } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import { auth, db, functions } from '../firebase';
 
