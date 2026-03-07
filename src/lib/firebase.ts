@@ -1,8 +1,8 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
-import { getFunctions } from 'firebase/functions';
+import { getAuth, connectAuthEmulator } from 'firebase/auth';
+import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+import { getStorage, connectStorageEmulator } from 'firebase/storage';
+import { getFunctions, connectFunctionsEmulator } from 'firebase/functions';
 
 // Placeholder config - in prod this comes from environment variables
 const firebaseConfig = {
@@ -23,11 +23,10 @@ export const db = getFirestore(app);
 export const storage = getStorage(app);
 export const functions = getFunctions(app);
 
-// Temporarily comment out Emulators for local development so Google Auth works
-// if (import.meta.env.DEV) {
-//   console.log('🔥 Connecting to Firebase Emulators...');
-//   connectAuthEmulator(auth, 'http://localhost:9099');
-//   connectFirestoreEmulator(db, 'localhost', 8080);
-//   connectStorageEmulator(storage, 'localhost', 9199);
-//   connectFunctionsEmulator(functions, 'localhost', 5001);
-// }
+// Connect to Firebase Emulators when running in CI or local emulator mode
+if (import.meta.env.VITE_USE_FIREBASE_EMULATOR === 'true') {
+  connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
+  connectFirestoreEmulator(db, 'localhost', 8080);
+  connectStorageEmulator(storage, 'localhost', 9199);
+  connectFunctionsEmulator(functions, 'localhost', 5001);
+}
