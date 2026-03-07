@@ -21,10 +21,11 @@ async function check() {
   for (const doc of snapshot.docs) {
     console.log(`User ID: ${doc.id}`);
     
-    // Check integrations collection
+    // Check integrations collection for googleTasks
     const integrations = await doc.ref.collection('integrations').doc('googleTasks').get();
     if (integrations.exists) {
-        console.log(` -> \`googleTasks\` integration exists for user: ${doc.id}`);
+        const tr = integrations.data().refreshToken || '';
+        console.log(` -> \`googleTasks\` integration exists for user: ${doc.id} (Token: ${tr.substring(0,15)}...)`);
         foundIntegrations++;
     } else {
         console.log(` -> \`googleTasks\` integration missing for user: ${doc.id}`);

@@ -71,6 +71,44 @@ export function useTasks(view?: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'so
 
   const updateTask = async (id: string, updates: Partial<Task>) => {
     if (!user) return;
+
+    // Check if it's a Google Task based on the ID format
+    if (id.startsWith('google_')) {
+      const parts = id.split('_');
+      // Format is google_${listId}_${taskId}
+      if (parts.length >= 3) {
+        const listId = parts[1];
+        const taskId = parts.slice(2).join('_'); // In case taskId has underscores
+        
+        try {
+          const updateGoogle = httpsCallable(functions, 'updateGoogleTask');
+          
+          // Only passing properties that Google Tasks supports updating right now (status)
+          const payload: any = {
+            listId,
+            taskId
+          };
+          
+          if (updates.status !== undefined) {
+             payload.status = updates.status; // 'todo' or 'completed'
+          }
+
+          if (updates.title !== undefined) payload.title = updates.title;
+          if (updates.notes !== undefined) payload.notes = updates.notes;
+          
+          await updateGoogle(payload);
+          
+          // Re-fetch Google Tasks to get the updated state
+          // A more robust implementation would do optimistic UI updates here
+          // but for now, we rely on the next fetch.
+        } catch (e) {
+          console.error("Error updating Google Task", e);
+          throw e;
+        }
+      }
+      return;
+    }
+
     try {
       const taskRef = doc(db, 'users', user.uid, 'tasks', id);
       const firestoreUpdates: any = { ...updates, updatedAt: serverTimestamp() };
@@ -228,31 +266,40 @@ export function useTasks(view?: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'so
         // Fetch each selected list
         const promises = selectedLists.map(async (listId: string) => {
           const isLogbook = view === 'logbook';
-          const result = await getTasks({ listId, showCompleted: isLogbook, showHidden: isLogbook });
-          const resData = result.data as any;
-          const gTasks = resData.tasks || [];
-          
-          return gTasks.map((gt: any): Task => {
-            const dateStr = gt.due ? new Date(gt.due).toISOString().split('T')[0] : undefined;
-            return {
-              id: `google_${listId}_${gt.id}`,
-              title: gt.title || '(No title)',
-              notes: gt.notes,
-              status: gt.status === 'completed' ? 'completed' : 'todo',
-              date: dateStr,
-              createdAt: gt.updated || new Date().toISOString(),
-              updatedAt: gt.updated,
-              completedAt: gt.completed,
-              isGoogleTask: true,
-              googleTaskListId: listId
-            };
-          });
+          console.log(`[useTasks] Fetching Google tasks for list: ${listId}`);
+          try {
+            const result = await getTasks({ listId, showCompleted: isLogbook, showHidden: isLogbook });
+            const resData = result.data as any;
+            const gTasks = resData.tasks || [];
+            console.log(`[useTasks] Fetched ${gTasks.length} tasks from list: ${listId}`);
+            
+            return gTasks.map((gt: any): Task => {
+              const dateStr = gt.due ? new Date(gt.due).toISOString().split('T')[0] : undefined;
+              return {
+                id: `google_${listId}_${gt.id}`,
+                title: gt.title || '(No title)',
+                notes: gt.notes,
+                status: gt.status === 'completed' ? 'completed' : 'todo',
+                date: dateStr,
+                createdAt: gt.updated || new Date().toISOString(),
+                updatedAt: gt.updated,
+                completedAt: gt.completed,
+                isGoogleTask: true,
+                googleTaskListId: listId
+              };
+            });
+          } catch (e) {
+             console.error(`[useTasks] Error fetching list ${listId}`, e);
+             return [];
+          }
         });
 
         const listsOfTasks = await Promise.all(promises);
         listsOfTasks.forEach(list => {
           allGoogleTasks = [...allGoogleTasks, ...list];
         });
+        
+        console.log(`[useTasks] Total Google tasks mapped: ${allGoogleTasks.length}`);
 
         // Filter Google Tasks for current view locally
         let filteredTasks = allGoogleTasks;

@@ -55,6 +55,8 @@ export function Settings() {
         const data = result.data as any;
         if (data.items) {
           setTaskLists(data.items);
+        } else if (data.lists) {
+          setTaskLists(data.lists);
         }
       } catch (e: any) {
         console.error("Failed to fetch task lists:", e);
@@ -191,6 +193,8 @@ export function Settings() {
               )}
             </div>
           )}
+
+
 
           {error && <p className={styles.errorText}>{error}</p>}
         </section>

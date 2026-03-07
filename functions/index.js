@@ -176,6 +176,53 @@ exports.generateBriefing = onCall({
   }
 });
 
+/**
+ * Cloud Function: exchangeGoogleAuthCode
+ * Exchanges an authorization code for an offline refresh token.
+ */
+exports.exchangeGoogleAuthCode = onCall({
+  secrets: [googleClientId, googleClientSecret],
+  memory: "256MiB",
+  timeoutSeconds: 30
+}, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'User must be logged in.');
+  }
+
+  const { code } = request.data;
+  if (!code) {
+    throw new HttpsError('invalid-argument', 'Missing authorization code.');
+  }
+
+  try {
+    const oauth2Client = new google.auth.OAuth2(
+      googleClientId.value(),
+      googleClientSecret.value(),
+      'postmessage' // Magic string for Web Server flow from GIS
+    );
+
+    const { tokens } = await oauth2Client.getToken(code);
+    const refreshToken = tokens.refresh_token;
+
+    if (!refreshToken) {
+      console.error("No refresh token returned. User might need to revoke access and try again.");
+      throw new HttpsError('failed-precondition', 'Google did not provide a refresh token.');
+    }
+
+    // Save strictly the offline refresh token
+    const docRef = admin.firestore().collection('users').doc(request.auth.uid).collection('integrations').doc('googleTasks');
+    await docRef.set({
+      refreshToken: refreshToken,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Exchange Code Error:", error);
+    throw new HttpsError('internal', 'Failed to exchange authorization code.', error.message);
+  }
+});
+
 // Helper Function: Get Google Tasks OAuth Client
 async function getGoogleTasksClient(uid) {
   console.log(`[getGoogleTasksClient] Requesting for UID: ${uid}`);

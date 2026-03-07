@@ -18,10 +18,6 @@ export function TaskItem({ task, onToggle }: TaskItemProps) {
   const { deleteTask } = useTasks();
 
   const handleToggle = () => {
-    if (task.isGoogleTask) {
-      alert("Completing Google Tasks from Arre is coming in Story 5!");
-      return;
-    }
     const newState = !complete;
     setComplete(newState);
     onToggle(task.id);
