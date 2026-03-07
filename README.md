@@ -34,6 +34,12 @@ _(Replace with actual screenshot)_
 - **Today View**: A focused list of tasks for right now, with a distinct **"This Evening"** section for separating work from personal time.
 - **Planning Views**: Dedicated views for **Upcoming**, **Anytime**, and **Someday** to keep your roadmap clear.
 
+### 🔄 Integrations
+
+- **Google Tasks Deep Integration**:
+  - **Stateless Proxy**: Syncs directly with Google's APIs using Cloud Functions without saving any of your private task data in our database.
+  - **Two-Way Sync**: Viewing, filtering, and checking off tasks instantly updates across both platforms.
+
 ### 📁 Project Management
 
 - **Create/Edit/Delete Projects**: Full CRUD with a curated 10-color palette (Emerald, Sapphire, Ruby, Lavender, Gold, Cyan, Rose, Amber, Teal, Indigo).
@@ -135,8 +141,9 @@ mindmap
 | 2     | AI & Advanced Features | Magic Import (Gemini 1.5 Pro), Upcoming/Anytime/Someday views, Energy filtering |
 | 3     | Testing Infrastructure | Playwright E2E, Anonymous auth for tests, 6-browser config, FAB for mobile      |
 | 4     | Project Management     | CRUD with 10-color palette, Sidebar listing, Task assignment, Grouped views     |
+| 5     | Google Tasks Sync      | Stateless Cloud Proxy, Google Identity Services, Two-Way Sync                   |
 
-### 🔜 Phase 5 — Polish, Stability & Deploy
+### 🔜 Phase 6 — Polish, Stability & Deploy
 
 | Priority | Task                                                                                          | Status  |
 | -------- | --------------------------------------------------------------------------------------------- | ------- |
