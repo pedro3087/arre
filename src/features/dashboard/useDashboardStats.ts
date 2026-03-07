@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { useAuth } from '../../lib/auth/AuthContext';
 
@@ -49,12 +49,13 @@ export function useDashboardStats(): DashboardStatsData {
 
     const tasksRef = collection(db, 'users', user.uid, 'tasks');
     
-    // We cannot use multiple inequalities on different fields, but here we just need 'completed' and 'completedAt' >= 7 days ago.
-    // In our firestore indexes, we have status ASC, completedAt DESC.
+    // Query completed tasks from the last 7 days.
+    // Uses the composite index: status ASC, completedAt DESC.
     const q = query(
       tasksRef,
       where('status', '==', 'completed'),
-      where('completedAt', '>=', sevenDaysAgo.toISOString())
+      where('completedAt', '>=', sevenDaysAgo.toISOString()),
+      orderBy('completedAt', 'desc')
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {

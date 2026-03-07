@@ -12,7 +12,7 @@ export interface TaskDocument {
   tags?: string[];
   projectId?: string;
   createdAt: Timestamp;
-  completedAt?: Timestamp;
+  completedAt?: string;
   updatedAt: Timestamp;
 }
 

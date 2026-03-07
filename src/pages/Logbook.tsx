@@ -83,7 +83,7 @@ export function Logbook() {
                   <TaskItem 
                     key={task.id} 
                     task={task} 
-                    onToggle={(id) => updateTask(id, { status: 'todo', completedAt: null as any })}
+                    onToggle={(id) => updateTask(id, { status: 'todo' })}
                   />
                 ))}
               </ul>

@@ -1,16 +1,17 @@
 import { useEffect, useState } from 'react';
 import { 
-  collection, 
-  query, 
-  where, 
-  orderBy, 
-  onSnapshot, 
-  addDoc, 
-  updateDoc, 
+  collection,
+  query,
+  where,
+  orderBy,
+  onSnapshot,
+  addDoc,
+  updateDoc,
   deleteDoc,
   doc,
   getDoc,
-  serverTimestamp
+  serverTimestamp,
+  deleteField
 } from 'firebase/firestore';
 import { db, functions } from '../../../lib/firebase';
 import { useAuth } from '../../../lib/auth/AuthContext';
@@ -113,9 +114,11 @@ export function useTasks(view?: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'so
       const taskRef = doc(db, 'users', user.uid, 'tasks', id);
       const firestoreUpdates: any = { ...updates, updatedAt: serverTimestamp() };
       
-      // If status is changing to completed, set completedAt
+      // Keep completedAt in sync with status
       if (updates.status === 'completed') {
-        firestoreUpdates.completedAt = serverTimestamp();
+        firestoreUpdates.completedAt = new Date().toISOString();
+      } else if (updates.status === 'todo') {
+        firestoreUpdates.completedAt = deleteField();
       }
 
       await updateDoc(taskRef, firestoreUpdates);
