@@ -14,6 +14,8 @@ export interface Task {
   createdAt: string;
   updatedAt?: string;
   completedAt?: string;
+  isGoogleTask?: boolean;
+  googleTaskListId?: string;
 }
 
 export const PROJECT_COLORS = [

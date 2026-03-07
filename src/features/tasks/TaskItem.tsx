@@ -66,6 +66,11 @@ export function TaskItem({ task, onToggle }: TaskItemProps) {
         {task.notes && <span className={styles.notes}>{task.notes}</span>}
         
         <div className={styles.meta}>
+          {task.isGoogleTask && (
+            <span className={clsx(styles.tag, styles.googleTaskTag)} title={`Google Tasks: ${task.googleTaskListId}`}>
+              Google Task
+            </span>
+          )}
           {project && (
             <span className={styles.projectBadge}>
               <span
@@ -88,12 +93,16 @@ export function TaskItem({ task, onToggle }: TaskItemProps) {
       </div>
 
       <div className={styles.actions}>
-        <button className={styles.actionBtn} onClick={handleEdit} title="Edit">
-          <Edit2 size={16} />
-        </button>
-        <button className={styles.actionBtn} onClick={handleDelete} title="Delete">
-          <Trash2 size={16} />
-        </button>
+        {!task.isGoogleTask && (
+          <button className={styles.actionBtn} onClick={handleEdit} title="Edit">
+            <Edit2 size={16} />
+          </button>
+        )}
+        {!task.isGoogleTask && (
+          <button className={styles.actionBtn} onClick={handleDelete} title="Delete">
+            <Trash2 size={16} />
+          </button>
+        )}
       </div>
     </div>
   );

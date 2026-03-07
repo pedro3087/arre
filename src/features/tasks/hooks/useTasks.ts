@@ -9,12 +9,14 @@ import {
   updateDoc, 
   deleteDoc,
   doc,
+  getDoc,
   serverTimestamp
 } from 'firebase/firestore';
-import { db } from '../../../lib/firebase';
+import { db, functions } from '../../../lib/firebase';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { TaskDocument } from '../../../lib/types/firestore';
 import { Task } from '../../../shared/types/task';
+import { httpsCallable } from 'firebase/functions';
 
 const parseFirestoreDate = (dateField: any): string | undefined => {
   if (!dateField) return undefined;
@@ -46,7 +48,9 @@ const convertTask = (doc: any): Task => {
 export function useTasks(view?: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'someday' | 'logbook' | null) {
   const { user } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [googleTasks, setGoogleTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingGoogle, setLoadingGoogle] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // CRUD actions need user but not necessarily view
@@ -67,6 +71,44 @@ export function useTasks(view?: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'so
 
   const updateTask = async (id: string, updates: Partial<Task>) => {
     if (!user) return;
+
+    // Check if it's a Google Task based on the ID format
+    if (id.startsWith('google_')) {
+      const parts = id.split('_');
+      // Format is google_${listId}_${taskId}
+      if (parts.length >= 3) {
+        const listId = parts[1];
+        const taskId = parts.slice(2).join('_'); // In case taskId has underscores
+        
+        try {
+          const updateGoogle = httpsCallable(functions, 'updateGoogleTask');
+          
+          // Only passing properties that Google Tasks supports updating right now (status)
+          const payload: any = {
+            listId,
+            taskId
+          };
+          
+          if (updates.status !== undefined) {
+             payload.status = updates.status; // 'todo' or 'completed'
+          }
+
+          if (updates.title !== undefined) payload.title = updates.title;
+          if (updates.notes !== undefined) payload.notes = updates.notes;
+          
+          await updateGoogle(payload);
+          
+          // Re-fetch Google Tasks to get the updated state
+          // A more robust implementation would do optimistic UI updates here
+          // but for now, we rely on the next fetch.
+        } catch (e) {
+          console.error("Error updating Google Task", e);
+          throw e;
+        }
+      }
+      return;
+    }
+
     try {
       const taskRef = doc(db, 'users', user.uid, 'tasks', id);
       const firestoreUpdates: any = { ...updates, updatedAt: serverTimestamp() };
@@ -187,5 +229,150 @@ export function useTasks(view?: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'so
     return () => unsubscribe();
   }, [user, view]);
 
-  return { tasks, loading, error, addTask, updateTask, deleteTask };
+  // Fetch Google Tasks
+  useEffect(() => {
+    if (!user || view === null) {
+      setGoogleTasks([]);
+      setLoadingGoogle(false);
+      return;
+    }
+
+    let isMounted = true;
+    
+    async function fetchGoogleTasks() {
+      if (!user) return;
+      setLoadingGoogle(true);
+      try {
+        const docRef = doc(db, 'users', user.uid, 'integrations', 'googleTasks');
+        const docSnap = await getDoc(docRef);
+        
+        if (!docSnap.exists()) {
+          if (isMounted) setGoogleTasks([]);
+          return;
+        }
+
+        const data = docSnap.data();
+        const selectedLists = data.selectedLists || [];
+        
+        if (selectedLists.length === 0) {
+          if (isMounted) setGoogleTasks([]);
+          return;
+        }
+
+        const getTasks = httpsCallable(functions, 'getGoogleTasks');
+        let allGoogleTasks: Task[] = [];
+        const todayDate = new Date().toISOString().split('T')[0];
+
+        // Fetch each selected list
+        const promises = selectedLists.map(async (listId: string) => {
+          const isLogbook = view === 'logbook';
+          console.log(`[useTasks] Fetching Google tasks for list: ${listId}`);
+          try {
+            const result = await getTasks({ listId, showCompleted: isLogbook, showHidden: isLogbook });
+            const resData = result.data as any;
+            const gTasks = resData.tasks || [];
+            console.log(`[useTasks] Fetched ${gTasks.length} tasks from list: ${listId}`);
+            
+            return gTasks.map((gt: any): Task => {
+              const dateStr = gt.due ? new Date(gt.due).toISOString().split('T')[0] : undefined;
+              return {
+                id: `google_${listId}_${gt.id}`,
+                title: gt.title || '(No title)',
+                notes: gt.notes,
+                status: gt.status === 'completed' ? 'completed' : 'todo',
+                date: dateStr,
+                createdAt: gt.updated || new Date().toISOString(),
+                updatedAt: gt.updated,
+                completedAt: gt.completed,
+                isGoogleTask: true,
+                googleTaskListId: listId
+              };
+            });
+          } catch (e) {
+             console.error(`[useTasks] Error fetching list ${listId}`, e);
+             return [];
+          }
+        });
+
+        const listsOfTasks = await Promise.all(promises);
+        listsOfTasks.forEach(list => {
+          allGoogleTasks = [...allGoogleTasks, ...list];
+        });
+        
+        console.log(`[useTasks] Total Google tasks mapped: ${allGoogleTasks.length}`);
+
+        // Filter Google Tasks for current view locally
+        let filteredTasks = allGoogleTasks;
+        switch (view) {
+          case 'today':
+            filteredTasks = allGoogleTasks.filter(t => t.date === todayDate && t.status === 'todo');
+            break;
+          case 'inbox':
+          case 'anytime':
+            filteredTasks = allGoogleTasks.filter(t => !t.date && t.status === 'todo');
+            break;
+          case 'upcoming':
+            filteredTasks = allGoogleTasks.filter(t => t.date && t.date > todayDate && t.status === 'todo');
+            break;
+          case 'someday':
+            filteredTasks = []; // Someday not natively supported by Google Tasks
+            break;
+          case 'logbook':
+            filteredTasks = allGoogleTasks.filter(t => t.status === 'completed');
+            break;
+          default:
+            filteredTasks = allGoogleTasks;
+        }
+
+        if (isMounted) setGoogleTasks(filteredTasks);
+
+      } catch (err: any) {
+        console.error("Error fetching Google Tasks:", err);
+      } finally {
+        if (isMounted) setLoadingGoogle(false);
+      }
+    }
+
+    fetchGoogleTasks();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [user, view]);
+
+  // Combine and Sort Tasks
+  const combinedTasks = [...tasks, ...googleTasks];
+  
+  if (view === 'today') {
+    combinedTasks.sort((a, b) => {
+      if (a.isEvening === b.isEvening) {
+        return b.createdAt.localeCompare(a.createdAt);
+      }
+      return a.isEvening ? 1 : -1;
+    });
+  } else if (view === 'logbook') {
+    combinedTasks.sort((a, b) => {
+      const aTime = a.completedAt || a.updatedAt || a.createdAt;
+      const bTime = b.completedAt || b.updatedAt || b.createdAt;
+      return bTime.localeCompare(aTime);
+    });
+  } else if (view === 'upcoming') {
+    combinedTasks.sort((a, b) => {
+      const aDate = a.date || '9999-12-31';
+      const bDate = b.date || '9999-12-31';
+      return aDate.localeCompare(bDate);
+    });
+  } else {
+    // Default (inbox, anytime, someday)
+    combinedTasks.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  }
+
+  return { 
+    tasks: combinedTasks, 
+    loading: loading || loadingGoogle, 
+    error, 
+    addTask, 
+    updateTask, 
+    deleteTask 
+  };
 }

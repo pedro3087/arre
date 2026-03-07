@@ -1,15 +1,13 @@
-import { test, expect } from '@playwright/test';
-import { login } from './utils';
+import { test, expect } from './auth';
 
 test.describe('Task Actions (Edit/Delete)', () => {
   
-  test.beforeEach(async ({ page }) => {
-    await login(page);
+  test.beforeEach(async ({ loggedInPage: page }) => {
     await page.goto('/inbox');
   });
 
   // TODO: persistent timeout in emulator. Skip until fixed.
-  test.skip('should edit and delete a task', async ({ page }) => {
+  test.skip('should edit and delete a task', async ({ loggedInPage: page }) => {
     // Listen for logs
     page.on('console', msg => console.log(`BROWSER: ${msg.text()}`));
 

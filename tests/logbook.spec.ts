@@ -1,14 +1,12 @@
-import { test, expect } from '@playwright/test';
-import { login } from './utils';
+import { test, expect } from './auth';
 
 test.describe('Logbook View', () => {
-  test.beforeEach(async ({ page }) => {
-    await login(page);
+  test.beforeEach(async ({ loggedInPage: page }) => {
     await page.goto('/inbox');
     await page.getByText('Clear').click();
   });
 
-  test('should display completed tasks in the logbook', async ({ page }) => {
+  test('should display completed tasks in the logbook', async ({ loggedInPage: page }) => {
     // 1. Create a task to complete
     const taskTitle = 'Logbook Test Task ' + Date.now();
     await page.getByTestId('btn-new-task-main').click();

@@ -23,10 +23,9 @@ export const db = getFirestore(app);
 export const storage = getStorage(app);
 export const functions = getFunctions(app);
 
-// Connect to Emulators in Development
-if (import.meta.env.DEV) {
-  console.log('🔥 Connecting to Firebase Emulators...');
-  connectAuthEmulator(auth, 'http://localhost:9099');
+// Connect to Firebase Emulators when running in CI or local emulator mode
+if (import.meta.env.VITE_USE_FIREBASE_EMULATOR === 'true') {
+  connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
   connectFirestoreEmulator(db, 'localhost', 8080);
   connectStorageEmulator(storage, 'localhost', 9199);
   connectFunctionsEmulator(functions, 'localhost', 5001);

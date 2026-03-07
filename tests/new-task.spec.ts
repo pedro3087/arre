@@ -1,11 +1,8 @@
-import { test, expect } from '@playwright/test';
-import { login } from './utils';
+import { test, expect } from './auth';
 
 test.describe('New Task Modal Flow', () => {
   
-  test.beforeEach(async ({ page }) => {
-    // 1. Login first
-    await login(page);
+  test.beforeEach(async ({ loggedInPage: page }) => {
     
     // 2. Go to inbox
     await page.goto('/inbox');
@@ -28,7 +25,7 @@ test.describe('New Task Modal Flow', () => {
     }
   };
 
-  test('should open and close the modal', async ({ page }) => {
+  test('should open and close the modal', async ({ loggedInPage: page }) => {
     await openModal(page);
     
     const modal = page.getByTestId('new-task-modal');
@@ -42,7 +39,7 @@ test.describe('New Task Modal Flow', () => {
     await expect(modal).not.toBeVisible({ timeout: 10000 });
   });
 
-  test('should create a manual task', async ({ page }) => {
+  test('should create a manual task', async ({ loggedInPage: page }) => {
     await openModal(page);
     await page.getByTestId('tab-manual').click();
     
@@ -63,7 +60,7 @@ test.describe('New Task Modal Flow', () => {
     await expect(page.getByText(taskTitle)).toBeVisible({ timeout: 10000 });
   });
 
-  test('should verify magic import UI elements', async ({ page }) => {
+  test('should verify magic import UI elements', async ({ loggedInPage: page }) => {
     await openModal(page);
     await expect(page.getByTestId('drop-zone')).toBeVisible();
     await expect(page.getByText('Drop PDF or CSV here')).toBeVisible();
