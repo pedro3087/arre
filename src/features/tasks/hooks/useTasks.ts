@@ -11,7 +11,8 @@ import {
   doc,
   getDoc,
   serverTimestamp,
-  deleteField
+  deleteField,
+  writeBatch
 } from 'firebase/firestore';
 import { db, functions } from '../../../lib/firebase';
 import { useAuth } from '../../../lib/auth/AuthContext';
@@ -124,6 +125,30 @@ export function useTasks(view?: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'so
       await updateDoc(taskRef, firestoreUpdates);
     } catch (e) {
       console.error("Error updating task", e);
+      throw e;
+    }
+  };
+
+  const reorderTasks = async (reorderedTasks: Task[]) => {
+    if (!user) return;
+    
+    try {
+      const batch = writeBatch(db);
+      
+      reorderedTasks.forEach((task, index) => {
+        // Only update local Firestore tasks
+        if (!task.isGoogleTask) {
+          const taskRef = doc(db, 'users', user.uid, 'tasks', task.id);
+          batch.update(taskRef, { 
+            order: index,
+            updatedAt: serverTimestamp()
+          });
+        }
+      });
+      
+      await batch.commit();
+    } catch (e) {
+      console.error("Error reordering tasks", e);
       throw e;
     }
   };
@@ -367,7 +392,18 @@ export function useTasks(view?: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'so
     });
   } else {
     // Default (inbox, anytime, someday)
-    combinedTasks.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    combinedTasks.sort((a, b) => {
+      // Sort by order if they both have it
+      if (typeof a.order === 'number' && typeof b.order === 'number') {
+        return a.order - b.order;
+      }
+      // If only one has order, it comes first
+      if (typeof a.order === 'number') return -1;
+      if (typeof b.order === 'number') return 1;
+      
+      // Default fallback
+      return b.createdAt.localeCompare(a.createdAt);
+    });
   }
 
   return { 
@@ -376,6 +412,7 @@ export function useTasks(view?: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'so
     error, 
     addTask, 
     updateTask, 
-    deleteTask 
+    deleteTask,
+    reorderTasks
   };
 }

@@ -1,14 +1,14 @@
 import { useMemo } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { useTasks } from '../features/tasks/hooks/useTasks';
-import { TaskItem } from '../features/tasks/TaskItem';
+import { ReorderableTaskList } from '../features/tasks/ReorderableTaskList';
 import { MainLayoutContext } from '../layout/MainLayout';
 import { PROJECT_COLORS, Project } from '../shared/types/task';
 import { Archive } from 'lucide-react';
 import styles from './ProjectView.module.css';
 
 export function Someday() {
-  const { tasks, loading, error, updateTask } = useTasks('someday');
+  const { tasks, loading, error, updateTask, reorderTasks } = useTasks('someday');
   const { projects } = useOutletContext<MainLayoutContext>();
 
   // For someday tasks, toggling usually means "Activate" => Move to Todo/Inbox
@@ -71,11 +71,12 @@ export function Someday() {
               {projectTasks.length} task{projectTasks.length !== 1 ? 's' : ''}
             </span>
           </div>
-          <div className={styles.taskList}>
-            {projectTasks.map(task => (
-              <TaskItem key={task.id} task={task} onToggle={handleActivate} />
-            ))}
-          </div>
+          <ReorderableTaskList 
+            tasks={projectTasks} 
+            onToggle={handleActivate} 
+            onReorderTasks={reorderTasks} 
+            className={styles.taskList} 
+          />
         </div>
       ))}
 
@@ -89,11 +90,12 @@ export function Someday() {
               {unassigned.length} task{unassigned.length !== 1 ? 's' : ''}
             </span>
           </div>
-          <div className={styles.taskList}>
-            {unassigned.map(task => (
-              <TaskItem key={task.id} task={task} onToggle={handleActivate} />
-            ))}
-          </div>
+          <ReorderableTaskList 
+            tasks={unassigned} 
+            onToggle={handleActivate} 
+            onReorderTasks={reorderTasks} 
+            className={styles.taskList} 
+          />
         </div>
       )}
 

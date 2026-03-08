@@ -1,14 +1,15 @@
 import { useMemo } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { useTasks } from '../features/tasks/hooks/useTasks';
-import { TaskItem } from '../features/tasks/TaskItem';
+
+import { ReorderableTaskList } from '../features/tasks/ReorderableTaskList';
 import { MainLayoutContext } from '../layout/MainLayout';
 import { PROJECT_COLORS, Project } from '../shared/types/task';
 import { Layers } from 'lucide-react';
 import styles from './ProjectView.module.css';
 
 export function Anytime() {
-  const { tasks, loading, error, updateTask } = useTasks('anytime');
+  const { tasks, loading, error, updateTask, reorderTasks } = useTasks('anytime');
   const { projects } = useOutletContext<MainLayoutContext>();
 
   const handleToggle = (id: string) => {
@@ -74,11 +75,12 @@ export function Anytime() {
               {projectTasks.length} task{projectTasks.length !== 1 ? 's' : ''}
             </span>
           </div>
-          <div className={styles.taskList}>
-            {projectTasks.map(task => (
-              <TaskItem key={task.id} task={task} onToggle={handleToggle} />
-            ))}
-          </div>
+          <ReorderableTaskList 
+            tasks={projectTasks} 
+            onToggle={handleToggle} 
+            onReorderTasks={reorderTasks} 
+            className={styles.taskList} 
+          />
         </div>
       ))}
 
@@ -92,11 +94,12 @@ export function Anytime() {
               {unassigned.length} task{unassigned.length !== 1 ? 's' : ''}
             </span>
           </div>
-          <div className={styles.taskList}>
-            {unassigned.map(task => (
-              <TaskItem key={task.id} task={task} onToggle={handleToggle} />
-            ))}
-          </div>
+          <ReorderableTaskList 
+            tasks={unassigned} 
+            onToggle={handleToggle} 
+            onReorderTasks={reorderTasks} 
+            className={styles.taskList} 
+          />
         </div>
       )}
 
