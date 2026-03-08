@@ -15,9 +15,12 @@ export type MainLayoutContext = {
   openNewTaskModal: () => void;
   openEditTaskModal: (task: Task) => void;
   projects: Project[];
+  activeProjectId: string | null;
+  setActiveProjectId: (id: string | null) => void;
 };
 
 export function MainLayout() {
+  const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
@@ -79,12 +82,14 @@ export function MainLayout() {
           projects={projects}
           onNewProject={handleOpenNewProject}
           onEditProject={handleEditProject}
+          activeProjectId={activeProjectId}
+          setActiveProjectId={setActiveProjectId}
         />
       </aside>
       
       <main className={styles.mainContent}>
         <div className={styles.container}>
-          <Outlet context={{ openNewTaskModal, openEditTaskModal, projects } satisfies MainLayoutContext} />
+          <Outlet context={{ openNewTaskModal, openEditTaskModal, projects, activeProjectId, setActiveProjectId } satisfies MainLayoutContext} />
         </div>
       </main>
 
