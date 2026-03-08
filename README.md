@@ -207,7 +207,18 @@ We use Playwright for E2E testing to ensure stability across all platforms. Curr
   - Mobile emulation temporarily disabled for stability.
   - Advanced flows (Project Management) skipped due to local emulator latency, but code is complete.
 - Verified scenarios: Magic Import flow, Task Lifecycle, Cross-view Synchronization.
-- **AI QA Agent**: CI pipelines are equipped with an autonomous agent that automatically analyzes test failures via Gemini 2.5 and posts debugging comments directly on Pull Requests.
+### Dual-Agent Review
+
+Arre uses two AI agents to automatically review every Pull Request:
+
+- **AI QA Agent**: Analyzes Playwright test failures via Gemini 2.5 Flash and posts root-cause analysis directly on PRs. See [AI_QA_AGENT.md](./docs/AI_QA_AGENT.md).
+- **Design Architect Agent**: Audits frontend code changes against the [Arre Design Vibes rulebook](./docs/DESIGN_VIBES.md). Flags hardcoded colors, spacing violations, and missing hover states. Automatically opens `design-debt` GitHub Issues for polish suggestions. See [DESIGN_ARCHITECT.md](./docs/DESIGN_ARCHITECT.md).
+
+Developers can also run the design check locally before pushing:
+
+```bash
+npm run design-check
+```
 
 See the [Testing Guide](./docs/TESTING.md) for instructions on running tests locally, and the [AI QA Agent Documentation](./docs/AI_QA_AGENT.md) for details on the self-healing CI pipeline.
 

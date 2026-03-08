@@ -9,7 +9,9 @@
     "preview": "vite preview",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
-    "emulators": "firebase emulators:start --only auth,firestore,storage,functions"
+    "emulators": "firebase emulators:start --only auth,firestore,storage,functions",
+    "design-check": "node scripts/design-architect.js --local",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
@@ -18,6 +20,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^4.7.0",
     "firebase-tools": "^15.6.0",
+    "husky": "^9.1.7",
     "typescript": "~5.9.3",
     "vite": "^7.3.1"
   },
