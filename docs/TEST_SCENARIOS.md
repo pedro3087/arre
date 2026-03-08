@@ -54,6 +54,14 @@ This document outlines the comprehensive test scenarios for the Arre application
 - **And** the user confirms the browser dialog
 - **Then** the task is permanently removed from the list
 
+### Scenario: Drag and Drop Reordering
+
+- **Given** multiple tasks within the same project group in Anytime view
+- **When** the user drags a task "A" above task "B"
+- **Then** the list instantly reorders with a smooth animation
+- **And** the new order is persisted to the backend
+- **And** the order remains consistent after a page reload
+
 ---
 
 ## 🟢 Feature: Project Management

@@ -47,6 +47,8 @@ const { tasks, loading, addTask } = useTasks("today");
 // 'tasks' will always be the real-time list of today's tasks
 ```
 
+- **Task Reordering:** The hook provides a `reorderTasks(tasks: Task[])` function. This function takes the new order of tasks (returned by the Framer Motion `Reorder` component) and performs a batched Firestore update to persist the new `order` index for each affected task. The state then automatically updates via the `onSnapshot` listener.
+
 ### c. Project Management (`src/features/projects/hooks/useProjects.ts`)
 
 This hook follows the exact same pattern as `useTasks` but for the `projects` collection.

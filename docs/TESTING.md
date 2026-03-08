@@ -108,6 +108,7 @@ await page.getByTestId("submit-btn").click();
 
 - `tests/new-task.spec.ts`: Covers the "New Task" modal flows (Manual creation, Magic Import simulation).
 - `tests/global-project-filtering.spec.ts`: Covers activating projects in the sidebar and verifying the global filter applied across views.
+- `tests/task-drag-drop.spec.ts`: Covers the manual reordering of tasks within project groups.
 
 ---
 

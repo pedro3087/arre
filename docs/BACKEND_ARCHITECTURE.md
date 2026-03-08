@@ -54,6 +54,7 @@ interface TaskDocument {
   // Logic: Organization
   tags: string[]; // Array of tag strings
   projectId?: string; // Reference to project ID
+  order?: number; // For manual reordering
 
   // Metadata
   createdAt: Timestamp;
@@ -85,8 +86,8 @@ interface ProjectDocument {
 | **This Evening** | Client-side filter from "Today" query OR `tasks.where('date', '==', today).where('isEvening', '==', true)` |
 | **Inbox**        | `tasks.where('date', '==', null).where('projectId', '==', null).where('status', '!=', 'completed')`        |
 | **Upcoming**     | `tasks.where('date', '>', today).orderBy('date', 'asc')`                                                   |
-| **Anytime**      | `tasks.where('date', '==', null).where('projectId', '!=', null)`                                           |
-| **Someday**      | `tasks.where('status', '==', 'someday')` (or distinct collection)                                          |
+| **Anytime**      | `tasks.where('date', '==', null).where('projectId', '!=', null).orderBy('order', 'asc')`                   |
+| **Someday**      | `tasks.where('status', '==', 'someday').orderBy('order', 'asc')`                                           |
 | **Logbook**      | `tasks.where('status', '==', 'completed').orderBy('completedAt', 'desc')`                                  |
 
 ### B. Productivity Metrics (Velocity Chart)

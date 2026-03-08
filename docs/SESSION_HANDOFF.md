@@ -64,6 +64,14 @@
 - [x] **Mobile Test Stability**: Fixed `tests/task-actions.spec.ts` to run on mobile devices (removed `isMobile` fixture dependency, added `try-catch` for hover, injected CSS to force action visibility).
 - [x] **MainLayout Repair**: Restored `handleSaveTask` logic and fixed `closeTaskModal` reference error.
 - [x] **TaskItem Mobile UX**: Added `@media (hover: none)` support to show actions by default on touch devices.
+- [x] **Global Project Filtering** (Phase 6):
+  - Click projects in Sidebar to filter all views (Today, Anytime, Logbook, etc.).
+  - Navigating to "Inbox" clears the active project context.
+  - "Filtered" indicator in view headers for UX clarity.
+- [x] **Task Drag & Drop** (Phase 7):
+  - Reorder tasks within project groups using Framer Motion `Reorder`.
+  - Persistence to Firestore with `order` field and batched updates.
+  - Smooth animations and consistent state sync.
 
 ---
 
@@ -156,12 +164,10 @@ The E2E test suite has accumulated issues across Phases 1–4. Tests must pass b
 
 ### P5 — Future Enhancements (Backlog) 🔮
 
-20. **Drag & Drop**: Reorder tasks within project groups (use `@dnd-kit/core`)
-21. **Sidebar project navigation**: Click a project in sidebar → filter views to show only that project's tasks
-22. **Recurring tasks**: Weekly/monthly repeat patterns
-23. **Tags system**: Beyond projects — hashtag-style labels for cross-cutting concerns
-24. **Keyboard shortcuts**: Quick-add task, navigate views, toggle sidebar
-25. **Mobile native**: React Native / Expo version
+20. **Recurring tasks**: Weekly/monthly repeat patterns
+21. **Tags system**: Beyond projects — hashtag-style labels for cross-cutting concerns
+22. **Keyboard shortcuts**: Quick-add task, navigate views, toggle sidebar
+23. **Mobile native**: React Native / Expo version
 
 ---
 
@@ -226,12 +232,14 @@ Upgraded to Node 22.22.0 via nvm.
 
 ### Tests (`tests/`)
 
-| File                   | Purpose                                                               |
-| ---------------------- | --------------------------------------------------------------------- |
-| `utils.ts`             | `login()` helper — clicks dev-login-button                            |
-| `new-task.spec.ts`     | 3 tests: open/close modal, create manual task, verify magic import UI |
-| `full-flow.spec.ts`    | 2 tests: full lifecycle across views, magic import file upload (skip) |
-| `task-actions.spec.ts` | 1 test: edit and delete a task from Inbox                             |
+| File                               | Purpose                                                               |
+| ---------------------------------- | --------------------------------------------------------------------- |
+| `utils.ts`                         | `login()` helper — clicks dev-login-button                            |
+| `new-task.spec.ts`                 | 3 tests: open/close modal, create manual task, verify magic import UI |
+| `full-flow.spec.ts`                | 2 tests: full lifecycle across views, magic import file upload (skip) |
+| `task-actions.spec.ts`             | 1 test: edit and delete a task from Inbox                             |
+| `task-drag-drop.spec.ts`           | Manual reordering of tasks within project groups                      |
+| `global-project-filtering.spec.ts` | Global filtering via sidebar projects                                 |
 
 ### Config
 

@@ -33,6 +33,7 @@ _(Replace with actual screenshot)_
 
 - **Today View**: A focused list of tasks for right now, with a distinct **"This Evening"** section for separating work from personal time.
 - **Planning Views**: Dedicated views for **Upcoming**, **Anytime**, and **Someday** to keep your roadmap clear.
+- **Task Drag & Drop**: Intuitively reorder tasks within project groups in Anytime and Someday views using smooth Framer Motion animations.
 
 ### 🔄 Integrations
 
@@ -144,6 +145,7 @@ mindmap
 | 4     | Project Management     | CRUD with 10-color palette, Sidebar listing, Task assignment, Grouped views     |
 | 5     | Google Tasks Sync      | Stateless Cloud Proxy, Google Identity Services, Two-Way Sync                   |
 | 6     | Global Filtering       | State-aware project filtering across all task views (Inbox, Today, Logbook)     |
+| 7     | Task Drag & Drop       | Reorderable task lists with Firestore persistence and Framer Motion             |
 
 ### 🔜 Phase 6 — Polish, Stability & Deploy
 
@@ -155,6 +157,7 @@ mindmap
 | P3 🟡    | **Security & data integrity** — Firestore rules review, project deletion cascade              | ✅ Done |
 | P4 🔵    | **Deployment** — Firebase Hosting + Functions deploy, CI/CD pipeline with AI QA Agent         | ✅ Done |
 | P5 🟣    | **Global Filtering** — Global project context filtering across all task views                 | ✅ Done |
+| P6 🟠    | **Task Drag & Drop** — Smooth reordering within project groups in planning views              | ✅ Done |
 
 ### 🔮 Project Tracking
 
