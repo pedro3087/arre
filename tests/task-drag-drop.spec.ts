@@ -53,10 +53,14 @@ test.describe('Task Reordering (Drag and Drop)', () => {
     const box2 = await task2.boundingBox();
     
     if (box1 && box2) {
-      await page.mouse.move(box1.x + box1.width / 2, box1.y + box1.height / 2);
+      await task1.hover();
       await page.mouse.down();
-      // Move slowly to trigger Framer Motion's layout animations
-      await page.mouse.move(box2.x + box2.width / 2, box2.y + box2.height / 4, { steps: 20 });
+      // Break drag threshold
+      await page.mouse.move(box1.x + box1.width / 2, box1.y + box1.height / 2 - 20, { steps: 5 });
+      await page.waitForTimeout(100);
+      
+      // Move past the center line of task 2 to ensure swapping
+      await page.mouse.move(box2.x + box2.width / 2, box2.y + 5, { steps: 20 });
       // Give it a tiny bit of time to register the overlap internally before releasing
       await page.waitForTimeout(500); 
       await page.mouse.up();
