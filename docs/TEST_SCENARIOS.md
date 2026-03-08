@@ -90,6 +90,18 @@ This document outlines the comprehensive test scenarios for the Arre application
 - **Then** the project is removed from the Sidebar
 - **And** tasks assigned to it become unassigned (or are deleted, depending on cascade logic)
 
+### Scenario: Global Project Filtering
+
+- **Given** projects "Work" and "Personal" exist
+- **And** tasks exist in both projects
+- **When** the user clicks "Work" in the Sidebar
+- **Then** all views (Inbox, Anytime, Logbook) only show tasks from "Work"
+- **And** the "Work" project item in Sidebar shows an active highlight
+- **And** the view header shows a "• Filtered" indicator
+- **When** the user clicks "Work" again or clicks "Inbox"
+- **Then** the filter is cleared
+- **And** all tasks are visible again
+
 ---
 
 ## 🟢 Feature: Views & Navigation

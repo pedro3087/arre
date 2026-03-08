@@ -14,12 +14,12 @@ For a real-time productivity app, state management is the central nervous system
 
 Arre employs a modern, hooks-based approach to state management, leveraging core React features and custom abstractions.
 
-| Pattern / Tool | Purpose & Application |
-| :--- | :--- |
-| **Custom Hooks** | This is the **core architectural pattern**. Complex logic for fetching, subscribing to, and manipulating data is encapsulated within reusable hooks (e.g., `useTasks`, `useProjects`). This provides a clean, single-line API for components to consume application state and actions, completely abstracting away the complexities of interacting with the database. |
-| **React Context** | Used to provide global, app-wide state that doesn't change frequently. In Arre, it is used for `AuthContext` (to provide the current user object everywhere) and `ThemeContext` (to provide the current theme). This avoids "prop drilling." |
-| **React Hooks (`useState`, `useEffect`)** | The fundamental building blocks. `useState` is used within our custom hooks to hold the state (e.g., the array of tasks), and `useEffect` is the critical piece that connects the component's lifecycle to the external Firebase backend, setting up and tearing down real-time data subscriptions. |
-| **Firebase `onSnapshot`**| This is the key to Arre's real-time functionality. Our custom hooks use this Firestore client SDK method to open a persistent connection to the database. Whenever data changes on the server (e.g., a task is added or updated), Firestore automatically pushes the new data to the client, the `onSnapshot` callback fires, and our state is updated via `useState`, triggering a UI re-render. |
+| Pattern / Tool                            | Purpose & Application                                                                                                                                                                                                                                                                                                                                                                             |
+| :---------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Custom Hooks**                          | This is the **core architectural pattern**. Complex logic for fetching, subscribing to, and manipulating data is encapsulated within reusable hooks (e.g., `useTasks`, `useProjects`). This provides a clean, single-line API for components to consume application state and actions, completely abstracting away the complexities of interacting with the database.                             |
+| **React Context**                         | Used to provide global, app-wide state. In Arre, it's used for `AuthContext` (User object), `ThemeContext` (Theming), and **`MainLayoutContext`** (managing the `activeProjectId` for global filtering).                                                                                                                                                                                          |
+| **React Hooks (`useState`, `useEffect`)** | The fundamental building blocks. `useState` is used within our custom hooks to hold the state (e.g., the array of tasks), and `useEffect` is the critical piece that connects the component's lifecycle to the external Firebase backend, setting up and tearing down real-time data subscriptions.                                                                                               |
+| **Firebase `onSnapshot`**                 | This is the key to Arre's real-time functionality. Our custom hooks use this Firestore client SDK method to open a persistent connection to the database. Whenever data changes on the server (e.g., a task is added or updated), Firestore automatically pushes the new data to the client, the `onSnapshot` callback fires, and our state is updated via `useState`, triggering a UI re-render. |
 
 ## 3. Implementation Details
 
@@ -40,9 +40,10 @@ This is the most critical and complex state management hook in the application.
 - **Data Modification:** The hook returns functions like `addTask`, `updateTask`, and `deleteTask`. These functions perform the write operations to Firestore. Because the app has an active `onSnapshot` listener, the UI updates automatically as soon as the write operation is confirmed by the server. We don't need to manually add the new task to the local state; Firestore's real-time push does it for us.
 
 **Example Usage:**
+
 ```tsx
 // In a component for the "Today" view
-const { tasks, loading, addTask } = useTasks('today');
+const { tasks, loading, addTask } = useTasks("today");
 // 'tasks' will always be the real-time list of today's tasks
 ```
 
@@ -52,7 +53,7 @@ This hook follows the exact same pattern as `useTasks` but for the `projects` co
 
 - **Real-Time Subscription:** It establishes an `onSnapshot` listener to the current user's `projects` collection in Firestore.
 - **Data Integrity:** The `deleteProject` function demonstrates a key state management principle: data integrity. It uses a Firestore `writeBatch` to atomically perform two operations:
-    1. It queries for all tasks associated with the project being deleted and updates them to have `projectId: null`.
-    2. It deletes the project document itself.
-  This batch operation ensures the database is never left in an inconsistent state (e.g., tasks pointing to a non-existent project).
+  1. It queries for all tasks associated with the project being deleted and updates them to have `projectId: null`.
+  2. It deletes the project document itself.
+     This batch operation ensures the database is never left in an inconsistent state (e.g., tasks pointing to a non-existent project).
 - **Centralized Logic:** Components don't need to know about this complex deletion logic. They simply call `deleteProject(id)`, and the hook handles the rest.

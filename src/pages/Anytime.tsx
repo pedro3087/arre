@@ -58,6 +58,7 @@ export function Anytime() {
           <h1 className={styles.title}>Anytime</h1>
           <span className={styles.subtitle}>
             {tasks.length} task{tasks.length !== 1 ? 's' : ''} across {grouped.length} project{grouped.length !== 1 ? 's' : ''}
+            {activeProjectId && <span data-testid="active-filter-indicator"> • Filtered</span>}
           </span>
         </div>
       </header>

@@ -61,7 +61,7 @@ This document outlines the UI views and features that have been deferred until a
 - Shares `ProjectView.module.css` with Anytime view.
 - "Activate" action sets `status: 'todo'`, moving task back to Inbox.
 
-## 4. Logbook (Completed) — PENDING
+## 4. Logbook (Completed) ✅ DONE
 
 **Route**: `/logbook` (Optional/Future)
 
@@ -82,3 +82,8 @@ This document outlines the UI views and features that have been deferred until a
 - **Task assignment**: Project selector dropdown in `TaskEditorModal`.
 - **Task badges**: `TaskItem` shows project color dot + name.
 - **View grouping**: `Anytime` and `Someday` views partition tasks by project.
+- **Global Projects Filter**: ✅ **IMPLEMENTED**
+  - Managed via `MainLayoutContext`.
+  - Sidebar projects toggle filter on/off.
+  - All task views (Today, Inbox, Logbook, etc.) consume `activeProjectId` and pass to `useTasks`.
+  - Visually confirmed with "• Filtered" indicator in headers.

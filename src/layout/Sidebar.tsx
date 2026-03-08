@@ -60,6 +60,7 @@ export function Sidebar({ onNewTask, projects = [], onNewProject, onEditProject,
                 <Link 
                   to={item.path} 
                   className={clsx(styles.navItem, isActive && styles.active)}
+                  data-testid={`nav-item-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
                   onClick={() => {
                     if (item.path === '/inbox') {
                       setActiveProjectId?.(null);
@@ -96,6 +97,7 @@ export function Sidebar({ onNewTask, projects = [], onNewProject, onEditProject,
             <li 
               key={project.id} 
               className={clsx(styles.projectItem, activeProjectId === project.id && styles.activeProject)}
+              data-testid={`project-item-${project.id}`}
               onClick={() => setActiveProjectId?.(activeProjectId === project.id ? null : project.id)}
             >
               <span
