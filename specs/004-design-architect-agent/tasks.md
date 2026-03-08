@@ -1,0 +1,21 @@
+# Tasks: Design Architect Agent (#11)
+
+- [ ] **Infrastructure**:
+  - [ ] Create `scripts/design-architect.js` skeleton.
+  - [ ] Create `.github/workflows/design-review.yml`.
+- [ ] **Prompt Engineering**:
+  - [ ] Define the "Design Rulebook" (Tokens, Spacing, Aesthetic).
+  - [ ] Implement the Gemini prompt for UX/UI analysis.
+- [ ] **Analysis Logic**:
+  - [ ] Implement Git Diff detection for frontend files.
+  - [ ] Implement CSS Variable validation (flagging hardcoded values).
+  - [ ] Implement Alignment & Consistency checking logic.
+- [ ] **Integration**:
+  - [ ] Implement the GitHub PR commenting logic.
+  - [ ] Add the "Design Review Report" template.
+- [ ] **Verification**:
+  - [ ] Test the agent against a "dirty" branch with inconsistent styles.
+  - [ ] Verify that reports are posted correctly to GitHub.
+- [ ] **Documentation**:
+  - [ ] Update `docs/AI_QA_AGENT.md` or create `docs/DESIGN_ARCHITECT.md`.
+  - [ ] Update `README.md` to mention the "Dual-Agent" (QA + Design) review process.
