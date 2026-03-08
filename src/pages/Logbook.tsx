@@ -1,3 +1,5 @@
+import { useOutletContext } from 'react-router-dom';
+import { MainLayoutContext } from '../layout/MainLayout';
 import { useTasks } from '../features/tasks/hooks/useTasks';
 import { TaskItem } from '../features/tasks/TaskItem';
 import { useAuth } from '../lib/auth/AuthContext';
@@ -14,8 +16,9 @@ interface LogbookGroup {
 }
 
 export function Logbook() {
+  const { activeProjectId } = useOutletContext<MainLayoutContext>();
   const { user } = useAuth();
-  const { tasks, loading, updateTask } = useTasks('logbook');
+  const { tasks, loading, updateTask } = useTasks('logbook', activeProjectId);
 
   // Group tasks by their completedAt date (or updated/created if completedAt is missing)
   const groupedTasks = useMemo(() => {

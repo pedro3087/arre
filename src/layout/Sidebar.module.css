@@ -86,11 +86,21 @@
 }
 
 /* Active Icon Colors */
-.accent-emerald { color: var(--accent-emerald); }
-.accent-sapphire { color: var(--accent-sapphire); }
-.accent-ruby { color: var(--accent-ruby); }
-.accent-lavender { color: var(--accent-lavender); }
-.text-secondary { color: var(--text-secondary); }
+.accent-emerald {
+  color: var(--accent-emerald);
+}
+.accent-sapphire {
+  color: var(--accent-sapphire);
+}
+.accent-ruby {
+  color: var(--accent-ruby);
+}
+.accent-lavender {
+  color: var(--accent-lavender);
+}
+.text-secondary {
+  color: var(--text-secondary);
+}
 
 .label {
   flex: 1;
@@ -198,12 +208,22 @@
   gap: 0.75rem;
   padding: 0.5rem 0.75rem;
   border-radius: 8px;
-  cursor: default;
+  cursor: pointer;
   transition: background-color 0.15s ease;
 }
 
 .projectItem:hover {
   background: rgba(0, 0, 0, 0.03);
+}
+
+.projectItem.activeProject {
+  background: rgba(0, 0, 0, 0.05);
+  font-weight: 600;
+}
+
+.activeProject .projectName {
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
 .projectDot {

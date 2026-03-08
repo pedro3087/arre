@@ -22,9 +22,11 @@ interface SidebarProps {
   projects?: Project[];
   onNewProject?: () => void;
   onEditProject?: (project: Project) => void;
+  activeProjectId?: string | null;
+  setActiveProjectId?: (id: string | null) => void;
 }
 
-export function Sidebar({ onNewTask, projects = [], onNewProject, onEditProject }: SidebarProps) {
+export function Sidebar({ onNewTask, projects = [], onNewProject, onEditProject, activeProjectId, setActiveProjectId }: SidebarProps) {
   const location = useLocation();
   const { theme, setTheme } = useTheme();
 
@@ -58,6 +60,12 @@ export function Sidebar({ onNewTask, projects = [], onNewProject, onEditProject 
                 <Link 
                   to={item.path} 
                   className={clsx(styles.navItem, isActive && styles.active)}
+                  data-testid={`nav-item-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
+                  onClick={() => {
+                    if (item.path === '/inbox') {
+                      setActiveProjectId?.(null);
+                    }
+                  }}
                 >
                   <span className={clsx(styles.iconWrapper, isActive && styles[item.color])}>
                     <Icon size={20} />
@@ -86,7 +94,12 @@ export function Sidebar({ onNewTask, projects = [], onNewProject, onEditProject 
         </div>
         <ul className={styles.projectsList}>
           {projects.map((project) => (
-            <li key={project.id} className={styles.projectItem}>
+            <li 
+              key={project.id} 
+              className={clsx(styles.projectItem, activeProjectId === project.id && styles.activeProject)}
+              data-testid={`project-item-${project.id}`}
+              onClick={() => setActiveProjectId?.(activeProjectId === project.id ? null : project.id)}
+            >
               <span
                 className={styles.projectDot}
                 style={{ backgroundColor: getProjectHex(project.color) }}
@@ -94,7 +107,10 @@ export function Sidebar({ onNewTask, projects = [], onNewProject, onEditProject 
               <span className={styles.projectName}>{project.title}</span>
               <button
                 className={styles.projectEditBtn}
-                onClick={() => onEditProject?.(project)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEditProject?.(project);
+                }}
                 title="Edit Project"
               >
                 <MoreHorizontal size={14} />

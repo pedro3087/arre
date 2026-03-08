@@ -33,6 +33,7 @@ _(Replace with actual screenshot)_
 
 - **Today View**: A focused list of tasks for right now, with a distinct **"This Evening"** section for separating work from personal time.
 - **Planning Views**: Dedicated views for **Upcoming**, **Anytime**, and **Someday** to keep your roadmap clear.
+- **Task Drag & Drop**: Intuitively reorder tasks within project groups in Anytime and Someday views using smooth Framer Motion animations.
 
 ### 🔄 Integrations
 
@@ -46,7 +47,8 @@ _(Replace with actual screenshot)_
 - **Sidebar Projects List**: Real-time project list below nav items with color dots and hover-to-edit.
 - **Assign Tasks to Projects**: Dropdown in task creation/edit modal.
 - **Project Badges**: Tasks show their project with a color dot throughout all views.
-- **Grouped Views**: Anytime and Someday views group tasks by project with color-coded section headers and task counts. Unassigned tasks appear under "Single Actions" / "Loose Ideas".
+- **Grouped Views**: Anytime and Someday views group tasks by project with color-coded section headers and task counts.
+- **Global Projects Filter**: Click any project in the Sidebar to filter **all** views (Today, Anytime, Logbook, etc.) to that specific project context. Navigating to "Inbox" automatically clears the filter.
 
 ## 🛠️ Tech Stack
 
@@ -142,6 +144,8 @@ mindmap
 | 3     | Testing Infrastructure | Playwright E2E, Anonymous auth for tests, 6-browser config, FAB for mobile      |
 | 4     | Project Management     | CRUD with 10-color palette, Sidebar listing, Task assignment, Grouped views     |
 | 5     | Google Tasks Sync      | Stateless Cloud Proxy, Google Identity Services, Two-Way Sync                   |
+| 6     | Global Filtering       | State-aware project filtering across all task views (Inbox, Today, Logbook)     |
+| 7     | Task Drag & Drop       | Reorderable task lists with Firestore persistence and Framer Motion             |
 
 ### 🔜 Phase 6 — Polish, Stability & Deploy
 
@@ -152,6 +156,8 @@ mindmap
 | P2 🟢    | **Logbook view** — Completed tasks archive at `/logbook`, grouped by date                     | ✅ Done |
 | P3 🟡    | **Security & data integrity** — Firestore rules review, project deletion cascade              | ✅ Done |
 | P4 🔵    | **Deployment** — Firebase Hosting + Functions deploy, CI/CD pipeline with AI QA Agent         | ✅ Done |
+| P5 🟣    | **Global Filtering** — Global project context filtering across all task views                 | ✅ Done |
+| P6 🟠    | **Task Drag & Drop** — Smooth reordering within project groups in planning views              | ✅ Done |
 
 ### 🔮 Project Tracking
 

@@ -107,6 +107,8 @@ await page.getByTestId("submit-btn").click();
 ### Key Test Files
 
 - `tests/new-task.spec.ts`: Covers the "New Task" modal flows (Manual creation, Magic Import simulation).
+- `tests/global-project-filtering.spec.ts`: Covers activating projects in the sidebar and verifying the global filter applied across views.
+- `tests/task-drag-drop.spec.ts`: Covers the manual reordering of tasks within project groups.
 
 ---
 
@@ -178,3 +180,8 @@ This section outlines the critical test scenarios for each major view and featur
   - Verify creation of new projects via sidebar.
   - Verify editing/deleting projects.
   - Verify task assignment to projects.
+- **Global Filtering**:
+  - Verify clicking a sidebar project applies `activeProject` state.
+  - Verify task lists only show items for the active project.
+  - Verify "Inbox" navigation clears the active project filter.
+  - Verify visual feedback ("• Filtered" indicator) in view headers.

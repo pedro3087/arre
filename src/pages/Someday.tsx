@@ -8,8 +8,8 @@ import { Archive } from 'lucide-react';
 import styles from './ProjectView.module.css';
 
 export function Someday() {
-  const { tasks, loading, error, updateTask, reorderTasks } = useTasks('someday');
-  const { projects } = useOutletContext<MainLayoutContext>();
+  const { projects, activeProjectId } = useOutletContext<MainLayoutContext>();
+  const { tasks, loading, error, updateTask, reorderTasks } = useTasks('someday', activeProjectId);
 
   // For someday tasks, toggling usually means "Activate" => Move to Todo/Inbox
   const handleActivate = (id: string) => {

@@ -47,7 +47,7 @@ const convertTask = (doc: any): Task => {
   } as Task;
 };
 
-export function useTasks(view?: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'someday' | 'logbook' | null) {
+export function useTasks(view?: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'someday' | 'logbook' | null, filterProjectId?: string | null) {
   const { user } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [googleTasks, setGoogleTasks] = useState<Task[]>([]);
@@ -177,69 +177,62 @@ export function useTasks(view?: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'so
     }
 
     const tasksRef = collection(db, 'users', user.uid, 'tasks');
-    let q;
     const today = new Date().toISOString().split('T')[0];
 
     // Query Logic per View
     // Note: Using 'status == todo' instead of '!= completed' to avoid Firestore index issues
     // and invalid range+inequality combinations (especially for 'upcoming').
+    const constraints = [];
+
     switch (view) {
       case 'today':
-        q = query(
-          tasksRef, 
-          where('date', '==', today), 
-          where('status', '==', 'todo'),
-          orderBy('isEvening', 'asc'),
-          orderBy('createdAt', 'desc')
-        );
+        constraints.push(where('date', '==', today));
+        constraints.push(where('status', '==', 'todo'));
+        if (filterProjectId) constraints.push(where('projectId', '==', filterProjectId));
+        constraints.push(orderBy('isEvening', 'asc'));
+        constraints.push(orderBy('createdAt', 'desc'));
         break;
         
       case 'inbox':
-        q = query(
-          tasksRef,
-          where('date', '==', null),
-          where('status', '==', 'todo'),
-          orderBy('createdAt', 'desc')
-        );
+        // Inbox conventionally doesn't show project tasks unless overridden
+        constraints.push(where('date', '==', null));
+        constraints.push(where('status', '==', 'todo'));
+        if (filterProjectId) constraints.push(where('projectId', '==', filterProjectId));
+        constraints.push(orderBy('createdAt', 'desc'));
         break;
 
       case 'upcoming':
-        q = query(
-          tasksRef,
-          where('date', '>', today),
-          where('status', '==', 'todo'),
-          orderBy('date', 'asc')
-        );
+        constraints.push(where('date', '>', today));
+        constraints.push(where('status', '==', 'todo'));
+        if (filterProjectId) constraints.push(where('projectId', '==', filterProjectId));
+        constraints.push(orderBy('date', 'asc'));
         break;
 
       case 'anytime':
-        q = query(
-          tasksRef,
-          where('date', '==', null),
-          where('status', '==', 'todo'),
-          orderBy('createdAt', 'desc')
-        );
+        constraints.push(where('date', '==', null));
+        constraints.push(where('status', '==', 'todo'));
+        if (filterProjectId) constraints.push(where('projectId', '==', filterProjectId));
+        constraints.push(orderBy('createdAt', 'desc'));
         break;
 
       case 'someday':
-        q = query(
-          tasksRef, 
-          where('status', '==', 'someday'),
-          orderBy('createdAt', 'desc')
-        );
+        constraints.push(where('status', '==', 'someday'));
+        if (filterProjectId) constraints.push(where('projectId', '==', filterProjectId));
+        constraints.push(orderBy('createdAt', 'desc'));
         break;
 
       case 'logbook':
-        q = query(
-          tasksRef, 
-          where('status', '==', 'completed'), 
-          orderBy('completedAt', 'desc')
-        );
+        constraints.push(where('status', '==', 'completed'));
+        if (filterProjectId) constraints.push(where('projectId', '==', filterProjectId));
+        constraints.push(orderBy('completedAt', 'desc'));
         break;
 
       default:
-        q = query(tasksRef, orderBy('createdAt', 'desc'));
+        if (filterProjectId) constraints.push(where('projectId', '==', filterProjectId));
+        constraints.push(orderBy('createdAt', 'desc'));
     }
+
+    const q = query(tasksRef, ...constraints);
 
     const unsubscribe = onSnapshot(q, 
       (snapshot) => {
@@ -255,7 +248,7 @@ export function useTasks(view?: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'so
     );
 
     return () => unsubscribe();
-  }, [user, view]);
+  }, [user, view, filterProjectId]);
 
   // Fetch Google Tasks
   useEffect(() => {
@@ -269,6 +262,11 @@ export function useTasks(view?: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'so
     
     async function fetchGoogleTasks() {
       if (!user) return;
+      if (filterProjectId) {
+        // Hide google tasks if a local project filter is active
+        if (isMounted) setGoogleTasks([]);
+        return;
+      }
       setLoadingGoogle(true);
       try {
         const docRef = doc(db, 'users', user.uid, 'integrations', 'googleTasks');
@@ -366,7 +364,7 @@ export function useTasks(view?: 'today' | 'inbox' | 'upcoming' | 'anytime' | 'so
     return () => {
       isMounted = false;
     };
-  }, [user, view]);
+  }, [user, view, filterProjectId]);
 
   // Combine and Sort Tasks
   const combinedTasks = [...tasks, ...googleTasks];

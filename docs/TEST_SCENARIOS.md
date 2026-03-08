@@ -54,6 +54,14 @@ This document outlines the comprehensive test scenarios for the Arre application
 - **And** the user confirms the browser dialog
 - **Then** the task is permanently removed from the list
 
+### Scenario: Drag and Drop Reordering
+
+- **Given** multiple tasks within the same project group in Anytime view
+- **When** the user drags a task "A" above task "B"
+- **Then** the list instantly reorders with a smooth animation
+- **And** the new order is persisted to the backend
+- **And** the order remains consistent after a page reload
+
 ---
 
 ## 🟢 Feature: Project Management
@@ -89,6 +97,18 @@ This document outlines the comprehensive test scenarios for the Arre application
 - **And** the user confirms the deletion
 - **Then** the project is removed from the Sidebar
 - **And** tasks assigned to it become unassigned (or are deleted, depending on cascade logic)
+
+### Scenario: Global Project Filtering
+
+- **Given** projects "Work" and "Personal" exist
+- **And** tasks exist in both projects
+- **When** the user clicks "Work" in the Sidebar
+- **Then** all views (Inbox, Anytime, Logbook) only show tasks from "Work"
+- **And** the "Work" project item in Sidebar shows an active highlight
+- **And** the view header shows a "• Filtered" indicator
+- **When** the user clicks "Work" again or clicks "Inbox"
+- **Then** the filter is cleared
+- **And** all tasks are visible again
 
 ---
 

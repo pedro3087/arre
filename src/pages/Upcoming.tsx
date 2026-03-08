@@ -1,9 +1,12 @@
+import { useOutletContext } from 'react-router-dom';
+import { MainLayoutContext } from '../layout/MainLayout';
 import { useTasks } from '../features/tasks/hooks/useTasks';
 import { TaskItem } from '../features/tasks/TaskItem';
 import styles from './Dashboard.module.css';
 
 export function Upcoming() {
-  const { tasks, loading, error, updateTask } = useTasks('upcoming');
+  const { activeProjectId } = useOutletContext<MainLayoutContext>();
+  const { tasks, loading, error, updateTask } = useTasks('upcoming', activeProjectId);
 
   const handleToggle = (id: string) => {
     const task = tasks.find(t => t.id === id);

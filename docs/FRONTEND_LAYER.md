@@ -15,16 +15,16 @@ For a productivity application like Arre, the user interface is not just a featu
 
 The frontend stack was chosen to prioritize developer experience, performance, and robustness.
 
-| Tool | Purpose & Application |
-| :--- | :--- |
-| **React (v19)** | The foundational library for building the user interface. Arre is built as a tree of reusable components, from atomic elements like buttons to complex views like the Dashboard. |
-| **Vite** | The build tool and development server. Chosen for its extremely fast startup times and instant Hot Module Replacement (HMR), which dramatically speeds up the development feedback loop. |
-| **React Router (v7)** | Manages all client-side routing. It enables the Single Page Application (SPA) architecture, allowing seamless navigation between views like `/inbox`, `/dashboard`, and `/someday` without full page reloads. |
-| **CSS Modules** | The primary styling strategy. Each component's styles are locally scoped by default (e.g., `MainLayout.module.css`), preventing class name collisions and ensuring styles are encapsulated. This is supplemented by a global style system. |
-| **CSS Variables** | Used extensively in `styles/variables.css` to power the theming system. By defining colors, fonts, and spacing as variables, the entire application's look can be changed by simply switching a `data-theme` attribute on the root element. |
-| **Framer Motion** | A production-ready animation library for React. It is used to create smooth page transitions and subtle, delightful micro-interactions that enhance the user experience without being distracting. |
-| **Lucide React** | Provides a library of clean, lightweight, and consistent icons that are crucial to Arre's minimalist aesthetic. |
-| **Recharts** | A composable charting library used to build the data visualization components in the Dashboard, such as the `VelocityChart`. |
+| Tool                  | Purpose & Application                                                                                                                                                                                                                       |
+| :-------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **React (v19)**       | The foundational library for building the user interface. Arre is built as a tree of reusable components, from atomic elements like buttons to complex views like the Dashboard.                                                            |
+| **Vite**              | The build tool and development server. Chosen for its extremely fast startup times and instant Hot Module Replacement (HMR), which dramatically speeds up the development feedback loop.                                                    |
+| **React Router (v7)** | Manages all client-side routing. It enables the Single Page Application (SPA) architecture, allowing seamless navigation between views like `/inbox`, `/dashboard`, and `/someday` without full page reloads.                               |
+| **CSS Modules**       | The primary styling strategy. Each component's styles are locally scoped by default (e.g., `MainLayout.module.css`), preventing class name collisions and ensuring styles are encapsulated. This is supplemented by a global style system.  |
+| **CSS Variables**     | Used extensively in `styles/variables.css` to power the theming system. By defining colors, fonts, and spacing as variables, the entire application's look can be changed by simply switching a `data-theme` attribute on the root element. |
+| **Framer Motion**     | A production-ready animation library for React. It is used to create smooth page transitions, subtle micro-interactions, and the **Drag & Drop** reordering experience in task lists via `Reorder.Group` and `Reorder.Item`.                |
+| **Lucide React**      | Provides a library of clean, lightweight, and consistent icons that are crucial to Arre's minimalist aesthetic.                                                                                                                             |
+| **Recharts**          | A composable charting library used to build the data visualization components in the Dashboard, such as the `VelocityChart`.                                                                                                                |
 
 ## 3. Implementation Details
 
