@@ -1,0 +1,2 @@
+# Pre-commit hook — intentionally empty.
+# Design checks run on pre-push via .husky/pre-push
