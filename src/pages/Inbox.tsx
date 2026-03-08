@@ -13,8 +13,8 @@ import { MainLayoutContext } from '../layout/MainLayout';
 
 export function Inbox() {
   const [energyFilter, setEnergyFilter] = useState<'all' | 'low' | 'neutral' | 'high'>('high');
-  const { openNewTaskModal } = useOutletContext<MainLayoutContext>();
-  const { tasks, loading, error, updateTask } = useTasks('inbox');
+  const {  openNewTaskModal , activeProjectId } = useOutletContext<MainLayoutContext>();
+  const { tasks, loading, error, updateTask } = useTasks('inbox', activeProjectId);
 
   const filteredTasks = tasks.filter(t => 
     (energyFilter === 'all' || t.energy === energyFilter)

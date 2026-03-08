@@ -9,8 +9,8 @@ import { Layers } from 'lucide-react';
 import styles from './ProjectView.module.css';
 
 export function Anytime() {
-  const { tasks, loading, error, updateTask, reorderTasks } = useTasks('anytime');
-  const { projects } = useOutletContext<MainLayoutContext>();
+  const { projects, activeProjectId } = useOutletContext<MainLayoutContext>();
+  const { tasks, loading, error, updateTask, reorderTasks } = useTasks('anytime', activeProjectId);
 
   const handleToggle = (id: string) => {
     const task = tasks.find(t => t.id === id);
