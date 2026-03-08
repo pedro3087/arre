@@ -60,7 +60,11 @@ export function Sidebar({ onNewTask, projects = [], onNewProject, onEditProject,
                 <Link 
                   to={item.path} 
                   className={clsx(styles.navItem, isActive && styles.active)}
-                  onClick={() => setActiveProjectId?.(null)}
+                  onClick={() => {
+                    if (item.path === '/inbox') {
+                      setActiveProjectId?.(null);
+                    }
+                  }}
                 >
                   <span className={clsx(styles.iconWrapper, isActive && styles[item.color])}>
                     <Icon size={20} />

@@ -4,7 +4,7 @@
 - [ ] Add `activeProjectId` and `setActiveProjectId` props to `Sidebar.tsx`.
 - [ ] Add conditional styling for active state on `li.projectItem` strings (`clsx(styles.projectItem, activeProjectId === project.id && styles.activeProject)`).
 - [ ] Implement `onClick` on project items: calling `setActiveProjectId(project.id)`. Add logic to clear the filter if clicked again.
-- [ ] Wrap main navigation links (Inbox, Today) with an `onClick` that clears the active filter implicitly if the user decides to change root views. Or wait, maybe only Inbox. Let's decide in implementation (simplest is clear on any top-nav click).
+- [ ] Add an `onClick` exclusively to the `Inbox` navigation link that implicitly clears the active project filter, per decisions in spec.md.
 - [ ] Update `useTasks(viewName, filterProjectId)` signature in `src/features/tasks/hooks/useTasks.ts`.
 - [ ] Append a single `where('projectId', '==', filterProjectId)` to the Firestore queries in `useTasks` if `filterProjectId` is present.
 - [ ] Prevent fetching/merging Google Tasks if `filterProjectId` is populated.
