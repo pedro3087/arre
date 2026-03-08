@@ -11,6 +11,7 @@ export interface Task {
   energy?: 'low' | 'neutral' | 'high';
   tags?: TaskTag[];
   projectId?: string;
+  order?: number; // Custom ordering
   createdAt: string;
   updatedAt?: string;
   completedAt?: string;
