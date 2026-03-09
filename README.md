@@ -146,6 +146,7 @@ mindmap
 | 5     | Google Tasks Sync      | Stateless Cloud Proxy, Google Identity Services, Two-Way Sync                   |
 | 6     | Global Filtering       | State-aware project filtering across all task views (Inbox, Today, Logbook)     |
 | 7     | Task Drag & Drop       | Reorderable task lists with Firestore persistence and Framer Motion             |
+| 8     | New Task Alignment     | Default to manual entry, pill-shaped UI, and energy level design consistency    |
 
 ### 🔜 Phase 6 — Polish, Stability & Deploy
 
@@ -213,6 +214,7 @@ We use Playwright for E2E testing to ensure stability across all platforms. Curr
   - Mobile emulation temporarily disabled for stability.
   - Advanced flows (Project Management) skipped due to local emulator latency, but code is complete.
 - Verified scenarios: Magic Import flow, Task Lifecycle, Cross-view Synchronization.
+
 ### Dual-Agent Review
 
 Arre uses two AI agents to automatically review every Pull Request:

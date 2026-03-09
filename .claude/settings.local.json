@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -Command \".specify/scripts/powershell/check-prerequisites.ps1 -Json\")",
+      "Bash(powershell -Command \".specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks\")",
+      "Bash(npx tsc --noEmit)",
+      "Bash(grep -n \"settings\\\\|Settings\\\\|theme\\\\|Theme\\\\|nav-item-settings\\\\|settingsButton\\\\|footerLink\" /c/repos/pipe0.1/arre-app/tests/*.spec.ts)",
+      "Bash(git add src/layout/Sidebar.tsx src/layout/Sidebar.module.css src/pages/Settings.tsx src/pages/Settings.module.css tests/settings-nav.spec.ts specs/001-consolidate-settings/ CLAUDE.md)",
+      "Bash(git commit:*)",
+      "Bash(git push -u origin 001-consolidate-settings)"
+    ]
+  }
+}

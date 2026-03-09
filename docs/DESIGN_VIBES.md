@@ -15,11 +15,12 @@ This document serves as the ground truth for the **Design Architect Agent** when
 
 ## VIBES-003: Borders and Radii
 
-- **Rounding**: UI elements should feel modern and soft but not pill-shaped.
+- **Rounding**: UI elements should feel modern and soft. Geometric "pill" shapes are preferred for primary actions and selection filters.
 - **Enforcement**: Stick to established radiuses:
   - Small elements (inputs, tags): `4px` or `6px`
   - Standard elements (cards, task items): `8px` or `12px`
   - Large containers (modals): `16px` or `24px`
+  - **Dynamic Elements** (Primary buttons, energy pills, sidebar nav): `9999px` (Pill shape)
 
 ## VIBES-004: Typography Hierarchy
 
@@ -44,14 +45,14 @@ This document serves as the ground truth for the **Design Architect Agent** when
 
 ## Severity Mapping
 
-| Rule ID   | Description              | Severity   | Detection Method     |
-|-----------|--------------------------|------------|----------------------|
-| VIBES-001 | No hardcoded colors      | Critical   | Deterministic regex  |
-| VIBES-002 | 8px/4px grid spacing     | Warning    | Gemini LLM           |
-| VIBES-003 | Border radius standards  | Warning    | Gemini LLM           |
-| VIBES-004 | Typography hierarchy     | Warning    | Gemini LLM           |
-| VIBES-005 | Hover/focus states       | Suggestion | Gemini LLM           |
-| VIBES-006 | No inline styles         | Warning    | Gemini LLM           |
+| Rule ID   | Description             | Severity   | Detection Method    |
+| --------- | ----------------------- | ---------- | ------------------- |
+| VIBES-001 | No hardcoded colors     | Critical   | Deterministic regex |
+| VIBES-002 | 8px/4px grid spacing    | Warning    | Gemini LLM          |
+| VIBES-003 | Border radius standards | Warning    | Gemini LLM          |
+| VIBES-004 | Typography hierarchy    | Warning    | Gemini LLM          |
+| VIBES-005 | Hover/focus states      | Suggestion | Gemini LLM          |
+| VIBES-006 | No inline styles        | Warning    | Gemini LLM          |
 
 ---
 

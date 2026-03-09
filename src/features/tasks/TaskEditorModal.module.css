@@ -80,8 +80,8 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 1rem 1.25rem;
-  border-radius: 12px;
+  padding: 0.75rem 1.25rem;
+  border-radius: 9999px;
   border: 1px solid transparent;
   background: transparent;
   color: var(--text-secondary);
@@ -155,7 +155,7 @@
   width: 40px;
   height: 40px;
   border: 1px solid var(--border-subtle);
-  border-radius: 12px;
+  border-radius: 50%;
   color: var(--text-secondary);
   cursor: pointer;
   z-index: 50;
@@ -253,8 +253,8 @@
 }
 
 .dateInput {
-  padding: 8px;
-  border-radius: 8px;
+  padding: 8px 16px;
+  border-radius: 9999px;
   border: 1px solid var(--border-subtle);
   background: var(--bg-paper);
   color: var(--text-primary);
@@ -276,8 +276,8 @@
 
 .projectSelect {
   flex: 1;
-  padding: 8px 12px;
-  border-radius: 8px;
+  padding: 8px 16px;
+  border-radius: 9999px;
   border: 1px solid var(--border-subtle);
   background: var(--bg-paper);
   color: var(--text-primary);
@@ -314,8 +314,8 @@
 }
 
 .pill {
-  padding: 0.5rem 1rem;
-  border-radius: 10px;
+  padding: 0.5rem 1.25rem;
+  border-radius: 9999px;
   font-size: 0.8125rem;
   font-weight: 600;
   border: 1px solid var(--border-subtle);
@@ -333,13 +333,13 @@
 
 .lowActive { background: rgba(16, 185, 129, 0.1); color: var(--energy-low); border-color: var(--energy-low); }
 .neutralActive { background: rgba(234, 179, 8, 0.1); color: var(--energy-neutral); border-color: var(--energy-neutral); }
-.highActive { background: rgba(147, 51, 234, 0.1); color: var(--energy-high); border-color: var(--energy-high); box-shadow: 0 4px 12px rgba(147, 51, 234, 0.15); }
+.highActive { background: rgba(147, 51, 234, 0.2); color: var(--energy-high); border-color: var(--energy-high); box-shadow: 0 0 15px rgba(147, 51, 234, 0.3); }
 
 .createButton {
-  background: var(--text-primary);
-  color: var(--bg-paper);
-  padding: 1rem 2rem;
-  border-radius: 14px;
+  background: var(--accent-purple-neon);
+  color: white;
+  padding: 1rem 2.5rem;
+  border-radius: 9999px;
   font-weight: 700;
   font-size: 1rem;
   display: flex;

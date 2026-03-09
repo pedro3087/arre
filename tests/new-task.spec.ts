@@ -31,7 +31,7 @@ test.describe('New Task Modal Flow', () => {
     const modal = page.getByTestId('new-task-modal');
     await expect(modal).toBeVisible();
     
-    await expect(page.getByRole('heading', { name: 'Magic Import', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Create New Task', exact: true })).toBeVisible();
 
     // force:true needed on mobile where backdrop/content can overlap the close button
     await page.getByTestId('btn-close-modal').click({ force: true });
@@ -41,7 +41,8 @@ test.describe('New Task Modal Flow', () => {
 
   test('should create a manual task', async ({ loggedInPage: page }) => {
     await openModal(page);
-    await page.getByTestId('tab-manual').click();
+    // Manual tab should be the default now
+    await expect(page.getByRole('heading', { name: 'Create New Task' })).toBeVisible();
     
     await expect(page.getByRole('heading', { name: 'Create New Task' })).toBeVisible();
 
@@ -62,6 +63,7 @@ test.describe('New Task Modal Flow', () => {
 
   test('should verify magic import UI elements', async ({ loggedInPage: page }) => {
     await openModal(page);
+    await page.getByTestId('tab-ai').click();
     await expect(page.getByTestId('drop-zone')).toBeVisible();
     await expect(page.getByText('Drop PDF or CSV here')).toBeVisible();
   });
