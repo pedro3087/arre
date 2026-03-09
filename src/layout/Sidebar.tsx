@@ -1,7 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Inbox, Sun, Calendar, Layers, Archive, Moon, Laptop, PlusCircle, FolderPlus, MoreHorizontal, CheckSquare, Sparkles, Settings as SettingsIcon } from 'lucide-react';
+import { Inbox, Sun, Calendar, Layers, Archive, PlusCircle, FolderPlus, MoreHorizontal, CheckSquare, Sparkles, Settings as SettingsIcon } from 'lucide-react';
 import clsx from 'clsx';
-import { useTheme } from '../features/theme/ThemeProvider';
 import styles from './Sidebar.module.css';
 import { SeedButton } from '../dev/SeedButton';
 import { Project, PROJECT_COLORS } from '../shared/types/task';
@@ -14,7 +13,6 @@ const NAV_ITEMS = [
   { path: '/someday', label: 'Someday', icon: Archive, color: 'accent-lavender' },
   { path: '/logbook', label: 'Logbook', icon: CheckSquare, color: 'text-secondary' },
   { path: '/briefing', label: 'AI Briefing', icon: Sparkles, color: 'accent-lavender' },
-  { path: '/settings', label: 'Settings', icon: SettingsIcon, color: 'text-secondary' },
 ];
 
 interface SidebarProps {
@@ -28,16 +26,6 @@ interface SidebarProps {
 
 export function Sidebar({ onNewTask, projects = [], onNewProject, onEditProject, activeProjectId, setActiveProjectId }: SidebarProps) {
   const location = useLocation();
-  const { theme, setTheme } = useTheme();
-
-  const cycleTheme = () => {
-    if (theme === 'light') setTheme('dark');
-    else if (theme === 'dark') setTheme('system');
-    else setTheme('light');
-  };
-
-  const ThemeIcon = theme === 'light' ? Sun : theme === 'dark' ? Moon : Laptop;
-  const themeLabel = theme === 'light' ? 'Light' : theme === 'dark' ? 'Dark' : 'System';
 
   const getProjectHex = (color: string) => {
     return PROJECT_COLORS.find(c => c.name === color)?.hex || '#86868b';
@@ -135,11 +123,11 @@ export function Sidebar({ onNewTask, projects = [], onNewProject, onEditProject,
       </div>
 
       <div className={styles.footer}>
-        <button className={styles.settingsButton} onClick={cycleTheme} title="Toggle Theme">
-          <ThemeIcon size={20} />
-          <span>{themeLabel} Mode</span>
-        </button>
-        
+        <Link to="/settings" className={styles.footerLink}>
+          <SettingsIcon size={20} />
+          <span>Settings</span>
+        </Link>
+
         {import.meta.env.DEV && <SeedButton />}
       </div>
     </aside>

@@ -1,6 +1,8 @@
-import { Settings as SettingsIcon } from 'lucide-react';
+import { Settings as SettingsIcon, Sun, Moon, Laptop } from 'lucide-react';
+import clsx from 'clsx';
 import styles from './Settings.module.css';
 import { useAuth } from '../lib/auth/AuthContext';
+import { useTheme } from '../features/theme/ThemeProvider';
 import { useState, useEffect } from 'react';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db, functions } from '../lib/firebase';
@@ -11,8 +13,15 @@ interface GoogleTaskList {
   title: string;
 }
 
+const THEME_OPTIONS = [
+  { value: 'light' as const, label: 'Light', Icon: Sun },
+  { value: 'dark' as const, label: 'Dark', Icon: Moon },
+  { value: 'system' as const, label: 'System', Icon: Laptop },
+];
+
 export function Settings() {
   const { user, connectGoogleTasks, disconnectGoogleTasks } = useAuth();
+  const { theme, setTheme } = useTheme();
   const [isConnecting, setIsConnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -127,6 +136,22 @@ export function Settings() {
       </header>
 
       <div className={styles.settingsContent}>
+        <section className={styles.settingsSection}>
+          <h2>Appearance</h2>
+          <div className={styles.themeSelector}>
+            {THEME_OPTIONS.map(({ value, label, Icon }) => (
+              <button
+                key={value}
+                className={clsx(styles.themeOption, theme === value && styles.themeOptionActive)}
+                onClick={() => setTheme(value)}
+              >
+                <Icon size={18} />
+                <span>{label}</span>
+              </button>
+            ))}
+          </div>
+        </section>
+
         <section className={styles.settingsSection}>
           <h2>Integrations</h2>
           
