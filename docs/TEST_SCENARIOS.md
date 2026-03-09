@@ -19,7 +19,7 @@ This document outlines the comprehensive test scenarios for the Arre application
 
 - **Given** the user is logged in and on the **Inbox** page
 - **When** the user clicks the "New Task" button (Header or FAB)
-- **And** the user selects the "Manual" tab in the modal
+- **And** the "New Task" (Manual) tab is active by default
 - **And** the user enters a unique task title (e.g., "Review Q3 Report")
 - **And** the user selects an energy level (e.g., "High")
 - **And** the user clicks "Create Task"
@@ -29,8 +29,8 @@ This document outlines the comprehensive test scenarios for the Arre application
 ### Scenario: Magic Import UI Verification
 
 - **Given** the user opens the "New Task" modal
-- **Then** the "Magic Import" tab is active by default
-- **And** the file drop zone is visible with text "Drop PDF or CSV here"
+- **When** the user switches to the "Magic Import" tab
+- **Then** the file drop zone is visible with text "Drop PDF or CSV here"
 
 ### Scenario: Complete a Task
 

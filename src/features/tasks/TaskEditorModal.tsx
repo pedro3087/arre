@@ -17,7 +17,7 @@ interface TaskEditorModalProps {
 }
 
 export function TaskEditorModal({ isOpen, onClose, onSave, initialData, projects = [] }: TaskEditorModalProps) {
-  const [activeTab, setActiveTab] = useState<'manual' | 'ai'>('ai');
+  const [activeTab, setActiveTab] = useState<'manual' | 'ai'>('manual');
   const [title, setTitle] = useState('');
   const [notes, setNotes] = useState('');
   const [energy, setEnergy] = useState<'low' | 'neutral' | 'high'>('neutral');
@@ -44,7 +44,7 @@ export function TaskEditorModal({ isOpen, onClose, onSave, initialData, projects
         setDate('');
         setIsSomeday(false);
         setProjectId(undefined);
-        setActiveTab('ai');
+        setActiveTab('manual');
       }
     }
   }, [isOpen, initialData]);

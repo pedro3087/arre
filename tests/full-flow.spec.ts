@@ -39,7 +39,8 @@ test.describe('Arre App Full Workflow', () => {
     
     // 2. Create a task for tomorrow
     await openNewTaskModal(page);
-    await page.getByTestId('tab-manual').click();
+    // Manual tab is now default
+    await expect(page.getByRole('heading', { name: 'Create New Task' })).toBeVisible();
     
     const tomorrowTask = 'Meeting with Team ' + Date.now();
     await page.getByTestId('input-title').fill(tomorrowTask);
@@ -67,7 +68,8 @@ test.describe('Arre App Full Workflow', () => {
 
     // 5. Create a Someday task
     await openNewTaskModal(page);
-    await page.getByTestId('tab-manual').click();
+    // Manual tab is now default
+    await expect(page.getByRole('heading', { name: 'Create New Task' })).toBeVisible();
     const somedayTask = 'Learn Rust ' + Date.now();
     await page.getByTestId('input-title').fill(somedayTask);
     
@@ -83,7 +85,8 @@ test.describe('Arre App Full Workflow', () => {
 
     await openNewTaskModal(page);
     
-    // The modal opens on the AI/Magic Import tab by default
+    // Switch to Magic Import tab (manual is now default)
+    await page.getByTestId('tab-ai').click();
     await expect(page.getByTestId('drop-zone')).toBeVisible();
     
     // Create a dummy file
