@@ -16,11 +16,11 @@ This document serves as the ground truth for the **Design Architect Agent** when
 ## VIBES-003: Borders and Radii
 
 - **Rounding**: UI elements should feel modern and soft. Geometric "pill" shapes are preferred for primary actions and selection filters.
-- **Enforcement**: Stick to established radiuses:
-  - Small elements (inputs, tags): `4px` or `6px`
-  - Standard elements (cards, task items): `8px` or `12px`
-  - Large containers (modals): `16px` or `24px`
-  - **Dynamic Elements** (Primary buttons, energy pills, sidebar nav): `9999px` (Pill shape)
+- **Enforcement**: Stick to established radiuses to maintain the "White Paper" feel:
+  - Small UI elements (inputs, checkboxes, tags): `6px` or `8px`
+  - List items (tasks, settings rows): `16px`
+  - Standard cards & Large containers (modals, sections): `24px`
+  - **Interactive Elements** (Primary buttons, energy pills, sidebar nav, selectors): `9999px` (Pill shape)
 
 ## VIBES-004: Typography Hierarchy
 

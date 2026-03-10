@@ -52,7 +52,7 @@
   gap: var(--spacing-1);
   background-color: var(--surface-overlay);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
+  border-radius: 9999px;
   padding: var(--spacing-1);
 }
 
@@ -62,7 +62,7 @@
   justify-content: center;
   gap: var(--spacing-2);
   padding: var(--spacing-2) var(--spacing-4);
-  border-radius: var(--radius-md);
+  border-radius: 9999px;
   color: var(--text-secondary);
   font-weight: 500;
   font-size: 0.875rem;
@@ -76,15 +76,15 @@
 }
 
 .themeOptionActive {
-  background-color: var(--surface-base);
+  background-color: var(--bg-paper);
   color: var(--text-primary);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.2);
 }
 
 .integrationCard {
-  background-color: var(--surface-overlay);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
+  background-color: var(--bg-paper);
+  border: 1px solid var(--border-subtle);
+  border-radius: 24px;
   padding: var(--spacing-6);
   display: flex;
   align-items: center;
@@ -129,14 +129,14 @@
 }
 
 .connectButton {
-  background-color: var(--primary-color);
+  background-color: var(--accent-purple-neon);
   color: white;
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: 9999px;
   padding: var(--spacing-2) var(--spacing-4);
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  transition: all 0.2s ease;
   white-space: nowrap;
 }
 
@@ -151,10 +151,10 @@
 }
 
 .disconnectButton {
-  background-color: var(--surface-overlay);
-  color: var(--status-error);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
+  background-color: transparent;
+  color: var(--accent-ruby);
+  border: 1px solid var(--border-subtle);
+  border-radius: 9999px;
   padding: var(--spacing-2) var(--spacing-4);
   font-weight: 500;
   cursor: pointer;
@@ -204,16 +204,16 @@
 }
 
 .taskListItem {
-  background-color: var(--surface-base);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
+  background-color: var(--bg-paper);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
   padding: var(--spacing-3) var(--spacing-4);
-  transition: border-color 0.2s ease, background-color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .taskListItem:hover {
-  border-color: var(--primary-color);
-  background-color: var(--surface-overlay);
+  border-color: var(--accent-purple-neon);
+  background-color: var(--bg-app);
 }
 
 .checkboxLabel {
@@ -230,8 +230,8 @@
   appearance: none;
   width: 1.25rem;
   height: 1.25rem;
-  border: 2px solid var(--border-color);
-  border-radius: var(--radius-sm);
+  border: 2px solid var(--border-subtle);
+  border-radius: 6px;
   background-color: transparent;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -240,8 +240,8 @@
 }
 
 .checkboxLabel input[type="checkbox"]:checked {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
+  background-color: var(--accent-purple-neon);
+  border-color: var(--accent-purple-neon);
 }
 
 .checkboxLabel input[type="checkbox"]:checked::after {
