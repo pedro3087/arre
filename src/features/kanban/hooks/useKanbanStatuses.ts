@@ -38,9 +38,22 @@ export function useKanbanStatuses() {
     const statusesRef = collection(db, 'users', user.uid, 'kanbanStatuses');
     const q = query(statusesRef, orderBy('order', 'asc'));
 
+    let seeded = false; // local flag — prevents double-seed within this effect run
+
     const unsubscribe = onSnapshot(
       q,
-      (snapshot) => {
+      async (snapshot) => {
+        if (snapshot.empty && !seeded) {
+          seeded = true;
+          const batch = writeBatch(db);
+          DEFAULT_STATUSES.forEach((s) => {
+            const newRef = doc(statusesRef);
+            batch.set(newRef, { ...s, createdAt: new Date().toISOString() });
+          });
+          await batch.commit();
+          // listener will fire again with the new docs — nothing more to do here
+          return;
+        }
         const fetched = snapshot.docs.map((d) => ({
           id: d.id,
           ...d.data(),
