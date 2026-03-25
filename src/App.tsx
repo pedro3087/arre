@@ -14,6 +14,7 @@ import { ProtectedRoute } from './lib/auth/ProtectedRoute';
 import { Login } from './pages/Login';
 import { AIBriefing } from './pages/AIBriefing';
 import { Settings } from './pages/Settings';
+import { Kanban } from './pages/Kanban';
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
               <Route path="/anytime" element={<Anytime />} />
               <Route path="/someday" element={<Someday />} />
               <Route path="/logbook" element={<Logbook />} />
+              <Route path="/kanban" element={<Kanban />} />
               <Route path="/briefing" element={<AIBriefing />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="*" element={<Navigate to="/" replace />} />

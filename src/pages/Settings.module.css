@@ -256,6 +256,29 @@
   border-width: 0 2px 2px 0;
 }
 
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--text-secondary);
+}
+
+.sectionHeader h2 {
+  margin: 0;
+}
+
+.sectionDescription {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.inlineIcon {
+  color: var(--accent-emerald);
+  font-style: normal;
+}
+
 @media (max-width: 640px) {
   .integrationCard {
     flex-direction: column;

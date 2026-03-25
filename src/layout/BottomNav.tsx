@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Inbox, Sun, Calendar, Layers, Archive, CheckSquare } from 'lucide-react';
+import { Inbox, Sun, Calendar, Layers, Archive, CheckSquare, LayoutDashboard } from 'lucide-react';
 import clsx from 'clsx';
 import styles from './BottomNav.module.css';
 
@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { path: '/anytime', label: 'Anytime', icon: Layers, color: 'accent-ruby' },
   { path: '/someday', label: 'Someday', icon: Archive, color: 'accent-lavender' },
   { path: '/logbook', label: 'Logbook', icon: CheckSquare, color: 'text-secondary' },
+  { path: '/kanban', label: 'Kanban', icon: LayoutDashboard, color: 'accent-sapphire' },
 ];
 
 export function BottomNav() {

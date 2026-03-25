@@ -1,10 +1,11 @@
-import { Settings as SettingsIcon, Sun, Moon, Laptop } from 'lucide-react';
+import { Settings as SettingsIcon, Sun, Moon, Laptop, LayoutDashboard } from 'lucide-react';
 import clsx from 'clsx';
 import styles from './Settings.module.css';
 import { useAuth } from '../lib/auth/AuthContext';
 import { useTheme } from '../features/theme/ThemeProvider';
 import { useState, useEffect } from 'react';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { KanbanStatusManager } from '../features/kanban/KanbanStatusManager';
 import { db, functions } from '../lib/firebase';
 import { httpsCallable } from 'firebase/functions';
 
@@ -222,6 +223,18 @@ export function Settings() {
 
 
           {error && <p className={styles.errorText}>{error}</p>}
+        </section>
+
+        <section className={styles.settingsSection}>
+          <div className={styles.sectionHeader}>
+            <LayoutDashboard size={18} />
+            <h2>Kanban Columns</h2>
+          </div>
+          <p className={styles.sectionDescription}>
+            Configure the workflow columns shared across all projects. Drag to reorder. Click a label to rename.
+            The <span className={styles.inlineIcon}>✓</span> marks the completion column — tasks dropped there move to Logbook.
+          </p>
+          <KanbanStatusManager />
         </section>
       </div>
     </div>
