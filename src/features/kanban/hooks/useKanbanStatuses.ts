@@ -51,14 +51,36 @@ export function useKanbanStatuses() {
             batch.set(newRef, { ...s, createdAt: new Date().toISOString() });
           });
           await batch.commit();
-          // listener will fire again with the new docs — nothing more to do here
           return;
         }
-        const fetched = snapshot.docs.map((d) => ({
+
+        const all = snapshot.docs.map((d) => ({
           id: d.id,
           ...d.data(),
         })) as KanbanStatus[];
-        setStatuses(fetched);
+
+        // Auto-deduplicate: if duplicate labels exist (StrictMode race), keep
+        // the first occurrence of each label and delete the rest.
+        const seen = new Map<string, string>(); // label → first id kept
+        const toDelete: string[] = [];
+        for (const s of all) {
+          const key = s.label.toLowerCase().trim();
+          if (seen.has(key)) {
+            toDelete.push(s.id);
+          } else {
+            seen.set(key, s.id);
+          }
+        }
+        if (toDelete.length > 0) {
+          const batch = writeBatch(db);
+          toDelete.forEach((id) =>
+            batch.delete(doc(db, 'users', user.uid, 'kanbanStatuses', id))
+          );
+          await batch.commit();
+          return; // listener fires again with clean data
+        }
+
+        setStatuses(all);
         setLoading(false);
       },
       (err) => {
