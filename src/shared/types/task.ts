@@ -11,12 +11,21 @@ export interface Task {
   energy?: 'low' | 'neutral' | 'high';
   tags?: TaskTag[];
   projectId?: string;
+  kanbanStatusId?: string; // ID of the KanbanStatus column this task is in
   order?: number; // Custom ordering
   createdAt: string;
   updatedAt?: string;
   completedAt?: string;
   isGoogleTask?: boolean;
   googleTaskListId?: string;
+}
+
+export interface KanbanStatus {
+  id: string;
+  label: string;
+  order: number;
+  isFinal: boolean;
+  createdAt: string;
 }
 
 export const PROJECT_COLORS = [

@@ -1,0 +1,82 @@
+.column {
+  display: flex;
+  flex-direction: column;
+  min-width: 260px;
+  max-width: 300px;
+  flex: 1;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-sm) var(--spacing-sm) var(--spacing-sm) var(--spacing-md);
+  margin-bottom: var(--spacing-xs);
+}
+
+.label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.finalIcon {
+  color: var(--accent-emerald);
+}
+
+.count {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg-app);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 1px 7px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.dropZone {
+  flex: 1;
+  border-radius: 10px;
+  border: 2px dashed transparent;
+  padding: var(--spacing-xs);
+  min-height: 120px;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.dropOver {
+  border-color: var(--accent-sapphire);
+  background-color: rgba(37, 99, 235, 0.04);
+}
+
+.cardList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.emptyColumn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80px;
+  color: var(--text-tertiary);
+  font-size: 0.75rem;
+  border-radius: 8px;
+  border: 1.5px dashed var(--border-subtle);
+  transition: border-color 0.15s ease;
+}
+
+.dropOver .emptyColumn {
+  border-color: var(--accent-sapphire);
+  color: var(--accent-sapphire);
+}

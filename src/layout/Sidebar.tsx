@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Inbox, Sun, Calendar, Layers, Archive, PlusCircle, FolderPlus, MoreHorizontal, CheckSquare, Sparkles, Settings as SettingsIcon } from 'lucide-react';
+import { Inbox, Sun, Calendar, Layers, Archive, PlusCircle, FolderPlus, MoreHorizontal, CheckSquare, Sparkles, Settings as SettingsIcon, LayoutDashboard } from 'lucide-react';
 import clsx from 'clsx';
 import styles from './Sidebar.module.css';
 import { SeedButton } from '../dev/SeedButton';
@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { path: '/anytime', label: 'Anytime', icon: Layers, color: 'accent-ruby' },
   { path: '/someday', label: 'Someday', icon: Archive, color: 'accent-lavender' },
   { path: '/logbook', label: 'Logbook', icon: CheckSquare, color: 'text-secondary' },
+  { path: '/kanban', label: 'Kanban', icon: LayoutDashboard, color: 'accent-sapphire' },
   { path: '/briefing', label: 'AI Briefing', icon: Sparkles, color: 'accent-lavender' },
 ];
 

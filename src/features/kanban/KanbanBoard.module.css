@@ -1,0 +1,121 @@
+.boardRoot {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: var(--spacing-md);
+  overflow: hidden;
+}
+
+/* Project Picker */
+.projectPicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.projectTab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: 5px var(--spacing-sm);
+  border-radius: 20px;
+  border: 1.5px solid var(--border-subtle);
+  background: none;
+  cursor: pointer;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+}
+
+.projectTab:hover {
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
+}
+
+.projectTabActive {
+  border-color: var(--accent-sapphire);
+  color: var(--accent-sapphire);
+  background: rgba(37, 99, 235, 0.06);
+}
+
+.projectDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.projectTabLabel {
+  white-space: nowrap;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Columns */
+.columns {
+  display: flex;
+  gap: var(--spacing-md);
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: auto;
+  padding-bottom: var(--spacing-md);
+  align-items: flex-start;
+}
+
+/* Loading */
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  flex: 1;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 2.5px solid var(--border-subtle);
+  border-top-color: var(--accent-sapphire);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Empty state */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  flex: 1;
+  text-align: center;
+  color: var(--text-secondary);
+  padding: var(--spacing-2xl);
+}
+
+.emptyIcon {
+  color: var(--text-tertiary);
+}
+
+.emptyState h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.emptyState p {
+  font-size: 0.875rem;
+  margin: 0;
+}
