@@ -38,14 +38,49 @@ export function useKanbanStatuses() {
     const statusesRef = collection(db, 'users', user.uid, 'kanbanStatuses');
     const q = query(statusesRef, orderBy('order', 'asc'));
 
+    let seeded = false; // local flag — prevents double-seed within this effect run
+
     const unsubscribe = onSnapshot(
       q,
-      (snapshot) => {
-        const fetched = snapshot.docs.map((d) => ({
+      async (snapshot) => {
+        if (snapshot.empty && !seeded) {
+          seeded = true;
+          const batch = writeBatch(db);
+          DEFAULT_STATUSES.forEach((s) => {
+            const newRef = doc(statusesRef);
+            batch.set(newRef, { ...s, createdAt: new Date().toISOString() });
+          });
+          await batch.commit();
+          return;
+        }
+
+        const all = snapshot.docs.map((d) => ({
           id: d.id,
           ...d.data(),
         })) as KanbanStatus[];
-        setStatuses(fetched);
+
+        // Auto-deduplicate: if duplicate labels exist (StrictMode race), keep
+        // the first occurrence of each label and delete the rest.
+        const seen = new Map<string, string>(); // label → first id kept
+        const toDelete: string[] = [];
+        for (const s of all) {
+          const key = s.label.toLowerCase().trim();
+          if (seen.has(key)) {
+            toDelete.push(s.id);
+          } else {
+            seen.set(key, s.id);
+          }
+        }
+        if (toDelete.length > 0) {
+          const batch = writeBatch(db);
+          toDelete.forEach((id) =>
+            batch.delete(doc(db, 'users', user.uid, 'kanbanStatuses', id))
+          );
+          await batch.commit();
+          return; // listener fires again with clean data
+        }
+
+        setStatuses(all);
         setLoading(false);
       },
       (err) => {

@@ -50,6 +50,11 @@ service cloud.firestore {
       match /integrations/{integrationId} {
         allow read, write: if isOwner(userId);
       }
+
+      // Kanban Statuses Sub-collection
+      match /kanbanStatuses/{statusId} {
+        allow read, write: if isOwner(userId);
+      }
     }
   }
 }

@@ -29,19 +29,19 @@ export function useKanbanBoard(projectId: string | null) {
 
     setTasksLoading(true);
     const tasksRef = collection(db, 'users', user.uid, 'tasks');
+    // Single-field query only — avoids requiring a composite Firestore index.
+    // Completed tasks are excluded client-side.
     const q = query(
       tasksRef,
-      where('projectId', '==', projectId),
-      where('status', '==', 'todo')
+      where('projectId', '==', projectId)
     );
 
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
-        const fetched = snapshot.docs.map((d) => ({
-          id: d.id,
-          ...d.data(),
-        })) as Task[];
+        const fetched = snapshot.docs
+          .map((d) => ({ id: d.id, ...d.data() }) as Task)
+          .filter((t) => t.status !== 'completed');
         setTasks(fetched);
         setTasksLoading(false);
       },

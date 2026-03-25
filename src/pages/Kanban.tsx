@@ -1,19 +1,11 @@
-import { useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { LayoutDashboard } from 'lucide-react';
 import { MainLayoutContext } from '../layout/MainLayout';
 import { KanbanBoard } from '../features/kanban/KanbanBoard';
-import { useKanbanStatuses } from '../features/kanban/hooks/useKanbanStatuses';
 import styles from './Kanban.module.css';
 
 export function Kanban() {
   const { projects, openEditTaskModal } = useOutletContext<MainLayoutContext>();
-  const { seedDefaults } = useKanbanStatuses();
-
-  // Seed default columns on first visit if none exist
-  useEffect(() => {
-    seedDefaults();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className={styles.page}>
