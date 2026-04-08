@@ -14,6 +14,9 @@ export interface TaskDocument {
   createdAt: Timestamp;
   completedAt?: string;
   updatedAt: Timestamp;
+  priority?: 'high' | 'normal';
+  isCalendarImport?: boolean;
+  calendarEventId?: string;
 }
 
 export interface ProjectDocument {

@@ -1,4 +1,4 @@
-import { Check, Circle, Trash2, Edit2 } from 'lucide-react';
+import { Check, Circle, Trash2, Edit2, Calendar } from 'lucide-react';
 import { Task, Project, PROJECT_COLORS } from '../../shared/types/task';
 import clsx from 'clsx';
 import styles from './TaskItem.module.css';
@@ -66,6 +66,15 @@ export function TaskItem({ task, onToggle }: TaskItemProps) {
         {task.notes && <span className={styles.notes}>{task.notes}</span>}
         
         <div className={styles.meta}>
+          {task.priority === 'high' && (
+            <span className={styles.highPriorityDot} title="High priority" />
+          )}
+          {task.isCalendarImport && (
+            <span className={styles.calendarImportTag} title="Imported from Google Calendar">
+              <Calendar size={12} />
+              Calendar
+            </span>
+          )}
           {task.isGoogleTask && (
             <span className={clsx(styles.tag, styles.googleTaskTag)} title={`Google Tasks: ${task.googleTaskListId}`}>
               Google Task

@@ -43,6 +43,29 @@
   transform: scale(0.95);
 }
 
+.calendarErrorBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 20px;
+  background-color: rgba(220, 38, 38, 0.08);
+  border-bottom: 1px solid rgba(220, 38, 38, 0.2);
+  color: var(--accent-ruby, #dc2626);
+  font-size: 0.875rem;
+}
+
+.calendarErrorDismiss {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .mainContent {

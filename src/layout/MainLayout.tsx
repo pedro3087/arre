@@ -2,13 +2,14 @@ import { Outlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { BottomNav } from './BottomNav';
 import styles from './MainLayout.module.css';
+import { useGoogleCalendarImport } from '../features/integrations/useGoogleCalendarImport';
 
 import { useState } from 'react';
 import { useTasks } from '../features/tasks/hooks/useTasks';
 import { useProjects } from '../features/projects/hooks/useProjects';
 import { TaskEditorModal } from '../features/tasks/TaskEditorModal';
 import { ProjectModal } from '../features/projects/ProjectModal';
-import { Plus } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import { Task, Project, ProjectColor } from '../shared/types/task';
 
 export type MainLayoutContext = {
@@ -28,6 +29,8 @@ export function MainLayout() {
   
   const { addTask, updateTask } = useTasks(null);
   const { projects, addProject, updateProject, deleteProject, reorderProjects } = useProjects();
+  const { importError: calendarImportError } = useGoogleCalendarImport();
+  const [calendarBannerDismissed, setCalendarBannerDismissed] = useState(false);
 
   const openNewTaskModal = () => {
     setTaskToEdit(null);
@@ -89,6 +92,18 @@ export function MainLayout() {
       </aside>
       
       <main className={styles.mainContent}>
+        {calendarImportError && !calendarBannerDismissed && (
+          <div className={styles.calendarErrorBanner}>
+            <span>Calendar import failed: {calendarImportError}</span>
+            <button
+              className={styles.calendarErrorDismiss}
+              onClick={() => setCalendarBannerDismissed(true)}
+              aria-label="Dismiss"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        )}
         <div className={styles.container}>
           <Outlet context={{ openNewTaskModal, openEditTaskModal, projects, activeProjectId, setActiveProjectId } satisfies MainLayoutContext} />
         </div>

@@ -343,3 +343,156 @@ exports.updateGoogleTask = onCall({
     throw new HttpsError('internal', 'Failed to update task.', error.message);
   }
 });
+
+// Helper Function: Get Google Calendar OAuth Client
+async function getGoogleCalendarClient(uid) {
+  const docRef = admin.firestore().collection('users').doc(uid).collection('integrations').doc('googleCalendar');
+  const docSnap = await docRef.get();
+
+  if (!docSnap.exists) {
+    throw new HttpsError('failed-precondition', 'Google Calendar integration not connected.');
+  }
+
+  const { refreshToken } = docSnap.data();
+  if (!refreshToken) {
+    throw new HttpsError('failed-precondition', 'No refresh token available for Google Calendar.');
+  }
+
+  const oauth2Client = new google.auth.OAuth2(
+    googleClientId.value(),
+    googleClientSecret.value()
+  );
+  oauth2Client.setCredentials({ refresh_token: refreshToken });
+
+  return google.calendar({ version: 'v3', auth: oauth2Client });
+}
+
+/**
+ * Cloud Function: exchangeGoogleCalendarAuthCode
+ * Exchanges an authorization code for an offline refresh token scoped to Google Calendar.
+ */
+exports.exchangeGoogleCalendarAuthCode = onCall({
+  secrets: [googleClientId, googleClientSecret],
+  memory: "256MiB",
+  timeoutSeconds: 30
+}, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'User must be logged in.');
+  }
+
+  const { code } = request.data;
+  if (!code) {
+    throw new HttpsError('invalid-argument', 'Missing authorization code.');
+  }
+
+  try {
+    const oauth2Client = new google.auth.OAuth2(
+      googleClientId.value(),
+      googleClientSecret.value(),
+      'postmessage'
+    );
+
+    const { tokens } = await oauth2Client.getToken(code);
+    const refreshToken = tokens.refresh_token;
+
+    if (!refreshToken) {
+      throw new HttpsError('failed-precondition', 'Google did not provide a refresh token. Revoke access and try again.');
+    }
+
+    const docRef = admin.firestore()
+      .collection('users').doc(request.auth.uid)
+      .collection('integrations').doc('googleCalendar');
+
+    await docRef.set({
+      refreshToken,
+      connectedAt: admin.firestore.FieldValue.serverTimestamp(),
+      lastSyncDate: null
+    }, { merge: true });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Exchange Calendar Code Error:", error);
+    throw new HttpsError('internal', 'Failed to exchange authorization code.', error.message);
+  }
+});
+
+/**
+ * Cloud Function: importGoogleCalendarEvents
+ * Fetches today's Google Calendar events and creates them as high-priority tasks in Firestore.
+ * Deduplicates by calendarEventId so repeated calls within the same day are idempotent.
+ */
+exports.importGoogleCalendarEvents = onCall({
+  secrets: [googleClientId, googleClientSecret],
+  memory: "256MiB",
+  timeoutSeconds: 60
+}, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'User must be logged in.');
+  }
+
+  const uid = request.auth.uid;
+
+  try {
+    const calendarService = await getGoogleCalendarClient(uid);
+
+    // Determine today's date bounds in local time (server runs UTC, so use UTC date)
+    const now = new Date();
+    const todayStr = now.toISOString().split('T')[0]; // YYYY-MM-DD
+
+    const timeMin = new Date(`${todayStr}T00:00:00.000Z`).toISOString();
+    const timeMax = new Date(`${todayStr}T23:59:59.999Z`).toISOString();
+
+    const eventsRes = await calendarService.events.list({
+      calendarId: 'primary',
+      timeMin,
+      timeMax,
+      singleEvents: true,
+      orderBy: 'startTime',
+      showDeleted: false,
+      maxResults: 250
+    });
+
+    const events = eventsRes.data.items || [];
+    const tasksRef = admin.firestore().collection('users').doc(uid).collection('tasks');
+
+    let imported = 0;
+    let skipped = 0;
+
+    for (const event of events) {
+      const calendarEventId = event.id;
+      const title = event.summary || '(No title)';
+      const dateStr = ((event.start.dateTime || event.start.date) || todayStr).substring(0, 10);
+
+      // Deduplication: check if a task already exists for this calendar event
+      const existing = await tasksRef.where('calendarEventId', '==', calendarEventId).limit(1).get();
+      if (!existing.empty) {
+        skipped++;
+        continue;
+      }
+
+      await tasksRef.add({
+        title,
+        date: dateStr,
+        status: 'todo',
+        priority: 'high',
+        isCalendarImport: true,
+        calendarEventId,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+
+      imported++;
+    }
+
+    // Update lastSyncDate
+    await admin.firestore()
+      .collection('users').doc(uid)
+      .collection('integrations').doc('googleCalendar')
+      .update({ lastSyncDate: todayStr });
+
+    return { imported, skipped, date: todayStr };
+  } catch (error) {
+    console.error("Import Calendar Events Error:", error);
+    throw new HttpsError('internal', 'Failed to import calendar events.', error.message);
+  }
+});

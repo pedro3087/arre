@@ -19,6 +19,8 @@ interface AuthContextType {
   logout: () => Promise<void>;
   connectGoogleTasks: () => Promise<void>;
   disconnectGoogleTasks: () => Promise<void>;
+  connectGoogleCalendar: () => Promise<void>;
+  disconnectGoogleCalendar: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -116,8 +118,60 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const connectGoogleCalendar = async () => {
+    if (!auth.currentUser) throw new Error("User must be logged in to connect Google Calendar.");
+
+    return new Promise<void>((resolve, reject) => {
+      try {
+        // @ts-ignore - google is loaded from external script
+        const client = google.accounts.oauth2.initCodeClient({
+          client_id: '428395068609-g01n1r7c5lrls4oasc07pdt9a0n1m00a.apps.googleusercontent.com',
+          scope: 'https://www.googleapis.com/auth/calendar.readonly',
+          ux_mode: 'popup',
+          callback: async (response: any) => {
+            if (response.error) {
+              console.error("Google OAuth Error:", response.error);
+              reject(new Error("Unable to obtain Google Calendar credentials."));
+              return;
+            }
+
+            if (response.code) {
+              try {
+                const exchangeCode = httpsCallable(functions, 'exchangeGoogleCalendarAuthCode');
+                await exchangeCode({ code: response.code });
+                console.log("Google Calendar connected successfully.");
+                resolve();
+              } catch (err) {
+                console.error("Error exchanging calendar code:", err);
+                reject(err);
+              }
+            } else {
+              reject(new Error("No authorization code returned from Google."));
+            }
+          },
+        });
+
+        client.requestCode();
+      } catch (e) {
+        console.error("InitCodeClient Error:", e);
+        reject(e);
+      }
+    });
+  };
+
+  const disconnectGoogleCalendar = async () => {
+    if (!auth.currentUser) throw new Error("User must be logged in to disconnect.");
+    try {
+      await deleteDoc(doc(db, 'users', auth.currentUser.uid, 'integrations', 'googleCalendar'));
+      console.log("Google Calendar disconnected.");
+    } catch (error) {
+      console.error("Error disconnecting Google Calendar", error);
+      throw error;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signInAnonymouslyUser, logout, connectGoogleTasks, disconnectGoogleTasks }}>
+    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signInAnonymouslyUser, logout, connectGoogleTasks, disconnectGoogleTasks, connectGoogleCalendar, disconnectGoogleCalendar }}>
       {!loading && children}
     </AuthContext.Provider>
   );
