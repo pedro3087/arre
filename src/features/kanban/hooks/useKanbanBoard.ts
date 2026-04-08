@@ -117,7 +117,7 @@ export function useKanbanBoard(projectId: string | null) {
         if (destinationStatus.isFinal) {
           await updateDoc(taskRef, {
             status: 'completed',
-            completedAt: serverTimestamp(),
+            completedAt: new Date().toISOString(),
             kanbanStatusId: toStatusId,
             updatedAt: serverTimestamp(),
           });
