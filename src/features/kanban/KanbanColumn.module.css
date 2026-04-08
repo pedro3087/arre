@@ -6,6 +6,31 @@
   flex: 1;
 }
 
+.columnDragging {
+  opacity: 0.35;
+}
+
+.dragHandle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  cursor: grab;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  flex-shrink: 0;
+  touch-action: none;
+  margin-right: var(--spacing-xs);
+}
+
+.column:hover .dragHandle {
+  opacity: 1;
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+}
+
 .header {
   display: flex;
   align-items: center;

@@ -47,5 +47,6 @@ export interface Project {
   id: string;
   title: string;
   color: ProjectColor;
+  order?: number;
   createdAt?: string;
 }

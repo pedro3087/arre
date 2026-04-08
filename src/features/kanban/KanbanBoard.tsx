@@ -1,8 +1,18 @@
 import { useState } from 'react';
-import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import { SortableContext, arrayMove, horizontalListSortingStrategy } from '@dnd-kit/sortable';
 import { LayoutDashboard } from 'lucide-react';
 import clsx from 'clsx';
-import { Task, Project, PROJECT_COLORS } from '../../shared/types/task';
+import { Task, Project, KanbanStatus, PROJECT_COLORS } from '../../shared/types/task';
 import { KanbanColumn } from './KanbanColumn';
 import { KanbanCard } from './KanbanCard';
 import { useKanbanBoard } from './hooks/useKanbanBoard';
@@ -17,12 +27,28 @@ function getProjectHex(color: string) {
   return PROJECT_COLORS.find((c) => c.name === color)?.hex || '#86868b';
 }
 
+/** Ghost rendered in DragOverlay when a column header is being dragged */
+function ColumnGhost({ status, taskCount }: { status: KanbanStatus; taskCount: number }) {
+  return (
+    <div className={styles.columnGhost}>
+      <span className={styles.columnGhostLabel}>{status.label}</span>
+      <span className={styles.columnGhostCount}>{taskCount}</span>
+    </div>
+  );
+}
+
 export function KanbanBoard({ projects, onEditTask }: KanbanBoardProps) {
+  // Project selection is by document ID (not list position), so drag-reordering
+  // projects in the sidebar never affects which tasks are shown here.
+  // useKanbanBoard filters tasks via where('projectId', '==', selectedProjectId).
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
     projects.length > 0 ? projects[0].id : null
   );
-  const { statuses, tasksByColumn, loading, moveTask } = useKanbanBoard(selectedProjectId);
-  const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
+  const { statuses, tasksByColumn, loading, moveTask, reorderColumns, reorderTasksInColumn } =
+    useKanbanBoard(selectedProjectId);
+
+  // Track what's being dragged: { type: 'column' | 'task', id: string }
+  const [activeDrag, setActiveDrag] = useState<{ type: string; id: string } | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -31,27 +57,67 @@ export function KanbanBoard({ projects, onEditTask }: KanbanBoardProps) {
   );
 
   const allTasks = Object.values(tasksByColumn).flat();
-  const activeTask = activeTaskId ? allTasks.find((t) => t.id === activeTaskId) ?? null : null;
+  const activeTask =
+    activeDrag?.type === 'task'
+      ? (allTasks.find((t) => t.id === activeDrag.id) ?? null)
+      : null;
+  const activeColumn =
+    activeDrag?.type === 'column'
+      ? (statuses.find((s) => s.id === activeDrag.id) ?? null)
+      : null;
 
   const handleDragStart = (event: DragStartEvent) => {
-    setActiveTaskId(event.active.id as string);
+    const type = (event.active.data.current?.type as string) ?? 'task';
+    setActiveDrag({ type, id: event.active.id as string });
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    setActiveTaskId(null);
+    setActiveDrag(null);
 
-    if (!over) return;
+    if (!over || active.id === over.id) return;
+
+    const type = active.data.current?.type as string;
+
+    if (type === 'column') {
+      // Column reorder
+      const oldIndex = statuses.findIndex((s) => s.id === active.id);
+      const newIndex = statuses.findIndex((s) => s.id === over.id);
+      if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
+        const newOrder = arrayMove(statuses, oldIndex, newIndex);
+        reorderColumns(newOrder.map((s) => s.id));
+      }
+      return;
+    }
+
+    // Task drag
     const taskId = active.id as string;
-    const toStatusId = over.id as string;
+    const sourceColumnId = active.data.current?.columnId as string | undefined;
+    // over could be a task (has columnId) or a column drop zone (its id is a status id)
+    const overIsColumn = statuses.some((s) => s.id === over.id);
+    const destColumnId = overIsColumn
+      ? (over.id as string)
+      : (over.data.current?.columnId as string | undefined);
 
-    // Find source column — no-op if same column
-    const sourceColumnId = statuses.find((s) =>
-      tasksByColumn[s.id]?.some((t) => t.id === taskId)
-    )?.id;
+    if (!destColumnId) return;
 
-    if (sourceColumnId === toStatusId) return;
-    moveTask(taskId, toStatusId);
+    if (sourceColumnId && sourceColumnId === destColumnId) {
+      // Same-column reorder
+      const columnTasks = tasksByColumn[sourceColumnId] ?? [];
+      const oldIdx = columnTasks.findIndex((t) => t.id === taskId);
+      const newIdx = columnTasks.findIndex((t) => t.id === over.id);
+      if (oldIdx !== -1 && newIdx !== -1 && oldIdx !== newIdx) {
+        const newOrder = arrayMove(
+          columnTasks.map((t) => t.id),
+          oldIdx,
+          newIdx
+        );
+        reorderTasksInColumn(sourceColumnId, newOrder);
+      }
+    } else {
+      // Cross-column move
+      moveTask(taskId, destColumnId);
+    }
   };
 
   if (projects.length === 0) {
@@ -104,23 +170,34 @@ export function KanbanBoard({ projects, onEditTask }: KanbanBoardProps) {
       ) : (
         <DndContext
           sensors={sensors}
+          collisionDetection={closestCenter}
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
         >
-          <div className={styles.columns}>
-            {statuses.map((status) => (
-              <KanbanColumn
-                key={status.id}
-                status={status}
-                tasks={tasksByColumn[status.id] ?? []}
-                projects={projects}
-                onEditRequest={onEditTask}
-              />
-            ))}
-          </div>
+          <SortableContext
+            items={statuses.map((s) => s.id)}
+            strategy={horizontalListSortingStrategy}
+          >
+            <div className={styles.columns}>
+              {statuses.map((status) => (
+                <KanbanColumn
+                  key={status.id}
+                  status={status}
+                  tasks={tasksByColumn[status.id] ?? []}
+                  projects={projects}
+                  onEditRequest={onEditTask}
+                />
+              ))}
+            </div>
+          </SortableContext>
 
           <DragOverlay dropAnimation={null}>
-            {activeTask ? (
+            {activeColumn ? (
+              <ColumnGhost
+                status={activeColumn}
+                taskCount={(tasksByColumn[activeColumn.id] ?? []).length}
+              />
+            ) : activeTask ? (
               <KanbanCard
                 task={activeTask}
                 projects={projects}
