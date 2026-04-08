@@ -21,12 +21,16 @@ const THEME_OPTIONS = [
 ];
 
 export function Settings() {
-  const { user, connectGoogleTasks, disconnectGoogleTasks } = useAuth();
+  const { user, connectGoogleTasks, disconnectGoogleTasks, connectGoogleCalendar, disconnectGoogleCalendar } = useAuth();
   const { theme, setTheme } = useTheme();
   const [isConnecting, setIsConnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [loadingInitialState, setLoadingInitialState] = useState(true);
+  const [isCalendarConnected, setIsCalendarConnected] = useState(false);
+  const [loadingCalendarState, setLoadingCalendarState] = useState(true);
+  const [isCalendarConnecting, setIsCalendarConnecting] = useState(false);
+  const [calendarError, setCalendarError] = useState<string | null>(null);
   const [taskLists, setTaskLists] = useState<GoogleTaskList[]>([]);
   const [selectedTaskLists, setSelectedTaskLists] = useState<string[]>([]);
   const [isLoadingLists, setIsLoadingLists] = useState(false);
@@ -53,6 +57,22 @@ export function Settings() {
       }
     }
     checkConnectionState();
+  }, [user]);
+
+  useEffect(() => {
+    async function checkCalendarConnectionState() {
+      if (!user) return;
+      try {
+        const docRef = doc(db, 'users', user.uid, 'integrations', 'googleCalendar');
+        const docSnap = await getDoc(docRef);
+        setIsCalendarConnected(docSnap.exists());
+      } catch (e) {
+        console.error("Failed to check calendar connection state", e);
+      } finally {
+        setLoadingCalendarState(false);
+      }
+    }
+    checkCalendarConnectionState();
   }, [user]);
 
   useEffect(() => {
@@ -124,6 +144,34 @@ export function Settings() {
       setError('Failed to disconnect. Please try again.');
     } finally {
       setIsConnecting(false);
+    }
+  };
+
+  const handleCalendarConnect = async () => {
+    try {
+      setIsCalendarConnecting(true);
+      setCalendarError(null);
+      await connectGoogleCalendar();
+      setIsCalendarConnected(true);
+    } catch (err: any) {
+      console.error('Failed to connect Google Calendar:', err);
+      setCalendarError(err.message || 'Failed to connect. Please try again.');
+    } finally {
+      setIsCalendarConnecting(false);
+    }
+  };
+
+  const handleCalendarDisconnect = async () => {
+    try {
+      setIsCalendarConnecting(true);
+      setCalendarError(null);
+      await disconnectGoogleCalendar();
+      setIsCalendarConnected(false);
+    } catch (err: any) {
+      console.error('Failed to disconnect Google Calendar:', err);
+      setCalendarError('Failed to disconnect. Please try again.');
+    } finally {
+      setIsCalendarConnecting(false);
     }
   };
 
@@ -223,6 +271,46 @@ export function Settings() {
 
 
           {error && <p className={styles.errorText}>{error}</p>}
+
+          <div className={styles.integrationCard}>
+            <div className={styles.integrationInfo}>
+              <div className={styles.integrationHeader}>
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Google_Calendar_icon_%282020%29.svg/1200px-Google_Calendar_icon_%282020%29.svg.png"
+                  alt="Google Calendar"
+                  className={styles.integrationLogo}
+                />
+                <h3>Google Calendar</h3>
+              </div>
+              <p className={styles.integrationDescription}>
+                Import today's calendar events as high-priority tasks automatically each time you open the app.
+              </p>
+            </div>
+
+            <div className={styles.integrationActions}>
+              {loadingCalendarState ? (
+                <span className={styles.loadingText}>Loading...</span>
+              ) : isCalendarConnected ? (
+                <button
+                  className={styles.disconnectButton}
+                  onClick={handleCalendarDisconnect}
+                  disabled={isCalendarConnecting}
+                >
+                  {isCalendarConnecting ? 'Disconnecting...' : 'Disconnect'}
+                </button>
+              ) : (
+                <button
+                  className={styles.connectButton}
+                  onClick={handleCalendarConnect}
+                  disabled={isCalendarConnecting}
+                >
+                  {isCalendarConnecting ? 'Connecting...' : 'Connect Google Calendar'}
+                </button>
+              )}
+            </div>
+          </div>
+
+          {calendarError && <p className={styles.errorText}>{calendarError}</p>}
         </section>
 
         <section className={styles.settingsSection}>

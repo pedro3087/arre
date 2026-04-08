@@ -18,6 +18,9 @@ export interface Task {
   completedAt?: string;
   isGoogleTask?: boolean;
   googleTaskListId?: string;
+  priority?: 'high' | 'normal';
+  isCalendarImport?: boolean;
+  calendarEventId?: string;
 }
 
 export interface KanbanStatus {
