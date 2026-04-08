@@ -6,6 +6,7 @@ import {
   onSnapshot,
   doc,
   updateDoc,
+  writeBatch,
   serverTimestamp,
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
@@ -15,7 +16,7 @@ import { useKanbanStatuses } from './useKanbanStatuses';
 
 export function useKanbanBoard(projectId: string | null) {
   const { user } = useAuth();
-  const { statuses, loading: statusesLoading } = useKanbanStatuses();
+  const { statuses, loading: statusesLoading, reorderStatuses } = useKanbanStatuses();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [tasksLoading, setTasksLoading] = useState(true);
 
@@ -76,6 +77,16 @@ export function useKanbanBoard(projectId: string | null) {
       result[colId].push(task);
     });
 
+    // Sort tasks within each column by their persisted `order` field
+    statuses.forEach((s) => {
+      result[s.id].sort((a, b) => {
+        const aOrder = a.order ?? Infinity;
+        const bOrder = b.order ?? Infinity;
+        if (aOrder !== bOrder) return aOrder - bOrder;
+        return a.createdAt < b.createdAt ? -1 : 1;
+      });
+    });
+
     return result;
   }, [tasks, statuses]);
 
@@ -124,10 +135,45 @@ export function useKanbanBoard(projectId: string | null) {
     [user, statuses]
   );
 
+  /**
+   * Reorders kanban columns (statuses) by delegating to reorderStatuses.
+   * IMPORTANT: Only writes the `order` field on kanbanStatus documents —
+   * never modifies task documents. Task-to-column associations (kanbanStatusId)
+   * are preserved entirely.
+   */
+  const reorderColumns = useCallback(
+    (orderedIds: string[]) => reorderStatuses(orderedIds),
+    [reorderStatuses]
+  );
+
+  /**
+   * Reorders tasks within a single column by their new top-to-bottom order.
+   * Writes a WriteBatch assigning each task `order = index` (0-based).
+   * Only writes the `order` field — never modifies projectId or kanbanStatusId.
+   */
+  const reorderTasksInColumn = useCallback(
+    async (columnId: string, orderedTaskIds: string[]) => {
+      if (!user) return;
+      const columnTasks = tasksByColumn[columnId] ?? [];
+      const batch = writeBatch(db);
+      orderedTaskIds.forEach((id, index) => {
+        const task = columnTasks.find((t) => t.id === id);
+        if (task && !task.isGoogleTask) {
+          const ref = doc(db, 'users', user.uid, 'tasks', id);
+          batch.update(ref, { order: index, updatedAt: serverTimestamp() });
+        }
+      });
+      await batch.commit();
+    },
+    [user, tasksByColumn]
+  );
+
   return {
     statuses,
     tasksByColumn,
     loading: tasksLoading || statusesLoading,
     moveTask,
+    reorderColumns,
+    reorderTasksInColumn,
   };
 }

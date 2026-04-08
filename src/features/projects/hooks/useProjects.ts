@@ -22,6 +22,7 @@ const convertProject = (docSnap: any): Project => {
     id: docSnap.id,
     title: data.title,
     color: data.color || 'emerald',
+    order: data.order ?? 0,
     createdAt: data.createdAt?.toDate().toISOString() || new Date().toISOString(),
   };
 };
@@ -96,7 +97,7 @@ export function useProjects() {
     }
 
     const projectsRef = collection(db, 'users', user.uid, 'projects');
-    const q = query(projectsRef, orderBy('createdAt', 'asc'));
+    const q = query(projectsRef, orderBy('order', 'asc'));
 
     const unsubscribe = onSnapshot(q,
       (snapshot) => {
@@ -114,5 +115,22 @@ export function useProjects() {
     return () => unsubscribe();
   }, [user]);
 
-  return { projects, loading, error, addProject, updateProject, deleteProject };
+  /**
+   * Persists a new project display order to Firestore.
+   * Writes a single WriteBatch assigning each project `order = index` (0-based).
+   * IMPORTANT: Only writes the `order` field — never touches projectId,
+   * kanbanStatusId, or any task documents. Task-to-project associations are
+   * preserved entirely.
+   */
+  const reorderProjects = async (orderedIds: string[]) => {
+    if (!user) return;
+    const batch = writeBatch(db);
+    orderedIds.forEach((id, index) => {
+      const ref = doc(db, 'users', user.uid, 'projects', id);
+      batch.update(ref, { order: index });
+    });
+    await batch.commit();
+  };
+
+  return { projects, loading, error, addProject, updateProject, deleteProject, reorderProjects };
 }
