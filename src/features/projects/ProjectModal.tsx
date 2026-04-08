@@ -57,9 +57,10 @@ export function ProjectModal({ isOpen, onClose, onSave, onDelete, initialData }:
           />
           <motion.div
             className={styles.modal}
-            initial={{ opacity: 0, scale: 0.95, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+            style={{ x: '-50%', y: '-50%' }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
             transition={{ type: 'spring', duration: 0.4, bounce: 0.15 }}
             data-testid="project-modal"
           >
