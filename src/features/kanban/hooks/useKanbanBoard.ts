@@ -7,7 +7,6 @@ import {
   doc,
   updateDoc,
   serverTimestamp,
-  deleteField,
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useAuth } from '../../../lib/auth/AuthContext';
@@ -30,7 +29,6 @@ export function useKanbanBoard(projectId: string | null) {
     setTasksLoading(true);
     const tasksRef = collection(db, 'users', user.uid, 'tasks');
     // Single-field query only — avoids requiring a composite Firestore index.
-    // Completed tasks are excluded client-side.
     const q = query(
       tasksRef,
       where('projectId', '==', projectId)
@@ -40,8 +38,7 @@ export function useKanbanBoard(projectId: string | null) {
       q,
       (snapshot) => {
         const fetched = snapshot.docs
-          .map((d) => ({ id: d.id, ...d.data() }) as Task)
-          .filter((t) => t.status !== 'completed');
+          .map((d) => ({ id: d.id, ...d.data() }) as Task);
         setTasks(fetched);
         setTasksLoading(false);
       },
@@ -54,20 +51,28 @@ export function useKanbanBoard(projectId: string | null) {
     return () => unsubscribe();
   }, [user, projectId]);
 
-  // Group tasks by column; tasks with no kanbanStatusId go to the first column
+  // Group tasks by column:
+  // - Completed tasks always go to the final column (isFinal:true), regardless of stored kanbanStatusId
+  // - Active tasks use their kanbanStatusId if valid, otherwise fall back to the first column
   const tasksByColumn = useMemo<Record<string, Task[]>>(() => {
     if (statuses.length === 0) return {};
     const firstColumnId = statuses[0].id;
+    const finalColumn = statuses.find((s) => s.isFinal);
+    const finalColumnId = finalColumn?.id ?? firstColumnId;
     const result: Record<string, Task[]> = {};
     statuses.forEach((s) => {
       result[s.id] = [];
     });
 
     tasks.forEach((task) => {
-      const colId =
-        task.kanbanStatusId && result[task.kanbanStatusId] !== undefined
-          ? task.kanbanStatusId
-          : firstColumnId;
+      let colId: string;
+      if (task.status === 'completed') {
+        colId = finalColumnId;
+      } else if (task.kanbanStatusId && result[task.kanbanStatusId] !== undefined) {
+        colId = task.kanbanStatusId;
+      } else {
+        colId = firstColumnId;
+      }
       result[colId].push(task);
     });
 
@@ -82,15 +87,19 @@ export function useKanbanBoard(projectId: string | null) {
       if (!destinationStatus) return;
 
       // Optimistic update — immediately reflect the move in local state
-      if (destinationStatus.isFinal) {
-        setTasks((prev) => prev.filter((t) => t.id !== taskId));
-      } else {
-        setTasks((prev) =>
-          prev.map((t) =>
-            t.id === taskId ? { ...t, kanbanStatusId: toStatusId } : t
-          )
-        );
-      }
+      setTasks((prev) =>
+        prev.map((t) =>
+          t.id === taskId
+            ? {
+                ...t,
+                kanbanStatusId: toStatusId,
+                ...(destinationStatus.isFinal
+                  ? { status: 'completed' as const, completedAt: new Date().toISOString() }
+                  : { status: 'todo' as const, completedAt: undefined }),
+              }
+            : t
+        )
+      );
 
       try {
         const taskRef = doc(db, 'users', user.uid, 'tasks', taskId);
@@ -98,7 +107,7 @@ export function useKanbanBoard(projectId: string | null) {
           await updateDoc(taskRef, {
             status: 'completed',
             completedAt: serverTimestamp(),
-            kanbanStatusId: deleteField(),
+            kanbanStatusId: toStatusId,
             updatedAt: serverTimestamp(),
           });
         } else {
