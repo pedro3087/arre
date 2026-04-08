@@ -1,0 +1,102 @@
+.projectsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.projectItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.projectItem:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.projectItem.activeProject {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.activeProject .projectName {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.projectItem.dragging {
+  opacity: 0.35;
+}
+
+.dragHandle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  cursor: grab;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  flex-shrink: 0;
+  touch-action: none;
+}
+
+.projectItem:hover .dragHandle {
+  opacity: 1;
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+}
+
+.projectDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.projectName {
+  flex: 1;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.projectEditBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  color: var(--text-tertiary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  opacity: 0;
+  flex-shrink: 0;
+}
+
+.projectItem:hover .projectEditBtn {
+  opacity: 1;
+}
+
+.projectEditBtn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text-primary);
+}
+
+.projectsEmpty {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  font-style: italic;
+}

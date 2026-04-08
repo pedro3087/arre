@@ -1,9 +1,10 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Inbox, Sun, Calendar, Layers, Archive, PlusCircle, FolderPlus, MoreHorizontal, CheckSquare, Sparkles, Settings as SettingsIcon, LayoutDashboard } from 'lucide-react';
+import { Inbox, Sun, Calendar, Layers, Archive, PlusCircle, FolderPlus, CheckSquare, Sparkles, Settings as SettingsIcon, LayoutDashboard } from 'lucide-react';
 import clsx from 'clsx';
 import styles from './Sidebar.module.css';
 import { SeedButton } from '../dev/SeedButton';
-import { Project, PROJECT_COLORS } from '../shared/types/task';
+import { Project } from '../shared/types/task';
+import { DraggableProjectList } from '../features/projects/DraggableProjectList';
 
 const NAV_ITEMS = [
   { path: '/inbox', label: 'Inbox', icon: Inbox, color: 'text-secondary' },
@@ -23,14 +24,11 @@ interface SidebarProps {
   onEditProject?: (project: Project) => void;
   activeProjectId?: string | null;
   setActiveProjectId?: (id: string | null) => void;
+  onReorderProjects?: (orderedIds: string[]) => void;
 }
 
-export function Sidebar({ onNewTask, projects = [], onNewProject, onEditProject, activeProjectId, setActiveProjectId }: SidebarProps) {
+export function Sidebar({ onNewTask, projects = [], onNewProject, onEditProject, activeProjectId, setActiveProjectId, onReorderProjects }: SidebarProps) {
   const location = useLocation();
-
-  const getProjectHex = (color: string) => {
-    return PROJECT_COLORS.find(c => c.name === color)?.hex || '#86868b';
-  };
 
   return (
     <aside className={styles.sidebar}>
@@ -81,35 +79,13 @@ export function Sidebar({ onNewTask, projects = [], onNewProject, onEditProject,
             <FolderPlus size={16} />
           </button>
         </div>
-        <ul className={styles.projectsList}>
-          {projects.map((project) => (
-            <li 
-              key={project.id} 
-              className={clsx(styles.projectItem, activeProjectId === project.id && styles.activeProject)}
-              data-testid={`project-item-${project.id}`}
-              onClick={() => setActiveProjectId?.(activeProjectId === project.id ? null : project.id)}
-            >
-              <span
-                className={styles.projectDot}
-                style={{ backgroundColor: getProjectHex(project.color) }}
-              />
-              <span className={styles.projectName}>{project.title}</span>
-              <button
-                className={styles.projectEditBtn}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEditProject?.(project);
-                }}
-                title="Edit Project"
-              >
-                <MoreHorizontal size={14} />
-              </button>
-            </li>
-          ))}
-          {projects.length === 0 && (
-            <li className={styles.projectsEmpty}>No projects yet</li>
-          )}
-        </ul>
+        <DraggableProjectList
+          projects={projects}
+          activeProjectId={activeProjectId ?? null}
+          onSelectProject={(id) => setActiveProjectId?.(id)}
+          onEditProject={(project) => onEditProject?.(project)}
+          onReorder={(orderedIds) => onReorderProjects?.(orderedIds)}
+        />
       </div>
 
       <div className={styles.actionGroup}>

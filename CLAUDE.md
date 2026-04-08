@@ -9,7 +9,8 @@ Auto-generated from all feature plans. Last updated: 2026-03-09
 - Firebase Firestore — new sub-collection `users/{uid}/kanbanStatuses`; extended `Task` document with `kanbanStatusId` field (001-project-kanban)
 - TypeScript 5.9 / React 19.2 + Firebase 12.9 (Firestore real-time `onSnapshot`), @dnd-kit/core + @dnd-kit/sortable (drag-and-drop), React Router 7.13, Lucide React (001-kanban-done-sync)
 - Firestore — `users/{uid}/tasks` (Task documents with `status`, `completedAt`, `kanbanStatusId`), `users/{uid}/kanbanStatuses` (KanbanStatus documents with `isFinal` flag) (001-kanban-done-sync)
-- TypeScript 5.9 + React 19.2 + Framer Motion 12.34 (animation), CSS Modules (styling) (001-fix-project-modal)
+- TypeScript 5.9 / React 19.2 + @dnd-kit/core, @dnd-kit/sortable, @dnd-kit/utilities (all installed); Firebase 12.9 Firestore; React Router 7.13; Lucide React (001-project-drag-ordering)
+- Firestore — `users/{uid}/projects`, `users/{uid}/kanbanStatuses`, `users/{uid}/tasks` (001-project-drag-ordering)
 
 - TypeScript / Node.js + React 19, Vite, Firebase, Framer Motion, Lucide React (025-new-task-alignment)
 - TypeScript 5.x + React 18 + React Router v6 (Link/useLocation), lucide-react (icons), CSS Modules (001-consolidate-settings)
@@ -31,7 +32,7 @@ npm test; npm run lint
 TypeScript / Node.js: Follow standard conventions
 
 ## Recent Changes
-- 001-fix-project-modal: Added TypeScript 5.9 + React 19.2 + Framer Motion 12.34 (animation), CSS Modules (styling)
+- 001-project-drag-ordering: Added TypeScript 5.9 / React 19.2 + @dnd-kit/core, @dnd-kit/sortable, @dnd-kit/utilities (all installed); Firebase 12.9 Firestore; React Router 7.13; Lucide React
 - 001-kanban-done-sync: Added TypeScript 5.9 / React 19.2 + Firebase 12.9 (Firestore real-time `onSnapshot`), @dnd-kit/core + @dnd-kit/sortable (drag-and-drop), React Router 7.13, Lucide React
 - 001-project-kanban: Added TypeScript 5.9 + React 19.2 + @dnd-kit/core, @dnd-kit/sortable, @dnd-kit/utilities (new); Framer Motion 12.34 (existing, for animations); Firebase 12.9 (existing); React Router 7.13 (existing); Lucide React (existing)
 

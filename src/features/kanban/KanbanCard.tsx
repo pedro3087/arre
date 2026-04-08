@@ -1,4 +1,5 @@
-import { useDraggable } from '@dnd-kit/core';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { Edit2 } from 'lucide-react';
 import clsx from 'clsx';
 import { Task, PROJECT_COLORS, Project } from '../../shared/types/task';
@@ -9,9 +10,10 @@ interface KanbanCardProps {
   projects: Project[];
   onEditRequest: (task: Task) => void;
   isOverlay?: boolean;
+  columnId?: string;
 }
 
-function CardContent({ task, projects, onEditRequest }: Omit<KanbanCardProps, 'isOverlay'>) {
+function CardContent({ task, projects, onEditRequest }: Omit<KanbanCardProps, 'isOverlay' | 'columnId'>) {
   const project = task.projectId
     ? projects.find((p) => p.id === task.projectId)
     : null;
@@ -68,15 +70,22 @@ function CardContent({ task, projects, onEditRequest }: Omit<KanbanCardProps, 'i
   );
 }
 
-export function KanbanCard({ task, projects, onEditRequest, isOverlay }: KanbanCardProps) {
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+export function KanbanCard({ task, projects, onEditRequest, isOverlay, columnId }: KanbanCardProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: task.id,
     disabled: isOverlay,
+    data: { type: 'task', id: task.id, columnId },
   });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
 
   return (
     <div
       ref={setNodeRef}
+      style={style}
       {...(!isOverlay ? listeners : {})}
       {...(!isOverlay ? attributes : {})}
       className={clsx(

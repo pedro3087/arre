@@ -119,3 +119,35 @@
   font-size: 0.875rem;
   margin: 0;
 }
+
+/* Column drag ghost (shown in DragOverlay when dragging a column) */
+.columnGhost {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: 6px var(--spacing-sm);
+  background: var(--bg-paper);
+  border: 1.5px solid var(--accent-sapphire);
+  border-radius: 8px;
+  box-shadow: var(--shadow-lg);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--accent-sapphire);
+  white-space: nowrap;
+  opacity: 0.96;
+  transform: rotate(1.5deg);
+}
+
+.columnGhostLabel {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.columnGhostCount {
+  background: var(--bg-app);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 1px 7px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}

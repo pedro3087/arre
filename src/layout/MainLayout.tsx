@@ -27,7 +27,7 @@ export function MainLayout() {
   const [projectToEdit, setProjectToEdit] = useState<Project | null>(null);
   
   const { addTask, updateTask } = useTasks(null);
-  const { projects, addProject, updateProject, deleteProject } = useProjects();
+  const { projects, addProject, updateProject, deleteProject, reorderProjects } = useProjects();
 
   const openNewTaskModal = () => {
     setTaskToEdit(null);
@@ -84,6 +84,7 @@ export function MainLayout() {
           onEditProject={handleEditProject}
           activeProjectId={activeProjectId}
           setActiveProjectId={setActiveProjectId}
+          onReorderProjects={reorderProjects}
         />
       </aside>
       
