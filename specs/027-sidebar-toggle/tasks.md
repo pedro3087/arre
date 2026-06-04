@@ -25,8 +25,8 @@
 
 **Purpose**: Add all CSS classes that the component changes will reference. Styles can be added in parallel since they touch different CSS module files.
 
-- [ ] T001 [P] Add `.collapsed`, `.headerRow`, and `.collapseBtn` styles in `src/layout/Sidebar.module.css` — `.collapsed` applies `transform: translateX(-100%)` inside `@media (min-width: 769px)`; `.headerRow` is a flex row with `justify-content: space-between`; `.collapseBtn` is 28px square, 6px radius, with `rgba(0, 0, 0, 0.05)` hover matching `.addProjectBtn`
-- [ ] T002 [P] Add `.mainContentExpanded` and `.expandButton` styles in `src/layout/MainLayout.module.css` — `.mainContentExpanded` sets `margin-left: 0`; `.expandButton` is fixed position (top: 16px, left: 16px), 36px square, `var(--bg-paper)` background, `1px solid var(--border-subtle)` border, `var(--shadow-sm)` shadow, z-index 999, hidden on mobile via `@media (max-width: 768px)`
+- [x] T001 [P] Add `.collapsed`, `.headerRow`, and `.collapseBtn` styles in `src/layout/Sidebar.module.css` — `.collapsed` applies `transform: translateX(-100%)` inside `@media (min-width: 769px)`; `.headerRow` is a flex row with `justify-content: space-between`; `.collapseBtn` is 28px square, 6px radius, with `rgba(0, 0, 0, 0.05)` hover matching `.addProjectBtn`
+- [x] T002 [P] Add `.mainContentExpanded` and `.expandButton` styles in `src/layout/MainLayout.module.css` — `.mainContentExpanded` sets `margin-left: 0`; `.expandButton` is fixed position (top: 16px, left: 16px), 36px square, `var(--bg-paper)` background, `1px solid var(--border-subtle)` border, `var(--shadow-sm)` shadow, z-index 999, hidden on mobile via `@media (max-width: 768px)`
 
 **Checkpoint**: All CSS classes exist — component changes can now reference them.
 
@@ -40,8 +40,8 @@
 
 ### Implementation
 
-- [ ] T003 [P] [US1] Update `SidebarProps` interface in `src/layout/Sidebar.tsx` — add `collapsed?: boolean` and `onToggleSidebar?: () => void`; import `PanelLeftClose` from lucide-react; apply `clsx(styles.sidebar, collapsed && styles.collapsed)` to root `<aside>`; restructure `.header` div to wrap logo and collapse button in a `styles.headerRow` flex row; collapse button calls `onToggleSidebar` with `aria-label="Collapse sidebar"`
-- [ ] T004 [P] [US2] Add expand button and sidebar state to `src/layout/MainLayout.tsx` — import `clsx` and `PanelLeftOpen` from lucide-react; add `sidebarCollapsed` state with `useState<boolean>(() => false)` (persistence added in US3); add `toggleSidebar` handler that flips state; pass `collapsed={sidebarCollapsed}` and `onToggleSidebar={toggleSidebar}` to `<Sidebar />`; apply `clsx(styles.mainContent, sidebarCollapsed && styles.mainContentExpanded)` to `<main>`; render expand button with `PanelLeftOpen` icon, `aria-label="Expand sidebar"`, `className={styles.expandButton}`, visible only when `sidebarCollapsed` is true
+- [x] T003 [P] [US1] Update `SidebarProps` interface in `src/layout/Sidebar.tsx` — add `collapsed?: boolean` and `onToggleSidebar?: () => void`; import `PanelLeftClose` from lucide-react; apply `clsx(styles.sidebar, collapsed && styles.collapsed)` to root `<aside>`; restructure `.header` div to wrap logo and collapse button in a `styles.headerRow` flex row; collapse button calls `onToggleSidebar` with `aria-label="Collapse sidebar"`
+- [x] T004 [P] [US2] Add expand button and sidebar state to `src/layout/MainLayout.tsx` — import `clsx` and `PanelLeftOpen` from lucide-react; add `sidebarCollapsed` state with `useState<boolean>(() => false)` (persistence added in US3); add `toggleSidebar` handler that flips state; pass `collapsed={sidebarCollapsed}` and `onToggleSidebar={toggleSidebar}` to `<Sidebar />`; apply `clsx(styles.mainContent, sidebarCollapsed && styles.mainContentExpanded)` to `<main>`; render expand button with `PanelLeftOpen` icon, `aria-label="Expand sidebar"`, `className={styles.expandButton}`, visible only when `sidebarCollapsed` is true
 
 **Checkpoint**: Sidebar toggle works — collapse and expand with smooth animation. State resets on page refresh (persistence not yet added).
 
@@ -55,7 +55,7 @@
 
 ### Implementation
 
-- [ ] T005 [US3] Add localStorage persistence to sidebar state in `src/layout/MainLayout.tsx` — change `useState` initializer from `() => false` to `() => localStorage.getItem('sidebar-collapsed') === 'true'`; update `toggleSidebar` handler to call `localStorage.setItem('sidebar-collapsed', String(next))` when flipping state
+- [x] T005 [US3] Add localStorage persistence to sidebar state in `src/layout/MainLayout.tsx` — change `useState` initializer from `() => false` to `() => localStorage.getItem('sidebar-collapsed') === 'true'`; update `toggleSidebar` handler to call `localStorage.setItem('sidebar-collapsed', String(next))` when flipping state
 
 **Checkpoint**: Full feature complete — toggle works with persistence across sessions.
 
@@ -65,11 +65,11 @@
 
 **Purpose**: Final verification and validation across all acceptance scenarios.
 
-- [ ] T006 Run dev server (`npm run dev`) and verify collapse/expand animation is smooth (60fps, no jank)
-- [ ] T007 Verify localStorage persistence — toggle sidebar, refresh page, confirm state preserved
-- [ ] T008 Verify mobile behavior unchanged — resize to ≤768px, confirm sidebar hidden, expand button not visible, bottom nav works
-- [ ] T009 Verify accessibility — tab to collapse/expand buttons, confirm they are focusable and have correct aria-labels
-- [ ] T010 Run quickstart.md validation checklist from `specs/027-sidebar-toggle/quickstart.md`
+- [ ] T006 Run dev server (`npm run dev`) and verify collapse/expand animation is smooth (60fps, no jank) *(manual)*
+- [ ] T007 Verify localStorage persistence — toggle sidebar, refresh page, confirm state preserved *(manual)*
+- [ ] T008 Verify mobile behavior unchanged — resize to ≤768px, confirm sidebar hidden, expand button not visible, bottom nav works *(manual)*
+- [ ] T009 Verify accessibility — tab to collapse/expand buttons, confirm they are focusable and have correct aria-labels *(manual)*
+- [ ] T010 Run quickstart.md validation checklist from `specs/027-sidebar-toggle/quickstart.md` *(manual)*
 
 ---
 

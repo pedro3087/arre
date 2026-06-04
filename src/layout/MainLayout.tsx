@@ -9,7 +9,8 @@ import { useTasks } from '../features/tasks/hooks/useTasks';
 import { useProjects } from '../features/projects/hooks/useProjects';
 import { TaskEditorModal } from '../features/tasks/TaskEditorModal';
 import { ProjectModal } from '../features/projects/ProjectModal';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, PanelLeftOpen } from 'lucide-react';
+import clsx from 'clsx';
 import { Task, Project, ProjectColor } from '../shared/types/task';
 
 export type MainLayoutContext = {
@@ -21,6 +22,9 @@ export type MainLayoutContext = {
 };
 
 export function MainLayout() {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(
+    () => localStorage.getItem('sidebar-collapsed') === 'true'
+  );
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
@@ -31,6 +35,14 @@ export function MainLayout() {
   const { projects, addProject, updateProject, deleteProject, reorderProjects } = useProjects();
   const { importError: calendarImportError } = useGoogleCalendarImport();
   const [calendarBannerDismissed, setCalendarBannerDismissed] = useState(false);
+
+  const toggleSidebar = () => {
+    setSidebarCollapsed(prev => {
+      const next = !prev;
+      localStorage.setItem('sidebar-collapsed', String(next));
+      return next;
+    });
+  };
 
   const openNewTaskModal = () => {
     setTaskToEdit(null);
@@ -88,10 +100,22 @@ export function MainLayout() {
           activeProjectId={activeProjectId}
           setActiveProjectId={setActiveProjectId}
           onReorderProjects={reorderProjects}
+          collapsed={sidebarCollapsed}
+          onToggleSidebar={toggleSidebar}
         />
       </aside>
       
-      <main className={styles.mainContent}>
+      {sidebarCollapsed && (
+        <button
+          className={styles.expandButton}
+          onClick={toggleSidebar}
+          aria-label="Expand sidebar"
+        >
+          <PanelLeftOpen size={18} />
+        </button>
+      )}
+
+      <main className={clsx(styles.mainContent, sidebarCollapsed && styles.mainContentExpanded)}>
         {calendarImportError && !calendarBannerDismissed && (
           <div className={styles.calendarErrorBanner}>
             <span>Calendar import failed: {calendarImportError}</span>

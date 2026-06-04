@@ -26,6 +26,37 @@
   border-bottom: 1px solid var(--border-subtle);
 }
 
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.collapseBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  color: var(--text-tertiary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.collapseBtn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text-primary);
+}
+
+@media (min-width: 769px) {
+  .sidebar.collapsed {
+    transform: translateX(-100%);
+  }
+}
+
 .logo {
   font-family: var(--font-sans);
   font-size: 1.5rem;
