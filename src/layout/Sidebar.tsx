@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Inbox, Sun, Calendar, Layers, Archive, PlusCircle, FolderPlus, CheckSquare, Sparkles, Settings as SettingsIcon, LayoutDashboard } from 'lucide-react';
+import { Inbox, Sun, Calendar, Layers, Archive, PlusCircle, FolderPlus, CheckSquare, Sparkles, Settings as SettingsIcon, LayoutDashboard, PanelLeftClose } from 'lucide-react';
 import clsx from 'clsx';
 import styles from './Sidebar.module.css';
 import { SeedButton } from '../dev/SeedButton';
@@ -25,15 +25,28 @@ interface SidebarProps {
   activeProjectId?: string | null;
   setActiveProjectId?: (id: string | null) => void;
   onReorderProjects?: (orderedIds: string[]) => void;
+  collapsed?: boolean;
+  onToggleSidebar?: () => void;
 }
 
-export function Sidebar({ onNewTask, projects = [], onNewProject, onEditProject, activeProjectId, setActiveProjectId, onReorderProjects }: SidebarProps) {
+export function Sidebar({ onNewTask, projects = [], onNewProject, onEditProject, activeProjectId, setActiveProjectId, onReorderProjects, collapsed, onToggleSidebar }: SidebarProps) {
   const location = useLocation();
 
   return (
-    <aside className={styles.sidebar}>
+    <aside className={clsx(styles.sidebar, collapsed && styles.collapsed)}>
       <div className={styles.header}>
-        <div className={styles.logo}>Arre</div>
+        <div className={styles.headerRow}>
+          <div className={styles.logo}>Arre</div>
+          {onToggleSidebar && (
+            <button
+              className={styles.collapseBtn}
+              onClick={onToggleSidebar}
+              aria-label="Collapse sidebar"
+            >
+              <PanelLeftClose size={18} />
+            </button>
+          )}
+        </div>
       </div>
       
       <nav className={styles.nav}>
