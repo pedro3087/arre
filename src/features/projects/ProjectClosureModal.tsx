@@ -9,7 +9,7 @@ import { Project, Task, PROJECT_COLORS } from '../../shared/types/task';
 import styles from './ProjectClosureModal.module.css';
 
 function getProjectHex(color: string) {
-  return PROJECT_COLORS.find(c => c.name === color)?.hex || '#86868b';
+  return PROJECT_COLORS.find(c => c.name === color)?.hex || 'var(--text-secondary)';
 }
 
 function convertTask(docSnap: any): Task {

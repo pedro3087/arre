@@ -8,7 +8,7 @@ import { Project, PROJECT_COLORS } from '../shared/types/task';
 import { DraggableProjectList } from '../features/projects/DraggableProjectList';
 
 function getProjectHex(color: string) {
-  return PROJECT_COLORS.find(c => c.name === color)?.hex || '#86868b';
+  return PROJECT_COLORS.find(c => c.name === color)?.hex || 'var(--text-secondary)';
 }
 
 const NAV_ITEMS = [
