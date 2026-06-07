@@ -15,6 +15,7 @@ import { Login } from './pages/Login';
 import { AIBriefing } from './pages/AIBriefing';
 import { Settings } from './pages/Settings';
 import { Kanban } from './pages/Kanban';
+import { ClosedProjectView } from './pages/ClosedProjectView';
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
               <Route path="/kanban" element={<Kanban />} />
               <Route path="/briefing" element={<AIBriefing />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/project/:id/closed" element={<ClosedProjectView />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
           </Routes>

@@ -1,10 +1,15 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Inbox, Sun, Calendar, Layers, Archive, PlusCircle, FolderPlus, CheckSquare, Sparkles, Settings as SettingsIcon, LayoutDashboard, PanelLeftClose } from 'lucide-react';
+import { useState } from 'react';
+import { Inbox, Sun, Calendar, Layers, Archive, PlusCircle, FolderPlus, CheckSquare, Sparkles, Settings as SettingsIcon, LayoutDashboard, PanelLeftClose, ChevronRight, ChevronDown } from 'lucide-react';
 import clsx from 'clsx';
 import styles from './Sidebar.module.css';
 import { SeedButton } from '../dev/SeedButton';
-import { Project } from '../shared/types/task';
+import { Project, PROJECT_COLORS } from '../shared/types/task';
 import { DraggableProjectList } from '../features/projects/DraggableProjectList';
+
+function getProjectHex(color: string) {
+  return PROJECT_COLORS.find(c => c.name === color)?.hex || '#86868b';
+}
 
 const NAV_ITEMS = [
   { path: '/inbox', label: 'Inbox', icon: Inbox, color: 'text-secondary' },
@@ -20,6 +25,7 @@ const NAV_ITEMS = [
 interface SidebarProps {
   onNewTask?: () => void;
   projects?: Project[];
+  closedProjects?: Project[];
   onNewProject?: () => void;
   onEditProject?: (project: Project) => void;
   activeProjectId?: string | null;
@@ -29,8 +35,9 @@ interface SidebarProps {
   onToggleSidebar?: () => void;
 }
 
-export function Sidebar({ onNewTask, projects = [], onNewProject, onEditProject, activeProjectId, setActiveProjectId, onReorderProjects, collapsed, onToggleSidebar }: SidebarProps) {
+export function Sidebar({ onNewTask, projects = [], closedProjects = [], onNewProject, onEditProject, activeProjectId, setActiveProjectId, onReorderProjects, collapsed, onToggleSidebar }: SidebarProps) {
   const location = useLocation();
+  const [closedExpanded, setClosedExpanded] = useState(false);
 
   return (
     <aside className={clsx(styles.sidebar, collapsed && styles.collapsed)}>
@@ -99,6 +106,42 @@ export function Sidebar({ onNewTask, projects = [], onNewProject, onEditProject,
           onEditProject={(project) => onEditProject?.(project)}
           onReorder={(orderedIds) => onReorderProjects?.(orderedIds)}
         />
+
+        {closedProjects.length > 0 && (
+          <div className={styles.closedSection}>
+            <button
+              className={styles.closedSectionToggle}
+              onClick={() => setClosedExpanded(prev => !prev)}
+            >
+              {closedExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+              <span>Closed</span>
+              <span className={styles.closedCount}>{closedProjects.length}</span>
+            </button>
+            {closedExpanded && (
+              <ul className={styles.closedList}>
+                {closedProjects.map(project => {
+                  const isActive = location.pathname === `/project/${project.id}/closed`;
+                  return (
+                    <li key={project.id}>
+                      <Link
+                        to={`/project/${project.id}/closed`}
+                        className={clsx(styles.closedItem, isActive && styles.closedItemActive)}
+                        onClick={() => setActiveProjectId?.(null)}
+                      >
+                        <span
+                          className={styles.closedDot}
+                          style={{ backgroundColor: getProjectHex(project.color), opacity: 0.5 }}
+                        />
+                        <span className={styles.closedName}>{project.title}</span>
+                        <Archive size={11} className={styles.closedIcon} />
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        )}
       </div>
 
       <div className={styles.actionGroup}>

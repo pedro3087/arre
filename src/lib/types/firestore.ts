@@ -24,4 +24,6 @@ export interface ProjectDocument {
   title: string;
   color: string;
   order: number;
+  status?: 'active' | 'closed';
+  closedAt?: string;
 }

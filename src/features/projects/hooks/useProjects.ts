@@ -10,7 +10,8 @@ import {
   serverTimestamp,
   getDocs,
   where,
-  writeBatch
+  writeBatch,
+  deleteField
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useAuth } from '../../../lib/auth/AuthContext';
@@ -24,12 +25,14 @@ const convertProject = (docSnap: any): Project => {
     color: data.color || 'emerald',
     order: data.order ?? 0,
     createdAt: data.createdAt?.toDate().toISOString() || new Date().toISOString(),
+    status: data.status,
+    closedAt: data.closedAt,
   };
 };
 
 export function useProjects() {
   const { user } = useAuth();
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [allProjects, setAllProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,7 +42,7 @@ export function useProjects() {
       const ref = await addDoc(collection(db, 'users', user.uid, 'projects'), {
         title,
         color,
-        order: projects.length,
+        order: allProjects.filter(p => p.status !== 'closed').length,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
@@ -102,7 +105,7 @@ export function useProjects() {
     const unsubscribe = onSnapshot(q,
       (snapshot) => {
         const fetchedProjects = snapshot.docs.map(convertProject);
-        setProjects(fetchedProjects);
+        setAllProjects(fetchedProjects);
         setLoading(false);
       },
       (err) => {
@@ -115,13 +118,6 @@ export function useProjects() {
     return () => unsubscribe();
   }, [user]);
 
-  /**
-   * Persists a new project display order to Firestore.
-   * Writes a single WriteBatch assigning each project `order = index` (0-based).
-   * IMPORTANT: Only writes the `order` field — never touches projectId,
-   * kanbanStatusId, or any task documents. Task-to-project associations are
-   * preserved entirely.
-   */
   const reorderProjects = async (orderedIds: string[]) => {
     if (!user) return;
     const batch = writeBatch(db);
@@ -132,5 +128,49 @@ export function useProjects() {
     await batch.commit();
   };
 
-  return { projects, loading, error, addProject, updateProject, deleteProject, reorderProjects };
+  const closeProject = async (id: string, reassignments: Record<string, string | null>) => {
+    if (!user) return;
+    try {
+      const batch = writeBatch(db);
+      Object.entries(reassignments).forEach(([taskId, newProjectId]) => {
+        const taskRef = doc(db, 'users', user.uid, 'tasks', taskId);
+        batch.update(taskRef, { projectId: newProjectId ?? null, updatedAt: serverTimestamp() });
+      });
+      const projectRef = doc(db, 'users', user.uid, 'projects', id);
+      batch.update(projectRef, {
+        status: 'closed',
+        closedAt: new Date().toISOString(),
+        updatedAt: serverTimestamp(),
+      });
+      await batch.commit();
+    } catch (e) {
+      console.error('Error closing project', e);
+      throw e;
+    }
+  };
+
+  const reopenProject = async (id: string) => {
+    if (!user) return;
+    try {
+      const projectRef = doc(db, 'users', user.uid, 'projects', id);
+      await updateDoc(projectRef, {
+        status: 'active',
+        closedAt: deleteField(),
+        updatedAt: serverTimestamp(),
+      });
+    } catch (e) {
+      console.error('Error reopening project', e);
+      throw e;
+    }
+  };
+
+  const projects = allProjects.filter(p => p.status !== 'closed');
+  const closedProjects = allProjects
+    .filter(p => p.status === 'closed')
+    .sort((a, b) => {
+      if (!a.closedAt || !b.closedAt) return 0;
+      return b.closedAt.localeCompare(a.closedAt);
+    });
+
+  return { projects, closedProjects, loading, error, addProject, updateProject, deleteProject, reorderProjects, closeProject, reopenProject };
 }
