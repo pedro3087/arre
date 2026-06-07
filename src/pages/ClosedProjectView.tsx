@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { collection, query, where, getDocs, doc, getDoc, updateDoc, serverTimestamp, deleteField } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc, getDoc, updateDoc, serverTimestamp, deleteField } from 'firebase/firestore';
 import { Archive, RotateCcw, CheckCircle2, XCircle, Circle } from 'lucide-react';
 import { db } from '../lib/firebase';
 import { useAuth } from '../lib/auth/AuthContext';
@@ -40,34 +40,39 @@ export function ClosedProjectView() {
 
   useEffect(() => {
     if (!user || !id) return;
-    const fetchData = async () => {
-      try {
-        const projectRef = doc(db, 'users', user.uid, 'projects', id);
-        const projectSnap = await getDoc(projectRef);
-        if (!projectSnap.exists()) {
-          navigate('/', { replace: true });
-          return;
-        }
-        const data = projectSnap.data();
-        setProject({
-          id: projectSnap.id,
-          title: data.title,
-          color: data.color || 'emerald',
-          order: data.order ?? 0,
-          createdAt: data.createdAt?.toDate().toISOString() || new Date().toISOString(),
-          status: data.status,
-          closedAt: data.closedAt,
-        });
 
-        const tasksRef = collection(db, 'users', user.uid, 'tasks');
-        const q = query(tasksRef, where('projectId', '==', id));
-        const tasksSnap = await getDocs(q);
-        setTasks(tasksSnap.docs.map(convertTask));
-      } finally {
+    // Fetch project doc once
+    const projectRef = doc(db, 'users', user.uid, 'projects', id);
+    getDoc(projectRef).then((snap) => {
+      if (!snap.exists()) { navigate('/', { replace: true }); return; }
+      const data = snap.data();
+      setProject({
+        id: snap.id,
+        title: data.title,
+        color: data.color || 'emerald',
+        order: data.order ?? 0,
+        createdAt: data.createdAt?.toDate().toISOString() || new Date().toISOString(),
+        status: data.status,
+        closedAt: data.closedAt,
+      });
+    }).catch(err => console.error('Error fetching closed project:', err));
+
+    // Subscribe to tasks for this project
+    const tasksRef = collection(db, 'users', user.uid, 'tasks');
+    const q = query(tasksRef, where('projectId', '==', id));
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        setTasks(snapshot.docs.map(convertTask));
+        setLoading(false);
+      },
+      (err) => {
+        console.error('Error fetching tasks for closed project:', err);
         setLoading(false);
       }
-    };
-    fetchData();
+    );
+
+    return () => unsubscribe();
   }, [user, id, navigate]);
 
   const stats = useMemo(() => {

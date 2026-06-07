@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Archive } from 'lucide-react';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { Project, Task, PROJECT_COLORS } from '../../shared/types/task';
@@ -48,23 +48,30 @@ export function ProjectClosureModal({ isOpen, project, activeProjects, onConfirm
   useEffect(() => {
     if (!isOpen || !user) return;
     setLoading(true);
-    const fetchTasks = async () => {
-      try {
-        const tasksRef = collection(db, 'users', user.uid, 'tasks');
-        const q = query(tasksRef, where('projectId', '==', project.id));
-        const snap = await getDocs(q);
-        const fetched = snap.docs.map(convertTask);
+    const tasksRef = collection(db, 'users', user.uid, 'tasks');
+    const q = query(tasksRef, where('projectId', '==', project.id));
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const fetched = snapshot.docs.map(convertTask);
         setTasks(fetched);
-        const initial: Record<string, string | null> = {};
-        fetched
-          .filter(t => t.status === 'todo' || t.status === 'someday')
-          .forEach(t => { initial[t.id] = null; });
-        setReassignments(initial);
-      } finally {
+        setReassignments(prev => {
+          const next: Record<string, string | null> = {};
+          fetched
+            .filter(t => t.status === 'todo' || t.status === 'someday')
+            .forEach(t => { next[t.id] = prev[t.id] ?? null; });
+          return next;
+        });
+        setLoading(false);
+      },
+      (err) => {
+        console.error('Error fetching project tasks for closure:', err);
         setLoading(false);
       }
-    };
-    fetchTasks();
+    );
+
+    return () => unsubscribe();
   }, [isOpen, user, project.id]);
 
   const openTasks = tasks.filter(t => t.status === 'todo' || t.status === 'someday');
