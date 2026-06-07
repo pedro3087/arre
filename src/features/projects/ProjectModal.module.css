@@ -149,6 +149,27 @@
   gap: 0.75rem;
   padding: 1rem 1.5rem;
   border-top: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+}
+
+@media (max-width: 480px) {
+  .footer {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .spacer {
+    display: none;
+  }
+
+  .saveBtn,
+  .cancelBtn,
+  .closeProjectBtn,
+  .deleteBtn {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
 }
 
 .deleteBtn {

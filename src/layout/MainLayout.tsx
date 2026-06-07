@@ -10,7 +10,7 @@ import { useProjects } from '../features/projects/hooks/useProjects';
 import { TaskEditorModal } from '../features/tasks/TaskEditorModal';
 import { ProjectModal } from '../features/projects/ProjectModal';
 import { ProjectClosureModal } from '../features/projects/ProjectClosureModal';
-import { Plus, X, PanelLeftOpen } from 'lucide-react';
+import { Plus, X, PanelLeftOpen, Menu } from 'lucide-react';
 import clsx from 'clsx';
 import { Task, Project, ProjectColor } from '../shared/types/task';
 
@@ -33,6 +33,7 @@ export function MainLayout() {
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [projectToEdit, setProjectToEdit] = useState<Project | null>(null);
   const [isClosureModalOpen, setIsClosureModalOpen] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const { addTask, updateTask } = useTasks(null);
   const { projects, closedProjects, addProject, updateProject, deleteProject, reorderProjects, closeProject } = useProjects();
@@ -125,6 +126,8 @@ export function MainLayout() {
           onReorderProjects={reorderProjects}
           collapsed={sidebarCollapsed}
           onToggleSidebar={toggleSidebar}
+          mobileOpen={mobileSidebarOpen}
+          onMobileClose={() => setMobileSidebarOpen(false)}
         />
       </aside>
       
@@ -136,6 +139,21 @@ export function MainLayout() {
         >
           <PanelLeftOpen size={18} />
         </button>
+      )}
+
+      <button
+        className={styles.mobileMenuBtn}
+        onClick={() => setMobileSidebarOpen(true)}
+        aria-label="Open menu"
+      >
+        <Menu size={20} />
+      </button>
+
+      {mobileSidebarOpen && (
+        <div
+          className={styles.mobileOverlay}
+          onClick={() => setMobileSidebarOpen(false)}
+        />
       )}
 
       <main className={clsx(styles.mainContent, sidebarCollapsed && styles.mainContentExpanded)}>
