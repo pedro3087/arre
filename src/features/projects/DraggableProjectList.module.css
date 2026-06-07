@@ -94,6 +94,13 @@
   color: var(--text-primary);
 }
 
+@media (max-width: 768px) {
+  .projectEditBtn,
+  .dragHandle {
+    opacity: 1;
+  }
+}
+
 .projectsEmpty {
   padding: 0.5rem 0.75rem;
   font-size: 0.8rem;

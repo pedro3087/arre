@@ -33,14 +33,16 @@ interface SidebarProps {
   onReorderProjects?: (orderedIds: string[]) => void;
   collapsed?: boolean;
   onToggleSidebar?: () => void;
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
 }
 
-export function Sidebar({ onNewTask, projects = [], closedProjects = [], onNewProject, onEditProject, activeProjectId, setActiveProjectId, onReorderProjects, collapsed, onToggleSidebar }: SidebarProps) {
+export function Sidebar({ onNewTask, projects = [], closedProjects = [], onNewProject, onEditProject, activeProjectId, setActiveProjectId, onReorderProjects, collapsed, onToggleSidebar, mobileOpen, onMobileClose }: SidebarProps) {
   const location = useLocation();
   const [closedExpanded, setClosedExpanded] = useState(false);
 
   return (
-    <aside className={clsx(styles.sidebar, collapsed && styles.collapsed)}>
+    <aside className={clsx(styles.sidebar, collapsed && styles.collapsed, mobileOpen && styles.mobileOpen)}>
       <div className={styles.header}>
         <div className={styles.headerRow}>
           <div className={styles.logo}>Arre</div>
@@ -69,9 +71,8 @@ export function Sidebar({ onNewTask, projects = [], closedProjects = [], onNewPr
                   className={clsx(styles.navItem, isActive && styles.active)}
                   data-testid={`nav-item-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
                   onClick={() => {
-                    if (item.path === '/inbox') {
-                      setActiveProjectId?.(null);
-                    }
+                    if (item.path === '/inbox') setActiveProjectId?.(null);
+                    onMobileClose?.();
                   }}
                 >
                   <span className={clsx(styles.iconWrapper, isActive && styles[item.color])}>
@@ -102,7 +103,7 @@ export function Sidebar({ onNewTask, projects = [], closedProjects = [], onNewPr
         <DraggableProjectList
           projects={projects}
           activeProjectId={activeProjectId ?? null}
-          onSelectProject={(id) => setActiveProjectId?.(id)}
+          onSelectProject={(id) => { setActiveProjectId?.(id); onMobileClose?.(); }}
           onEditProject={(project) => onEditProject?.(project)}
           onReorder={(orderedIds) => onReorderProjects?.(orderedIds)}
         />
@@ -126,7 +127,7 @@ export function Sidebar({ onNewTask, projects = [], closedProjects = [], onNewPr
                       <Link
                         to={`/project/${project.id}/closed`}
                         className={clsx(styles.closedItem, isActive && styles.closedItemActive)}
-                        onClick={() => setActiveProjectId?.(null)}
+                        onClick={() => { setActiveProjectId?.(null); onMobileClose?.(); }}
                       >
                         <span
                           className={styles.closedDot}
