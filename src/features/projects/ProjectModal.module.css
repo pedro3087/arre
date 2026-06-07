@@ -173,6 +173,27 @@
   opacity: 1;
 }
 
+.closeProjectBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: none;
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.closeProjectBtn:hover {
+  background: var(--bg-app);
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
+
 .spacer {
   flex: 1;
 }

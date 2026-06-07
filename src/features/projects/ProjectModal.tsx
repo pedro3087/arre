@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Check, Trash2 } from 'lucide-react';
+import { X, Check, Trash2, Archive } from 'lucide-react';
 import clsx from 'clsx';
 import { Project, PROJECT_COLORS, ProjectColor } from '../../shared/types/task';
 import styles from './ProjectModal.module.css';
@@ -11,10 +11,11 @@ interface ProjectModalProps {
   onClose: () => void;
   onSave: (title: string, color: ProjectColor) => Promise<void>;
   onDelete?: (id: string) => Promise<void>;
+  onCloseProject?: () => void;
   initialData?: Project | null;
 }
 
-export function ProjectModal({ isOpen, onClose, onSave, onDelete, initialData }: ProjectModalProps) {
+export function ProjectModal({ isOpen, onClose, onSave, onDelete, onCloseProject, initialData }: ProjectModalProps) {
   const [title, setTitle] = useState('');
   const [color, setColor] = useState<ProjectColor>('emerald');
 
@@ -121,6 +122,11 @@ export function ProjectModal({ isOpen, onClose, onSave, onDelete, initialData }:
               {initialData && onDelete && (
                 <button className={styles.deleteBtn} onClick={handleDelete} data-testid="btn-delete-project">
                   <Trash2 size={14} /> Delete
+                </button>
+              )}
+              {initialData && onCloseProject && (
+                <button className={styles.closeProjectBtn} onClick={() => { onClose(); onCloseProject(); }} data-testid="btn-close-project">
+                  <Archive size={14} /> Close
                 </button>
               )}
               <div className={styles.spacer} />

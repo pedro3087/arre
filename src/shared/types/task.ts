@@ -52,4 +52,6 @@ export interface Project {
   color: ProjectColor;
   order?: number;
   createdAt?: string;
+  status?: 'active' | 'closed';
+  closedAt?: string;
 }

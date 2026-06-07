@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { BottomNav } from './BottomNav';
 import styles from './MainLayout.module.css';
@@ -9,6 +9,7 @@ import { useTasks } from '../features/tasks/hooks/useTasks';
 import { useProjects } from '../features/projects/hooks/useProjects';
 import { TaskEditorModal } from '../features/tasks/TaskEditorModal';
 import { ProjectModal } from '../features/projects/ProjectModal';
+import { ProjectClosureModal } from '../features/projects/ProjectClosureModal';
 import { Plus, X, PanelLeftOpen } from 'lucide-react';
 import clsx from 'clsx';
 import { Task, Project, ProjectColor } from '../shared/types/task';
@@ -22,6 +23,7 @@ export type MainLayoutContext = {
 };
 
 export function MainLayout() {
+  const navigate = useNavigate();
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(
     () => localStorage.getItem('sidebar-collapsed') === 'true'
   );
@@ -30,9 +32,10 @@ export function MainLayout() {
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [projectToEdit, setProjectToEdit] = useState<Project | null>(null);
-  
+  const [isClosureModalOpen, setIsClosureModalOpen] = useState(false);
+
   const { addTask, updateTask } = useTasks(null);
-  const { projects, addProject, updateProject, deleteProject, reorderProjects } = useProjects();
+  const { projects, closedProjects, addProject, updateProject, deleteProject, reorderProjects, closeProject } = useProjects();
   const { importError: calendarImportError } = useGoogleCalendarImport();
   const [calendarBannerDismissed, setCalendarBannerDismissed] = useState(false);
 
@@ -89,12 +92,32 @@ export function MainLayout() {
     await deleteProject(id);
   };
 
+  const handleInitiateClose = () => {
+    setIsProjectModalOpen(false);
+    setIsClosureModalOpen(true);
+  };
+
+  const handleConfirmClosure = async (reassignments: Record<string, string | null>) => {
+    if (!projectToEdit) return;
+    const closingId = projectToEdit.id;
+    await closeProject(closingId, reassignments);
+    if (activeProjectId === closingId) setActiveProjectId(null);
+    setIsClosureModalOpen(false);
+    setProjectToEdit(null);
+    navigate(`/project/${closingId}/closed`);
+  };
+
+  const handleCancelClosure = () => {
+    setIsClosureModalOpen(false);
+  };
+
   return (
     <div className={styles.layout}>
       <aside className={styles.sidebarWrapper}>
         <Sidebar
           onNewTask={openNewTaskModal}
           projects={projects}
+          closedProjects={closedProjects}
           onNewProject={handleOpenNewProject}
           onEditProject={handleEditProject}
           activeProjectId={activeProjectId}
@@ -158,8 +181,19 @@ export function MainLayout() {
         onClose={() => setIsProjectModalOpen(false)}
         onSave={handleSaveProject}
         onDelete={handleDeleteProject}
+        onCloseProject={handleInitiateClose}
         initialData={projectToEdit}
       />
+
+      {projectToEdit && (
+        <ProjectClosureModal
+          isOpen={isClosureModalOpen}
+          project={projectToEdit}
+          activeProjects={projects}
+          onConfirm={handleConfirmClosure}
+          onCancel={handleCancelClosure}
+        />
+      )}
     </div>
   );
 }
