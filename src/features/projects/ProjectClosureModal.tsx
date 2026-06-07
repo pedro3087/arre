@@ -12,15 +12,23 @@ function getProjectHex(color: string) {
   return PROJECT_COLORS.find(c => c.name === color)?.hex || 'var(--text-secondary)';
 }
 
+function parseDate(field: any): string | undefined {
+  if (!field) return undefined;
+  if (typeof field === 'object' && typeof field.toDate === 'function') return field.toDate().toISOString();
+  if (typeof field === 'string') return field;
+  if (field instanceof Date) return field.toISOString();
+  return undefined;
+}
+
 function convertTask(docSnap: any): Task {
   const data = docSnap.data();
   return {
     id: docSnap.id,
     title: data.title,
     status: data.status,
-    createdAt: data.createdAt?.toDate().toISOString() || new Date().toISOString(),
-    updatedAt: data.updatedAt?.toDate().toISOString(),
-    completedAt: data.completedAt,
+    createdAt: parseDate(data.createdAt) || new Date().toISOString(),
+    updatedAt: parseDate(data.updatedAt),
+    completedAt: parseDate(data.completedAt),
     projectId: data.projectId,
     notes: data.notes,
     date: data.date,
@@ -54,16 +62,21 @@ export function ProjectClosureModal({ isOpen, project, activeProjects, onConfirm
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
-        const fetched = snapshot.docs.map(convertTask);
-        setTasks(fetched);
-        setReassignments(prev => {
-          const next: Record<string, string | null> = {};
-          fetched
-            .filter(t => t.status === 'todo' || t.status === 'someday')
-            .forEach(t => { next[t.id] = prev[t.id] ?? null; });
-          return next;
-        });
-        setLoading(false);
+        try {
+          const fetched = snapshot.docs.map(convertTask);
+          setTasks(fetched);
+          setReassignments(prev => {
+            const next: Record<string, string | null> = {};
+            fetched
+              .filter(t => t.status === 'todo' || t.status === 'someday')
+              .forEach(t => { next[t.id] = prev[t.id] ?? null; });
+            return next;
+          });
+        } catch (err) {
+          console.error('Error processing project tasks:', err);
+        } finally {
+          setLoading(false);
+        }
       },
       (err) => {
         console.error('Error fetching project tasks for closure:', err);
