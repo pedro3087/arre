@@ -14,7 +14,7 @@ interface TaskItemProps {
 
 export function TaskItem({ task, onToggle }: TaskItemProps) {
   const [complete, setComplete] = useState(task.status === 'completed');
-  const { openEditTaskModal, projects } = useOutletContext<MainLayoutContext>();
+  const { openEditTaskModal, projects, closedProjects } = useOutletContext<MainLayoutContext>();
   const { deleteTask } = useTasks();
 
   const handleToggle = () => {
@@ -35,8 +35,9 @@ export function TaskItem({ task, onToggle }: TaskItemProps) {
     openEditTaskModal(task);
   };
 
+  const allProjects = [...(projects ?? []), ...(closedProjects ?? [])];
   const project = task.projectId
-    ? projects?.find((p: Project) => p.id === task.projectId)
+    ? allProjects.find((p: Project) => p.id === task.projectId)
     : null;
 
   const getProjectHex = (color: string) =>

@@ -18,6 +18,7 @@ export type MainLayoutContext = {
   openNewTaskModal: () => void;
   openEditTaskModal: (task: Task) => void;
   projects: Project[];
+  closedProjects: Project[];
   activeProjectId: string | null;
   setActiveProjectId: (id: string | null) => void;
 };
@@ -170,7 +171,7 @@ export function MainLayout() {
           </div>
         )}
         <div className={styles.container}>
-          <Outlet context={{ openNewTaskModal, openEditTaskModal, projects, activeProjectId, setActiveProjectId } satisfies MainLayoutContext} />
+          <Outlet context={{ openNewTaskModal, openEditTaskModal, projects, closedProjects, activeProjectId, setActiveProjectId } satisfies MainLayoutContext} />
         </div>
       </main>
 
