@@ -1,6 +1,6 @@
 ﻿# arre-app Development Guidelines
 
-Auto-generated from all feature plans. Last updated: 2026-06-04
+Auto-generated from all feature plans. Last updated: 2026-06-08
 
 ## Active Technologies
 - TypeScript / React 19 + Lucide React, clsx, Firebase (auth/firestore/functions) (026-settings-page-alignment)
@@ -18,6 +18,8 @@ Auto-generated from all feature plans. Last updated: 2026-06-04
 - TypeScript 5.x + React 18 + React Router v6 (Link/useLocation), lucide-react (icons), CSS Modules (001-consolidate-settings)
 - TypeScript 5.9 / React 19.2 + lucide-react ^0.564.0, clsx (027-sidebar-toggle)
 - Browser localStorage (sidebar-collapsed preference) (027-sidebar-toggle)
+- TypeScript 5.9 / React 19.2 + React Context API (NavVisibilityProvider) (028-nav-visibility)
+- Browser localStorage (`nav-visibility` key, JSON object) (028-nav-visibility)
 
 ## Project Structure
 
@@ -36,6 +38,7 @@ npm test; npm run lint
 TypeScript / Node.js: Follow standard conventions
 
 ## Recent Changes
+- 028-nav-visibility: Added React Context (NavVisibilityProvider) + localStorage for per-item nav visibility toggles in Settings
 - 027-sidebar-toggle: Added TypeScript 5.9 / React 19.2 + lucide-react ^0.564.0, clsx
 - 001-gcal-import: Added TypeScript 5.9 (frontend) / Node.js CommonJS (Firebase Functions) + React 19.2, Firebase 12.9 (Firestore + Functions), `googleapis` npm package (already used for Google Tasks)
 - 001-project-drag-ordering: Added TypeScript 5.9 / React 19.2 + @dnd-kit/core, @dnd-kit/sortable, @dnd-kit/utilities (all installed); Firebase 12.9 Firestore; React Router 7.13; Lucide React
