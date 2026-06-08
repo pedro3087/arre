@@ -18,7 +18,7 @@
 
 **Purpose**: Prepare the single prerequisite needed before any story work can begin — exporting `NAV_ITEMS` as a shared constant so both `Settings.tsx` and `App.tsx` can reference it.
 
-- [ ] T001 Export `NAV_ITEMS` array as a named export from `src/layout/Sidebar.tsx` (currently only used locally)
+- [x] T001 Export `NAV_ITEMS` array as a named export from `src/layout/Sidebar.tsx` (currently only used locally)
 
 **Checkpoint**: `NAV_ITEMS` importable by Settings.tsx, App.tsx, BottomNav.tsx.
 
@@ -30,8 +30,8 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T002 Create `src/features/navigation/NavVisibilityProvider.tsx` — React context with `visibility: Record<string, boolean>`, `toggleItem(path)`, `isVisible(path)` and `useNavVisibility()` hook; read/write `nav-visibility` key in localStorage
-- [ ] T003 Wrap the authenticated route tree with `<NavVisibilityProvider>` in `src/App.tsx` (inside `<BrowserRouter>`, above `<MainLayout>`)
+- [x] T002 Create `src/features/navigation/NavVisibilityProvider.tsx` — React context with `visibility: Record<string, boolean>`, `toggleItem(path)`, `isVisible(path)` and `useNavVisibility()` hook; read/write `nav-visibility` key in localStorage
+- [x] T003 Wrap the authenticated route tree with `<NavVisibilityProvider>` in `src/App.tsx` (inside `<BrowserRouter>`, above `<MainLayout>`)
 
 **Checkpoint**: `useNavVisibility()` hook returns default visibility (all true) from any component in the tree; localStorage key is written on first toggle.
 
@@ -45,10 +45,10 @@
 
 **Independent Test**: Open Settings → toggle "Logbook" off → sidebar loses Logbook immediately. Toggle it back on → it reappears. Resize to mobile → BottomNav also reflects the setting.
 
-- [ ] T004 [P] [US1] Filter `NAV_ITEMS` in `src/layout/Sidebar.tsx` using `isVisible(item.path)` from `useNavVisibility()`
-- [ ] T005 [P] [US1] Filter items in `src/layout/BottomNav.tsx` using `isVisible(item.path)` from `useNavVisibility()`
-- [ ] T006 [US1] Add "Navigation" section with a labeled toggle row per NAV_ITEMS entry in `src/pages/Settings.tsx` (import `useNavVisibility`, `toggleItem`, `NAV_ITEMS`; render toggle per item using `isVisible` as checked state)
-- [ ] T007 [US1] Add `.navToggleRow`, `.navItemInfo`, `.toggleSwitch`, and `.toggleSwitchOn` styles in `src/pages/Settings.module.css` — reuse existing color/spacing tokens from the file; style the toggle as a pill button that flips color on active state
+- [x] T004 [P] [US1] Filter `NAV_ITEMS` in `src/layout/Sidebar.tsx` using `isVisible(item.path)` from `useNavVisibility()`
+- [x] T005 [P] [US1] Filter items in `src/layout/BottomNav.tsx` using `isVisible(item.path)` from `useNavVisibility()`
+- [x] T006 [US1] Add "Navigation" section with a labeled toggle row per NAV_ITEMS entry in `src/pages/Settings.tsx` (import `useNavVisibility`, `toggleItem`, `NAV_ITEMS`; render toggle per item using `isVisible` as checked state)
+- [x] T007 [US1] Add `.navToggleRow`, `.navItemInfo`, `.toggleSwitch`, and `.toggleSwitchOn` styles in `src/pages/Settings.module.css` — reuse existing color/spacing tokens from the file; style the toggle as a pill button that flips color on active state
 
 **Checkpoint**: All 8 nav items appear in Settings with working on/off toggles; Sidebar and BottomNav immediately reflect changes; no page reload required.
 
@@ -62,7 +62,7 @@
 
 **Independent Test**: Hide "Kanban", reload the page → Kanban is still absent. Settings toggle still shows it as off.
 
-- [ ] T008 [US3] Verify `NavVisibilityProvider` initialises `visibility` from `localStorage.getItem('nav-visibility')` on mount and confirm the `toggleItem` function persists each change — fix any defect found in T002
+- [x] T008 [US3] Verify `NavVisibilityProvider` initialises `visibility` from `localStorage.getItem('nav-visibility')` on mount and confirm the `toggleItem` function persists each change — fix any defect found in T002
 
 **Checkpoint**: Preference survives hard refresh; new tabs inherit the same preference (shared localStorage).
 
@@ -74,7 +74,7 @@
 
 **Independent Test**: Navigate to `/kanban`. Open Settings and hide Kanban. App immediately redirects to the first visible nav item (e.g., `/inbox` or `/`).
 
-- [ ] T009 [US4] Add a `RedirectIfHidden` component rendered inside the router in `src/App.tsx`: reads `location.pathname` + `isVisible`; if the current path matches a `NAV_ITEMS` entry and `isVisible` returns false, call `navigate` to the first item where `isVisible` is true (fallback `/inbox` if all hidden)
+- [x] T009 [US4] Add a `RedirectIfHidden` component rendered inside the router in `src/App.tsx`: reads `location.pathname` + `isVisible`; if the current path matches a `NAV_ITEMS` entry and `isVisible` returns false, call `navigate` to the first item where `isVisible` is true (fallback `/inbox` if all hidden)
 
 **Checkpoint**: Hiding the active route triggers an immediate redirect; direct-URL navigation to a hidden route redirects on load.
 
@@ -82,7 +82,7 @@
 
 ## Final Phase: Polish & Cross-Cutting Concerns
 
-- [ ] T010 [P] Confirm `CLAUDE.md` reflects `028-nav-visibility` in Active Technologies and Recent Changes (already updated in /speckit.plan run; verify and fix if out of date)
+- [x] T010 [P] Confirm `CLAUDE.md` reflects `028-nav-visibility` in Active Technologies and Recent Changes (already updated in /speckit.plan run; verify and fix if out of date)
 - [ ] T011 Run quickstart.md verification steps end-to-end against the dev server and confirm all 7 checkpoints pass
 
 ---

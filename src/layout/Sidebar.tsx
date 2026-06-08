@@ -6,12 +6,13 @@ import styles from './Sidebar.module.css';
 import { SeedButton } from '../dev/SeedButton';
 import { Project, PROJECT_COLORS } from '../shared/types/task';
 import { DraggableProjectList } from '../features/projects/DraggableProjectList';
+import { useNavVisibility } from '../features/navigation/NavVisibilityProvider';
 
 function getProjectHex(color: string) {
   return PROJECT_COLORS.find(c => c.name === color)?.hex || 'var(--text-secondary)';
 }
 
-const NAV_ITEMS = [
+export const NAV_ITEMS = [
   { path: '/inbox', label: 'Inbox', icon: Inbox, color: 'text-secondary' },
   { path: '/', label: 'Today', icon: Sun, color: 'accent-emerald' },
   { path: '/upcoming', label: 'Upcoming', icon: Calendar, color: 'accent-sapphire' },
@@ -40,6 +41,7 @@ interface SidebarProps {
 export function Sidebar({ onNewTask, projects = [], closedProjects = [], onNewProject, onEditProject, activeProjectId, setActiveProjectId, onReorderProjects, collapsed, onToggleSidebar, mobileOpen, onMobileClose }: SidebarProps) {
   const location = useLocation();
   const [closedExpanded, setClosedExpanded] = useState(false);
+  const { isVisible } = useNavVisibility();
 
   return (
     <aside className={clsx(styles.sidebar, collapsed && styles.collapsed, mobileOpen && styles.mobileOpen)}>
@@ -57,10 +59,10 @@ export function Sidebar({ onNewTask, projects = [], closedProjects = [], onNewPr
           )}
         </div>
       </div>
-      
+
       <nav className={styles.nav}>
         <ul>
-          {NAV_ITEMS.map((item) => {
+          {NAV_ITEMS.filter(item => isVisible(item.path)).map((item) => {
             const isActive = location.pathname === item.path;
             const Icon = item.icon;
             
