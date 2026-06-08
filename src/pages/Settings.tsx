@@ -8,6 +8,8 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { KanbanStatusManager } from '../features/kanban/KanbanStatusManager';
 import { db, functions } from '../lib/firebase';
 import { httpsCallable } from 'firebase/functions';
+import { NAV_ITEMS } from '../layout/Sidebar';
+import { useNavVisibility } from '../features/navigation/NavVisibilityProvider';
 
 interface GoogleTaskList {
   id: string;
@@ -23,6 +25,7 @@ const THEME_OPTIONS = [
 export function Settings() {
   const { user, connectGoogleTasks, disconnectGoogleTasks, connectGoogleCalendar, disconnectGoogleCalendar } = useAuth();
   const { theme, setTheme } = useTheme();
+  const { isVisible, toggleItem } = useNavVisibility();
   const [isConnecting, setIsConnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -198,6 +201,34 @@ export function Settings() {
                 <span>{label}</span>
               </button>
             ))}
+          </div>
+        </section>
+
+        <section className={styles.settingsSection}>
+          <h2>Navigation</h2>
+          <p className={styles.sectionDescription}>
+            Choose which items appear in the sidebar and navigation.
+          </p>
+          <div className={styles.navToggleList}>
+            {NAV_ITEMS.map((item) => {
+              const Icon = item.icon;
+              const visible = isVisible(item.path);
+              return (
+                <div key={item.path} className={styles.navToggleRow}>
+                  <div className={styles.navItemInfo}>
+                    <Icon size={16} />
+                    <span>{item.label}</span>
+                  </div>
+                  <button
+                    role="switch"
+                    aria-checked={visible}
+                    className={clsx(styles.toggleSwitch, visible && styles.toggleSwitchOn)}
+                    onClick={() => toggleItem(item.path)}
+                    aria-label={`${visible ? 'Hide' : 'Show'} ${item.label}`}
+                  />
+                </div>
+              );
+            })}
           </div>
         </section>
 

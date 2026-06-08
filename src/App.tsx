@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { MainLayout } from './layout/MainLayout';
 import { Dashboard } from './pages/Dashboard';
 import { Inbox } from './pages/Inbox';
@@ -16,12 +17,32 @@ import { AIBriefing } from './pages/AIBriefing';
 import { Settings } from './pages/Settings';
 import { Kanban } from './pages/Kanban';
 import { ClosedProjectView } from './pages/ClosedProjectView';
+import { NavVisibilityProvider, useNavVisibility } from './features/navigation/NavVisibilityProvider';
+import { NAV_ITEMS } from './layout/Sidebar';
+
+function RedirectIfHidden() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { visibility } = useNavVisibility();
+
+  useEffect(() => {
+    const isNavPath = NAV_ITEMS.some(item => item.path === location.pathname);
+    if (isNavPath && visibility[location.pathname] === false) {
+      const firstVisible = NAV_ITEMS.find(item => visibility[item.path] !== false);
+      navigate(firstVisible?.path ?? '/inbox', { replace: true });
+    }
+  }, [location.pathname, visibility, navigate]);
+
+  return null;
+}
 
 function App() {
   return (
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
       <AuthProvider>
+        <NavVisibilityProvider>
         <BrowserRouter>
+          <RedirectIfHidden />
           <Routes>
             <Route path="/login" element={<Login />} />
             
@@ -44,6 +65,7 @@ function App() {
             </Route>
           </Routes>
         </BrowserRouter>
+        </NavVisibilityProvider>
       </AuthProvider>
     </ThemeProvider>
   );

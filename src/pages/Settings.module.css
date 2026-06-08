@@ -279,6 +279,67 @@
   font-style: normal;
 }
 
+.navToggleList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.navToggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-3) var(--spacing-4);
+  background-color: var(--bg-paper);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  transition: border-color 0.15s ease;
+}
+
+.navToggleRow:hover {
+  border-color: var(--border-color);
+}
+
+.navItemInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  color: var(--text-primary);
+  font-size: 0.9375rem;
+}
+
+.toggleSwitch {
+  width: 44px;
+  height: 24px;
+  background-color: var(--border-color);
+  border-radius: 9999px;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.toggleSwitch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.toggleSwitchOn {
+  background-color: var(--accent-purple-neon);
+}
+
+.toggleSwitchOn::after {
+  transform: translateX(20px);
+}
+
 @media (max-width: 640px) {
   .integrationCard {
     flex-direction: column;
