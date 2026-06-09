@@ -21,6 +21,9 @@ export type MainLayoutContext = {
   closedProjects: Project[];
   activeProjectId: string | null;
   setActiveProjectId: (id: string | null) => void;
+  onNewProject: () => void;
+  onEditProject: (project: Project) => void;
+  reorderProjects: (orderedIds: string[]) => Promise<void>;
 };
 
 export function MainLayout() {
@@ -171,7 +174,7 @@ export function MainLayout() {
           </div>
         )}
         <div className={styles.container}>
-          <Outlet context={{ openNewTaskModal, openEditTaskModal, projects, closedProjects, activeProjectId, setActiveProjectId } satisfies MainLayoutContext} />
+          <Outlet context={{ openNewTaskModal, openEditTaskModal, projects, closedProjects, activeProjectId, setActiveProjectId, onNewProject: handleOpenNewProject, onEditProject: handleEditProject, reorderProjects } satisfies MainLayoutContext} />
         </div>
       </main>
 
