@@ -9,7 +9,8 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import { SortableContext, arrayMove, horizontalListSortingStrategy } from '@dnd-kit/sortable';
+import { SortableContext, arrayMove, horizontalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { LayoutDashboard } from 'lucide-react';
 import clsx from 'clsx';
 import { Task, Project, KanbanStatus, PROJECT_COLORS } from '../../shared/types/task';
@@ -21,10 +22,48 @@ import styles from './KanbanBoard.module.css';
 interface KanbanBoardProps {
   projects: Project[];
   onEditTask: (task: Task) => void;
+  selectedProjectId: string | null;
+  setSelectedProjectId: (id: string | null) => void;
+  reorderProjects: (orderedIds: string[]) => Promise<void>;
 }
 
 function getProjectHex(color: string) {
   return PROJECT_COLORS.find((c) => c.name === color)?.hex || '#86868b';
+}
+
+/** A single drag-reorderable project tab in the picker row */
+function SortableProjectTab({
+  project,
+  isActive,
+  onSelect,
+}: {
+  project: Project;
+  isActive: boolean;
+  onSelect: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id: project.id, data: { type: 'project' } });
+
+  return (
+    <button
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition }}
+      className={clsx(
+        styles.projectTab,
+        isActive && styles.projectTabActive,
+        isDragging && styles.projectTabDragging
+      )}
+      onClick={onSelect}
+      {...attributes}
+      {...listeners}
+    >
+      <span
+        className={styles.projectDot}
+        style={{ backgroundColor: getProjectHex(project.color) }}
+      />
+      <span className={styles.projectTabLabel}>{project.title}</span>
+    </button>
+  );
 }
 
 /** Ghost rendered in DragOverlay when a column header is being dragged */
@@ -37,13 +76,16 @@ function ColumnGhost({ status, taskCount }: { status: KanbanStatus; taskCount: n
   );
 }
 
-export function KanbanBoard({ projects, onEditTask }: KanbanBoardProps) {
+export function KanbanBoard({
+  projects,
+  onEditTask,
+  selectedProjectId,
+  setSelectedProjectId,
+  reorderProjects,
+}: KanbanBoardProps) {
   // Project selection is by document ID (not list position), so drag-reordering
-  // projects in the sidebar never affects which tasks are shown here.
+  // projects never affects which tasks are shown here.
   // useKanbanBoard filters tasks via where('projectId', '==', selectedProjectId).
-  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
-    projects.length > 0 ? projects[0].id : null
-  );
   const { statuses, tasksByColumn, loading, moveTask, reorderColumns, reorderTasksInColumn } =
     useKanbanBoard(selectedProjectId);
 
@@ -65,6 +107,16 @@ export function KanbanBoard({ projects, onEditTask }: KanbanBoardProps) {
     activeDrag?.type === 'column'
       ? (statuses.find((s) => s.id === activeDrag.id) ?? null)
       : null;
+
+  const handleProjectDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = projects.findIndex((p) => p.id === active.id);
+    const newIndex = projects.findIndex((p) => p.id === over.id);
+    if (oldIndex === -1 || newIndex === -1 || oldIndex === newIndex) return;
+    const newOrder = arrayMove(projects, oldIndex, newIndex);
+    reorderProjects(newOrder.map((p) => p.id));
+  };
 
   const handleDragStart = (event: DragStartEvent) => {
     const type = (event.active.data.current?.type as string) ?? 'task';
@@ -135,25 +187,28 @@ export function KanbanBoard({ projects, onEditTask }: KanbanBoardProps) {
 
   return (
     <div className={styles.boardRoot}>
-      {/* Project Picker */}
-      <div className={styles.projectPicker}>
-        {projects.map((project) => (
-          <button
-            key={project.id}
-            className={clsx(
-              styles.projectTab,
-              selectedProjectId === project.id && styles.projectTabActive
-            )}
-            onClick={() => setSelectedProjectId(project.id)}
-          >
-            <span
-              className={styles.projectDot}
-              style={{ backgroundColor: getProjectHex(project.color) }}
-            />
-            <span className={styles.projectTabLabel}>{project.title}</span>
-          </button>
-        ))}
-      </div>
+      {/* Project Picker (drag to reorder) */}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleProjectDragEnd}
+      >
+        <SortableContext
+          items={projects.map((p) => p.id)}
+          strategy={horizontalListSortingStrategy}
+        >
+          <div className={styles.projectPicker}>
+            {projects.map((project) => (
+              <SortableProjectTab
+                key={project.id}
+                project={project}
+                isActive={selectedProjectId === project.id}
+                onSelect={() => setSelectedProjectId(project.id)}
+              />
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
 
       {/* Board */}
       {loading ? (
