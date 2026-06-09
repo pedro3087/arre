@@ -28,9 +28,9 @@
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-xs);
-  padding: 6px var(--spacing-sm);
-  border-radius: 8px;
-  font-size: 0.8125rem;
+  padding: 8px var(--spacing-sm);
+  border-radius: 9999px;
+  font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
   transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
@@ -50,11 +50,11 @@
 .actionBtnPrimary {
   border: 1.5px solid var(--accent-sapphire);
   background: var(--accent-sapphire);
-  color: #fff;
+  color: white;
 }
 
 .actionBtnPrimary:hover {
-  filter: brightness(1.05);
+  opacity: 0.9;
 }
 
 .titleWrapper {
