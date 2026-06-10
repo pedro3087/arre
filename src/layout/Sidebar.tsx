@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { Inbox, Sun, Calendar, Layers, Archive, PlusCircle, FolderPlus, CheckSquare, Sparkles, Settings as SettingsIcon, LayoutDashboard, PanelLeftClose, ChevronRight, ChevronDown } from 'lucide-react';
 import clsx from 'clsx';
@@ -40,7 +40,9 @@ interface SidebarProps {
 
 export function Sidebar({ onNewTask, projects = [], closedProjects = [], onNewProject, onEditProject, activeProjectId, setActiveProjectId, onReorderProjects, collapsed, onToggleSidebar, mobileOpen, onMobileClose }: SidebarProps) {
   const location = useLocation();
+  const navigate = useNavigate();
   const [closedExpanded, setClosedExpanded] = useState(false);
+  const [projectsExpanded, setProjectsExpanded] = useState(true);
   const { isVisible } = useNavVisibility();
 
   return (
@@ -92,7 +94,14 @@ export function Sidebar({ onNewTask, projects = [], closedProjects = [], onNewPr
       {/* Projects Section */}
       <div className={styles.projectsSection}>
         <div className={styles.projectsHeader}>
-          <span className={styles.projectsTitle}>Projects</span>
+          <button
+            className={styles.projectsToggle}
+            onClick={() => setProjectsExpanded(prev => !prev)}
+            aria-label={projectsExpanded ? 'Collapse projects' : 'Expand projects'}
+          >
+            {projectsExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+            <span className={styles.projectsTitle}>Projects</span>
+          </button>
           <button
             className={styles.addProjectBtn}
             onClick={onNewProject}
@@ -102,13 +111,23 @@ export function Sidebar({ onNewTask, projects = [], closedProjects = [], onNewPr
             <FolderPlus size={16} />
           </button>
         </div>
-        <DraggableProjectList
-          projects={projects}
-          activeProjectId={activeProjectId ?? null}
-          onSelectProject={(id) => { setActiveProjectId?.(id); onMobileClose?.(); }}
-          onEditProject={(project) => onEditProject?.(project)}
-          onReorder={(orderedIds) => onReorderProjects?.(orderedIds)}
-        />
+        {projectsExpanded && (
+          <DraggableProjectList
+            projects={projects}
+            activeProjectId={activeProjectId ?? null}
+            onSelectProject={(id) => {
+              if (id) {
+                setActiveProjectId?.(id);
+                navigate('/kanban', { state: { projectId: id } });
+              } else {
+                setActiveProjectId?.(null);
+              }
+              onMobileClose?.();
+            }}
+            onEditProject={(project) => onEditProject?.(project)}
+            onReorder={(orderedIds) => onReorderProjects?.(orderedIds)}
+          />
+        )}
 
         {closedProjects.length > 0 && (
           <div className={styles.closedSection}>
