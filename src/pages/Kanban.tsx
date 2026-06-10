@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, useLocation } from 'react-router-dom';
 import { LayoutDashboard, FolderPlus, Settings2 } from 'lucide-react';
 import { MainLayoutContext } from '../layout/MainLayout';
 import { KanbanBoard } from '../features/kanban/KanbanBoard';
@@ -8,11 +8,24 @@ import styles from './Kanban.module.css';
 export function Kanban() {
   const { projects, openEditTaskModal, onNewProject, onEditProject, reorderProjects } =
     useOutletContext<MainLayoutContext>();
+  const location = useLocation();
+
+  const getInitialProjectId = () => {
+    const stateId = (location.state as { projectId?: string } | null)?.projectId;
+    if (stateId && projects.some((p) => p.id === stateId)) return stateId;
+    return projects.length > 0 ? projects[0].id : null;
+  };
 
   // Selection is lifted here so the header buttons know the "current" project.
-  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
-    projects.length > 0 ? projects[0].id : null
-  );
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(getInitialProjectId);
+
+  // When navigating from sidebar with a specific project, update selection.
+  useEffect(() => {
+    const stateId = (location.state as { projectId?: string } | null)?.projectId;
+    if (stateId && projects.some((p) => p.id === stateId)) {
+      setSelectedProjectId(stateId);
+    }
+  }, [location.state, projects]);
 
   // Keep the selection valid as the project list changes (deleted/closed/added).
   useEffect(() => {
