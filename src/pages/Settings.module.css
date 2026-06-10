@@ -279,6 +279,27 @@
   font-style: normal;
 }
 
+.selectControl {
+  padding: var(--spacing-2) var(--spacing-3);
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  cursor: pointer;
+  min-width: 140px;
+  transition: border-color 0.15s ease;
+}
+
+.selectControl:hover {
+  border-color: var(--border-color);
+}
+
+.selectControl:focus {
+  outline: none;
+  border-color: var(--accent-sapphire);
+}
+
 .navToggleList {
   display: flex;
   flex-direction: column;

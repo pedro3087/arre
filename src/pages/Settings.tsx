@@ -1,4 +1,4 @@
-import { Settings as SettingsIcon, Sun, Moon, Laptop, LayoutDashboard } from 'lucide-react';
+import { Settings as SettingsIcon, Sun, Moon, Laptop, LayoutDashboard, Home } from 'lucide-react';
 import clsx from 'clsx';
 import styles from './Settings.module.css';
 import { useAuth } from '../lib/auth/AuthContext';
@@ -10,6 +10,7 @@ import { db, functions } from '../lib/firebase';
 import { httpsCallable } from 'firebase/functions';
 import { NAV_ITEMS } from '../layout/Sidebar';
 import { useNavVisibility } from '../features/navigation/NavVisibilityProvider';
+import { DEFAULT_PAGE_KEY } from '../App';
 
 interface GoogleTaskList {
   id: string;
@@ -26,6 +27,9 @@ export function Settings() {
   const { user, connectGoogleTasks, disconnectGoogleTasks, connectGoogleCalendar, disconnectGoogleCalendar } = useAuth();
   const { theme, setTheme } = useTheme();
   const { isVisible, toggleItem } = useNavVisibility();
+  const [defaultPage, setDefaultPage] = useState(
+    () => localStorage.getItem(DEFAULT_PAGE_KEY) ?? '/'
+  );
   const [isConnecting, setIsConnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -209,6 +213,28 @@ export function Settings() {
           <p className={styles.sectionDescription}>
             Choose which items appear in the sidebar and navigation.
           </p>
+          <div className={styles.navToggleRow}>
+            <div className={styles.navItemInfo}>
+              <Home size={16} />
+              <span>Landing page</span>
+            </div>
+            <select
+              className={styles.selectControl}
+              value={defaultPage}
+              onChange={(e) => {
+                const val = e.target.value;
+                setDefaultPage(val);
+                localStorage.setItem(DEFAULT_PAGE_KEY, val);
+              }}
+              aria-label="Default landing page"
+            >
+              {NAV_ITEMS.map((item) => (
+                <option key={item.path} value={item.path}>
+                  {item.label}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className={styles.navToggleList}>
             {NAV_ITEMS.map((item) => {
               const Icon = item.icon;
