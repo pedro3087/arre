@@ -20,6 +20,20 @@ import { ClosedProjectView } from './pages/ClosedProjectView';
 import { NavVisibilityProvider, useNavVisibility } from './features/navigation/NavVisibilityProvider';
 import { NAV_ITEMS } from './layout/Sidebar';
 
+export const DEFAULT_PAGE_KEY = 'default-page';
+
+function RootRoute() {
+  const hasChecked = sessionStorage.getItem('default-page-checked');
+  if (!hasChecked) {
+    sessionStorage.setItem('default-page-checked', '1');
+    const pref = localStorage.getItem(DEFAULT_PAGE_KEY);
+    if (pref && pref !== '/') {
+      return <Navigate to={pref} replace />;
+    }
+  }
+  return <Dashboard />;
+}
+
 function RedirectIfHidden() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -51,7 +65,7 @@ function App() {
                 <MainLayout />
               </ProtectedRoute>
             }>
-              <Route path="/" element={<Dashboard />} />
+              <Route path="/" element={<RootRoute />} />
               <Route path="/inbox" element={<Inbox />} />
               <Route path="/upcoming" element={<Upcoming />} />
               <Route path="/anytime" element={<Anytime />} />
